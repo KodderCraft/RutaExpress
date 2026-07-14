@@ -15,20 +15,9 @@
 
 <body>
 
-<header>
+    <div th:replace="~{componentes/header :: header}" ></div>
 
-    <div class="logo">
-        <h1>RutaExpress</h1>
-    </div>
-
-    <nav>
-        <a href="/">Inicio</a>
-        <a href="/">Servicios</a>
-        <a href="/login">Ingresar</a>
-    </nav>
-
-</header>
-
+    
 <div class="login-container">
 
 
@@ -41,61 +30,72 @@
 
 
 
-        <form th:action="@{/validar}" th:object="${cliente}" method="post">
+      <form th:action="@{/validar}" th:object="${usuario}" method="post">
 
+    <div class="input-group">
+        <label>Nombre completo</label>
+        <input
+            type="text"
+            th:field="*{nombre}"
+            placeholder="Juan Pérez"
+            required>
+    </div>
 
-            <div class="input-group">
+    <div class="input-group">
+        <label>Correo</label>
+        <input
+            type="email"
+            th:field="*{email}"
+            placeholder="correo@ejemplo.com"
+            required>
+    </div>
 
-                <label>Nombre completo</label>
+    <div class="input-group">
+        <label>Contraseña</label>
+        <input
+            type="password"
+            th:field="*{password}"
+            placeholder="********"
+            required>
+    </div>
 
-                <input 
-                    type="text"
-                    th:field="*{nombre}"
-                    placeholder="Juan Pérez"
-                    required>
+    <div class="input-group">
+        <label>Teléfono</label>
+        <input
+            type="text"
+            th:field="*{telefono}"
+            placeholder="0999999999"
+            required>
+    </div>
 
-            </div>
+    <div class="input-group">
+    <label>Rol</label>
 
+    <div class="roles">
 
+        <label class="rol-card">
+            <input type="radio" th:field="*{rol}" value="CLIENTE">
+            <span>Cliente</span>
+        </label>
 
-            <div class="input-group">
+        <label class="rol-card">
+            <input type="radio" th:field="*{rol}" value="REPARTIDOR">
+            <span>Repartidor</span>
+        </label>
 
-                <label>Correo</label>
+        <label class="rol-card">
+            <input type="radio" th:field="*{rol}" value="ADMINISTRADOR">
+            <span>Administrador</span>
+        </label>
 
-                <input 
-                    type="email"
-                    th:field="*{correo}"
-                    placeholder="correo@ejemplo.com"
-                    required>
+    </div>
+    </div>
 
-            </div>
+    <button type="submit">
+        Registrarse
+    </button>
 
-
-
-
-
-
-            <div class="input-group">
-
-                <label>Contraseña</label>
-
-                <input 
-                    type="password"
-                    th:field="*{password}"
-                    placeholder="********"
-                    required>
-
-            </div>
-
-
-
-            <button type="submit">
-                Registrarse
-            </button>
-
-
-        </form>
-
+</form>
 
 
         <p>
@@ -115,6 +115,7 @@
 
 </div>
 
+<div th:replace="~{componentes/footer :: footer}" ></div>
 
 </body>
 

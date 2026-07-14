@@ -1,0 +1,48 @@
+<aside class="sidebar" th:fragment="sidebarCliente" >
+
+    <div class="sidebar-logo">
+        <h2>RutaExpress</h2>
+    </div>
+
+    <div class="sidebar-user">
+        <div class="avatar">
+            👤
+        </div>
+
+        <h4 th:text="${session.usuario.nombre}"></h4>
+        <span th:text="${session.usuario.rol}">Cliente</span>
+    </div>
+
+    <nav class="sidebar-menu">
+
+        <a th:href="@{/cliente/dashboard}">
+            🏠 Dashboard
+        </a>
+
+        <a th:href="@{/cliente/nuevo-envio}">
+            📦 Nuevo envío
+        </a>
+
+        <a th:href="@{/cliente/mis-envios}">
+            🚚 Mis envíos
+        </a>
+
+        <a th:href="@{/cliente/seguimiento}">
+            📍 Seguimiento
+        </a>
+
+        <a th:href="@{/cliente/pagos}">
+            💳 Pagos
+        </a>
+
+        <a th:href="@{/cliente/perfil}">
+            👤 Mi perfil
+        </a>
+
+        <a th:href="@{/cliente/configuracion}">
+            ⚙ Configuración
+        </a>
+
+    </nav>
+
+</aside>

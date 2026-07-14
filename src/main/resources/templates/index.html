@@ -12,20 +12,9 @@
 
 <body>
 
-<header>
+    <div th:replace="~{componentes/header :: header}" ></div>
 
-    <div class="logo">
-        <h1>RutaExpress</h1>
-    </div>
 
-    <nav>
-        <a href="/">Inicio</a>
-        <a href="#servicio">Servicios</a>
-    
-        <a href="/login">Ingresar</a>
-    </nav>
-
-</header>
 
 
 <section class="inicio">
@@ -112,13 +101,8 @@
 
 </section>
 
-<footer>
 
-    <p>
-        © 2026 RutaExpress - Sistema de entregas
-    </p>
-
-</footer>
+<div th:replace="~{componentes/footer :: footer}" ></div>
 
 
 </body>

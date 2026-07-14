@@ -15,19 +15,8 @@
 
 <body>
 
-<header>
+        <div th:replace="~{componentes/header :: header}" ></div>
 
-    <div class="logo">
-        <h1>RutaExpress</h1>
-    </div>
-
-    <nav>
-        <a href="/">Inicio</a>
-        <a href="/">Servicios</a>
-        <a href="/login">Ingresar</a>
-    </nav>
-
-</header>
 
 <div class="login-container">
 
@@ -48,7 +37,7 @@
 
             <div class="input-group">
 
-                <label>Nombre completo</label>
+                <label>Nombre </label>
 
                 <input 
                     type="text"
@@ -100,6 +89,7 @@
 
 </div>
 
+<div th:replace="~{componentes/footer :: footer}" ></div>
 
 </body>
 

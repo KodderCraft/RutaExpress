@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RutaExpress - Servicio de Entregas</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:fragment="header" >
+
+    <div class="logo">
+        <a href="/" style="text-decoration: none;"><h1>RutaExpress</h1></a> 
+    </div>
+
+<nav class="navbar">
+
+
+    <div class="menu">
+        <a class="dropbtn" th:href="@{/}">Inicio</a>
+        <a class="dropbtn" th:href="@{/}">Servicios</a>
+    
+
+    <div th:if="${session.usuario == null}">
+        <a class="btn-login" th:href="@{/login}">Ingresar</a>
+    </div>
+
+    <div th:if="${session.usuario != null}" class="dropdown">
+
+        <button class="dropbtn">
+        <span th:text="${session.usuario.nombre}"></span> 
+        </button>
+
+        <div class="dropdown-content">
+            <a th:href="@{/dashboard}">Mi perfil</a>
+            <a th:href="@{/configuracion}">Configuración</a>
+            <!-- <a th:href="@{/preguntas}">Preguntas frecuentes</a> -->
+            <hr>
+            <a th:href="@{/logout}">Cerrar sesión</a>
+        </div>
+        </div>
+    </div>
+
+</nav>
+</header>
+
+</body>
+</html>
