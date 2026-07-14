@@ -39,12 +39,6 @@
 
         <h2>Iniciar sesión  </h2>
 
-        <div th:if="${error}" style="color: red; margin-bottom: 15px;">
-    <p th:text="${error}"></p>
-</div>
-
-        <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
-
 
             <div class="input-group">
 
@@ -52,11 +46,12 @@
 
                 <input 
                     type="text"
-                    th:field="*{nombre}"
+
                     placeholder="Juan Pérez"
                     required>
 
             </div>
+
 
 
             <div class="input-group">
@@ -65,7 +60,6 @@
 
                 <input 
                     type="password"
-                    th:field="*{password}"
 
                     placeholder="********"
                     required>
@@ -79,7 +73,7 @@
             </button>
 
 
-        </form> 
+
 
 
 
