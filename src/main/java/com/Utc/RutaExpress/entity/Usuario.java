@@ -1,44 +1,44 @@
 package com.Utc.RutaExpress.entity;
-import jakarta.persistence.*;
 
+import jakarta.persistence.*;
+import java.time.LocalDate;
+
+// Tabla usuarios: guarda cliente, repartidor y administrador en una sola tabla, diferenciados por rol
 @Entity
 @Table(name = "usuarios")
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Usuario {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String nombreCompleto;
+    private String nombre;
 
     @Column(nullable = false, unique = true)
-    private String correo;
-
-    @Column(nullable = false, unique = true)
-    private String cedula;
-
-    private String telefono;
+    private String email;
 
     @Column(nullable = false)
+    // El backend debe guardar aqui el hash (bcrypt), nunca la contrasena en texto plano
     private String password;
+
+    private String telefono;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol;
 
-    private boolean activo = true;
+    @Column(nullable = false)
+    private LocalDate fechaRegistro = LocalDate.now();
 
-    protected Usuario() {
+    public Usuario() {
     }
 
-    protected Usuario(String nombreCompleto, String correo, String cedula, String telefono, String password, Rol rol) {
-        this.nombreCompleto = nombreCompleto;
-        this.correo = correo;
-        this.cedula = cedula;
-        this.telefono = telefono;
+    public Usuario(String nombre, String email, String password, String telefono, Rol rol) {
+        this.nombre = nombre;
+        this.email = email;
         this.password = password;
+        this.telefono = telefono;
         this.rol = rol;
     }
 
@@ -46,36 +46,20 @@ public abstract class Usuario {
         return id;
     }
 
-    public String getNombreCompleto() {
-        return nombreCompleto;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public String getCedula() {
-        return cedula;
-    }
-
-    public void setCedula(String cedula) {
-        this.cedula = cedula;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -86,15 +70,23 @@ public abstract class Usuario {
         this.password = password;
     }
 
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
     public Rol getRol() {
         return rol;
     }
 
-    public boolean isActivo() {
-        return activo;
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 
-    public void setActivo(boolean activo) {
-        this.activo = activo;
+    public LocalDate getFechaRegistro() {
+        return fechaRegistro;
     }
 }

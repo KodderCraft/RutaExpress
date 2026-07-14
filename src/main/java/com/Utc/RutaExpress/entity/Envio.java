@@ -1,7 +1,10 @@
 package com.Utc.RutaExpress.entity;
+
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+// Tabla envios: paquete que un cliente registra para que un repartidor lo entregue
 @Entity
 @Table(name = "envios")
 public class Envio {
@@ -10,22 +13,20 @@ public class Envio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Codigo publico para rastrear el envio (ej. SE-00001); lo genera el backend, no el cliente
     @Column(nullable = false, unique = true)
-    private String codigoSeguimiento;
+    private String codigoGuia;
 
     @ManyToOne
     @JoinColumn(name = "remitente_id", nullable = false)
-    private Cliente remitente;
-
-    @Column(nullable = false)
-    private String destinatarioNombre;
-
-    @Column(nullable = false)
-    private String destinatarioTelefono;
+    private Usuario remitente;
 
     @ManyToOne
-    @JoinColumn(name = "direccion_destino_id", nullable = false)
-    private Direccion direccionDestino;
+    @JoinColumn(name = "destinatario_id", nullable = false)
+    private Usuario destinatario;
+
+    @Column(nullable = false)
+    private String direccionEntrega;
 
     @ManyToOne
     @JoinColumn(name = "sucursal_origen_id", nullable = false)
@@ -35,16 +36,19 @@ public class Envio {
     @JoinColumn(name = "sucursal_destino_id", nullable = false)
     private Sucursal sucursalDestino;
 
-    private double peso;
-    private double alto;
-    private double ancho;
-    private double largo;
+    // Sin @Column(nullable = false): el envio puede no tener repartidor asignado todavia
+    @ManyToOne
+    @JoinColumn(name = "repartidor_id")
+    private Usuario repartidor;
+
+    private BigDecimal peso;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoServicio tipoServicio;
 
-    private double costo;
+    // Lo calcula el backend (costoBase de la tarifa + peso * costoKgAdicional); el cliente nunca lo envia
+    private BigDecimal costoTotal;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,6 +57,8 @@ public class Envio {
     @Column(nullable = false)
     private LocalDateTime fechaRegistro = LocalDateTime.now();
 
+    private LocalDateTime fechaEntrega;
+
     public Envio() {
     }
 
@@ -60,44 +66,36 @@ public class Envio {
         return id;
     }
 
-    public String getCodigoSeguimiento() {
-        return codigoSeguimiento;
+    public String getCodigoGuia() {
+        return codigoGuia;
     }
 
-    public void setCodigoSeguimiento(String codigoSeguimiento) {
-        this.codigoSeguimiento = codigoSeguimiento;
+    public void setCodigoGuia(String codigoGuia) {
+        this.codigoGuia = codigoGuia;
     }
 
-    public Cliente getRemitente() {
+    public Usuario getRemitente() {
         return remitente;
     }
 
-    public void setRemitente(Cliente remitente) {
+    public void setRemitente(Usuario remitente) {
         this.remitente = remitente;
     }
 
-    public String getDestinatarioNombre() {
-        return destinatarioNombre;
+    public Usuario getDestinatario() {
+        return destinatario;
     }
 
-    public void setDestinatarioNombre(String destinatarioNombre) {
-        this.destinatarioNombre = destinatarioNombre;
+    public void setDestinatario(Usuario destinatario) {
+        this.destinatario = destinatario;
     }
 
-    public String getDestinatarioTelefono() {
-        return destinatarioTelefono;
+    public String getDireccionEntrega() {
+        return direccionEntrega;
     }
 
-    public void setDestinatarioTelefono(String destinatarioTelefono) {
-        this.destinatarioTelefono = destinatarioTelefono;
-    }
-
-    public Direccion getDireccionDestino() {
-        return direccionDestino;
-    }
-
-    public void setDireccionDestino(Direccion direccionDestino) {
-        this.direccionDestino = direccionDestino;
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = direccionEntrega;
     }
 
     public Sucursal getSucursalOrigen() {
@@ -116,36 +114,20 @@ public class Envio {
         this.sucursalDestino = sucursalDestino;
     }
 
-    public double getPeso() {
+    public Usuario getRepartidor() {
+        return repartidor;
+    }
+
+    public void setRepartidor(Usuario repartidor) {
+        this.repartidor = repartidor;
+    }
+
+    public BigDecimal getPeso() {
         return peso;
     }
 
-    public void setPeso(double peso) {
+    public void setPeso(BigDecimal peso) {
         this.peso = peso;
-    }
-
-    public double getAlto() {
-        return alto;
-    }
-
-    public void setAlto(double alto) {
-        this.alto = alto;
-    }
-
-    public double getAncho() {
-        return ancho;
-    }
-
-    public void setAncho(double ancho) {
-        this.ancho = ancho;
-    }
-
-    public double getLargo() {
-        return largo;
-    }
-
-    public void setLargo(double largo) {
-        this.largo = largo;
     }
 
     public TipoServicio getTipoServicio() {
@@ -156,12 +138,12 @@ public class Envio {
         this.tipoServicio = tipoServicio;
     }
 
-    public double getCosto() {
-        return costo;
+    public BigDecimal getCostoTotal() {
+        return costoTotal;
     }
 
-    public void setCosto(double costo) {
-        this.costo = costo;
+    public void setCostoTotal(BigDecimal costoTotal) {
+        this.costoTotal = costoTotal;
     }
 
     public EstadoEnvio getEstado() {
@@ -174,5 +156,13 @@ public class Envio {
 
     public LocalDateTime getFechaRegistro() {
         return fechaRegistro;
+    }
+
+    public LocalDateTime getFechaEntrega() {
+        return fechaEntrega;
+    }
+
+    public void setFechaEntrega(LocalDateTime fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
     }
 }

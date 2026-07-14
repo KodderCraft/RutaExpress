@@ -1,30 +1,63 @@
 package com.Utc.RutaExpress.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+// Tabla repartidores: datos extra que solo aplican a un usuario con rol REPARTIDOR
 @Entity
 @Table(name = "repartidores")
-public class Repartidor extends Usuario {
+public class Repartidor {
 
-    private String placaVehiculo;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // unique = true asegura que un mismo usuario no tenga mas de una fila de repartidor
+    @OneToOne
+    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    private Usuario usuario;
+
+    private String vehiculoTipo;
+
+    private String placa;
+
+    @Column(nullable = false)
     private boolean disponible = true;
 
     public Repartidor() {
-        super();
     }
 
-    public Repartidor(String nombreCompleto, String correo, String cedula, String telefono, String password, String placaVehiculo) {
-        super(nombreCompleto, correo, cedula, telefono, password, Rol.REPARTIDOR);
-        this.placaVehiculo = placaVehiculo;
+    public Repartidor(Usuario usuario, String vehiculoTipo, String placa) {
+        this.usuario = usuario;
+        this.vehiculoTipo = vehiculoTipo;
+        this.placa = placa;
     }
 
-    public String getPlacaVehiculo() {
-        return placaVehiculo;
+    public Long getId() {
+        return id;
     }
 
-    public void setPlacaVehiculo(String placaVehiculo) {
-        this.placaVehiculo = placaVehiculo;
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getVehiculoTipo() {
+        return vehiculoTipo;
+    }
+
+    public void setVehiculoTipo(String vehiculoTipo) {
+        this.vehiculoTipo = vehiculoTipo;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
     }
 
     public boolean isDisponible() {
