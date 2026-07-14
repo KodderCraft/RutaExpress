@@ -41,7 +41,7 @@
 
 
 
-        <form action="/registro" method="post">
+        <form th:action="@{/validar}" th:object="${cliente}" method="post">
 
 
             <div class="input-group">
@@ -50,7 +50,7 @@
 
                 <input 
                     type="text"
-                    name="nombre"
+                    th:field="*{nombre}"
                     placeholder="Juan Pérez"
                     required>
 
@@ -64,7 +64,7 @@
 
                 <input 
                     type="email"
-                    name="correo"
+                    th:field="*{correo}"
                     placeholder="correo@ejemplo.com"
                     required>
 
@@ -81,7 +81,7 @@
 
                 <input 
                     type="password"
-                    name="password"
+                    th:field="*{password}"
                     placeholder="********"
                     required>
 
