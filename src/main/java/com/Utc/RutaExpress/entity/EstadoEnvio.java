@@ -1,8 +1,8 @@
 package com.Utc.RutaExpress.entity;
 
+// Progreso de un envio; el backend solo debe permitir avanzar en este orden, nunca retroceder
 public enum EstadoEnvio {
     REGISTRADO,
-    RECIBIDO_EN_SUCURSAL,
     EN_TRANSITO,
     EN_REPARTO,
     ENTREGADO

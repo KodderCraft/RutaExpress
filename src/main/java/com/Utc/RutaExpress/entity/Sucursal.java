@@ -1,6 +1,8 @@
 package com.Utc.RutaExpress.entity;
+
 import jakarta.persistence.*;
 
+// Tabla sucursales: puntos fisicos de origen/destino de los envios
 @Entity
 @Table(name = "sucursales")
 public class Sucursal {
@@ -12,17 +14,17 @@ public class Sucursal {
     @Column(nullable = false)
     private String nombre;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "direccion_id", nullable = false)
-    private Direccion direccion;
+    @Column(nullable = false)
+    private String ciudad;
 
-    private boolean activa = true;
+    private String direccion;
 
     public Sucursal() {
     }
 
-    public Sucursal(String nombre, Direccion direccion) {
+    public Sucursal(String nombre, String ciudad, String direccion) {
         this.nombre = nombre;
+        this.ciudad = ciudad;
         this.direccion = direccion;
     }
 
@@ -38,19 +40,19 @@ public class Sucursal {
         this.nombre = nombre;
     }
 
-    public Direccion getDireccion() {
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public String getDireccion() {
         return direccion;
     }
 
-    public void setDireccion(Direccion direccion) {
+    public void setDireccion(String direccion) {
         this.direccion = direccion;
-    }
-
-    public boolean isActiva() {
-        return activa;
-    }
-
-    public void setActiva(boolean activa) {
-        this.activa = activa;
     }
 }
