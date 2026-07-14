@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RutaExpress - Registro</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo">
+        <h1>RutaExpress</h1>
+    </div>
+
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/">Servicios</a>
+        <a href="/login">Ingresar</a>
+    </nav>
+
+</header>
+
+<div class="login-container">
+
+
+    <div class="login-box">
+
+
+        <h1>RutaExpress</h1>
+
+        <h2>Iniciar sesión  </h2>
+
+        <div th:if="${error}" style="color: red; margin-bottom: 15px;">
+    <p th:text="${error}"></p>
+</div>
+
+        <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
+
+
+            <div class="input-group">
+
+                <label>Nombre completo</label>
+
+                <input 
+                    type="text"
+                    th:field="*{nombre}"
+                    placeholder="Juan Pérez"
+                    required>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Contraseña</label>
+
+                <input 
+                    type="password"
+                    th:field="*{password}"
+
+                    placeholder="********"
+                    required>
+
+            </div>
+
+
+
+            <button type="submit">
+                Iniciar sesión
+            </button>
+
+
+        </form> 
+
+
+
+        <p>
+
+            ¿no tienes cuenta?
+
+            <a href="/registro">
+                Crear cuenta
+            </a>
+
+        </p>
+
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
