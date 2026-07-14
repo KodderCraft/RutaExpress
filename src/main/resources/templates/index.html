@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RutaExpress - Servicio de Entregas</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        <h1>RutaExpress</h1>
+    </div>
+
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="#servicio">Servicios</a>
+    
+        <a href="/login">Ingresar</a>
+    </nav>
+
+</header>
+
+
+<section class="inicio">
+
+    <div class="contenido">
+
+        <h2>
+            Entregas rápidas, seguras y confiables
+        </h2>
+
+        <p>
+            Conecta tus paquetes con cualquier destino.
+            Selecciona la ubicación, calcula la ruta y realiza
+            el seguimiento de tu envío en tiempo real.
+        </p>
+
+        <div class="botones">
+
+            <a href="/registro" class="btn">
+                Crear cuenta
+            </a>
+
+            <a href="/login" class="btn secundario">
+                Iniciar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="imagen" style="display: flex; justify-content: center; align-items: center;">
+
+        <!-- <div id="mapa">
+        </div> -->
+        <img src="/images/logo.jpg"  alt="Logo RutaExpress" style="width: 400px; height: 400px; border-radius: 50%; " >
+    </div>
+
+
+</section>
+
+
+<section class="servicios" id="servicio">
+
+    <h2>Nuestros servicios</h2>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>📦 Envíos</h3>
+            <p>
+                Envía paquetes de forma rápida y segura.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>📍 Seguimiento</h3>
+            <p>
+                Consulta el estado de tu pedido.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>🗺️ Rutas inteligentes</h3>
+            <p>
+                Calculamos la mejor ruta mediante Google Maps.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="servicios" style="background-color: #f9f9f9;">
+    <h2>Productos</h2>
+
+    <div class="cards">
+
+
+
+    </div>
+
+</section>
+
+<footer>
+
+    <p>
+        © 2026 RutaExpress - Sistema de entregas
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
