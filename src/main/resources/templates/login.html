@@ -15,8 +15,19 @@
 
 <body>
 
-        <div th:replace="~{componentes/header :: header}" ></div>
+<header>
 
+    <div class="logo">
+        <h1>RutaExpress</h1>
+    </div>
+
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/">Servicios</a>
+        <a href="/login">Ingresar</a>
+    </nav>
+
+</header>
 
 <div class="login-container">
 
@@ -28,19 +39,24 @@
 
         <h2>Iniciar sesión  </h2>
 
+        <div th:if="${error}" style="color: red; margin-bottom: 15px;">
+    <p th:text="${error}"></p>
+</div>
+
+        <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
+
 
             <div class="input-group">
 
-                <label>Nombre </label>
+                <label>Nombre completo</label>
 
                 <input 
                     type="text"
-
+                    th:field="*{nombre}"
                     placeholder="Juan Pérez"
                     required>
 
             </div>
-
 
 
             <div class="input-group">
@@ -49,6 +65,7 @@
 
                 <input 
                     type="password"
+                    th:field="*{password}"
 
                     placeholder="********"
                     required>
@@ -62,7 +79,7 @@
             </button>
 
 
-
+        </form> 
 
 
 
@@ -83,7 +100,6 @@
 
 </div>
 
-<div th:replace="~{componentes/footer :: footer}" ></div>
 
 </body>
 
