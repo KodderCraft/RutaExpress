@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 
 import com.Utc.RutaExpress.DTO.loginValidar;
@@ -16,10 +17,10 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/")
-public class controller {
+public class controllerPrincipal {
     private final UsuarioService usuarioService;
     
-    public controller(UsuarioService ser){
+    public controllerPrincipal(UsuarioService ser){
         this.usuarioService = ser;
     }
 
@@ -28,17 +29,22 @@ public class controller {
         return "index";
     }
     
-    @GetMapping("/registro")
-    public String registro(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        model.addAttribute("roles", Rol.values());
+    // @GetMapping("/registro")
+    // public String registro(Model model) {
+    //     model.addAttribute("usuario", new Usuario());
+    //     model.addAttribute("roles", Rol.values());
 
-        return "registro";
-    }
+    //     return "registro";
+    // }
+
     
     @GetMapping("/login")
-    public String login(Model model ) {
+    public String login(@RequestParam(defaultValue = "login") String panel,Model model ) {
         model.addAttribute("loginRequest", new loginValidar());
+        model.addAttribute("usuario", new Usuario());
+        model.addAttribute("roles", Rol.values());
+        model.addAttribute("panel", panel);
+
         return "login";
     }
 
@@ -50,11 +56,13 @@ public class controller {
 
         if (acceso != null) {
             session.setAttribute("usuario", acceso);
-
+            System.out.println("error");
             return "redirect:/dashboard";
         }
 
         model.addAttribute("error", "Correo o contraseña incorrectos");
+        model.addAttribute("usuario", new Usuario());
+
         return "login";
     }
 

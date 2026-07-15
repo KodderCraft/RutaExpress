@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.Utc.RutaExpress.repository.UsuarioRepository;
 import com.Utc.RutaExpress.DTO.loginValidar;
 import com.Utc.RutaExpress.entity.Usuario;
-import com.Utc.RutaExpress.DTO.loginValidar;
 @Service
 public class UsuarioService {
 
