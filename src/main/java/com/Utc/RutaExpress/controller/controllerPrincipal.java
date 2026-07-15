@@ -43,7 +43,7 @@ public class controllerPrincipal {
         model.addAttribute("loginRequest", new loginValidar());
         model.addAttribute("usuario", new Usuario());
         model.addAttribute("roles", Rol.values());
-        model.addAttribute("panel", panel);
+        
 
         return "login";
     }

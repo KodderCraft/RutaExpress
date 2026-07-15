@@ -72,8 +72,8 @@
   .auth-tabs{display:flex;gap:6px;background:var(--paper);border-radius:11px;padding:4px;margin-bottom:22px;}
   .auth-tab{flex:1;background:transparent;border:none;padding:10px;border-radius:8px;font-weight:600;font-size:.86rem;color:var(--mute);cursor:pointer;}
   .auth-tab.active{background:#fff;color:var(--ink);box-shadow:var(--shadow);}
-  .role-picker{display:grid;grid-template-columns:repeat(3,1.2fr);gap:8px;margin-bottom:18px;}
-  .role-pick{border:1.5px solid var(--line);border-radius:11px;padding:12px 6px;text-align:center;cursor:pointer;background:#fff;}
+  .role-picker{  display:grid;grid-template-columns:repeat(3,1.2fr);gap:8px;margin-bottom:18px;}
+  .role-pick{position: relative; border:1.5px solid var(--line);border-radius:11px;padding:12px 6px;text-align:center;cursor:pointer;background:#fff;}
   .role-pick .icon{width:19px;height:19px;color:var(--mute);margin-bottom:6px;}
   .role-pick span{display:block;font-size:.72rem;font-weight:700;color:var(--mute);}
   .role-pick.active{border-color:var(--amber);background:var(--amber-tint);}
