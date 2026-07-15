@@ -48,7 +48,7 @@
 
       <!-- LOGIN -->
     <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
-      <div class="auth-subpanel " th:classappend="${panel=='login'} ? 'active'" data-authpanel="login">
+      <div class="auth-subpanel active" data-authpanel="login">
         <div class="field"><label>Nombre</label><input th:field="*{nombre}" type="text" placeholder="Juan P"></div>
         <div class="field"><label>Contraseña</label><input th:field="*{password}" type="password" placeholder="••••••••"></div>
         <div style="display:flex;justify-content:space-around ;align-items:center;margin:20px 16px;font-size:.8rem;">
@@ -64,12 +64,12 @@
       <!-- REGISTRO -->
     <form th:action="@{/validar}" th:object="${usuario}" method="post">
 
-      <div class="auth-subpanel " th:classappend="${panel=='registro'} ? 'active'" data-authpanel="registro">
+      <div class="auth-subpanel "  data-authpanel="registro">
         <p class="hint" style="margin:10px 0;">Selecciona tu tipo de usuario</p>
       <div class="role-picker">
-        <div class="role-pick active" data-authrole="remitente"><i data-icon="send"></i><input type="radio" th:field="*{rol}" value="CLIENTE" style="display:none;"/><span>Cliente</span></div>
-        <div class="role-pick" data-authrole="repartidor"><i data-icon="truck"></i> <input type="radio" th:field="*{rol}" value="REPARTIDOR" style="display:none;"/><span>Repartidor</span></div>
-        <div class="role-pick" data-authrole="admin"> <i data-icon="chart"></i> <input  type="radio" th:field="*{rol}" value="ADMINISTRADOR" style="display:none;"/><span>Administrador</span></div>
+        <div class="role-pick" data-authrole="remitente"><i data-icon="send"></i><input type="radio" th:field="*{rol}" value="CLIENTE" style="display: none; " /><span>Cliente</span></div>
+        <div class="role-pick" data-authrole="repartidor"><i data-icon="truck"></i> <input type="radio" th:field="*{rol}" value="REPARTIDOR" style="display: none; "/><span>Repartidor</span></div>
+        <div class="role-pick" data-authrole="admin"> <i data-icon="chart"></i> <input  type="radio" th:field="*{rol}" value="ADMINISTRADOR" style="display: none; "/><span>Administrador</span></div>
       </div>
 
         <div class="field-row">
