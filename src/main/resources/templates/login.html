@@ -9,97 +9,86 @@
     <title>RutaExpress - Registro</title>
 
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/stilos.css}">
+
 
 </head>
 
 
 <body>
+      <div th:replace="~{componentes/header :: header}" ></div>
 
-<header>
 
-    <div class="logo">
-        <h1>RutaExpress</h1>
+<div class="auth-wrap" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-side">
+      <div>
+        <div class="brand">
+            <img th:src="@{/img/RutaExpres-logo.jpg}" alt="logo" style=" height: 120px; border-radius:5px  20px 50% 16%;">
+            <div>RutaExpress<br><small>Inicie Secion</small></div></div>
+        <div class="pitch">
+          <h2>Un solo sistema para Clientes, Repartidores.</h2>
+          <p>Todos los usuarios deben registrarse y autenticarse antes de acceder a sus funciones dentro de la plataforma.</p>
+        </div>
+        <div class="steps">
+          <div><i data-icon="check"></i>Registro y validación de identidad</div>
+          <div><i data-icon="check"></i>Un rol distinto según el tipo de usuario</div>
+        </div>
+      </div>
+      <div class="foot" style="margin-top: 20px;">© ServiEntrega — Demo de interfaz, datos ilustrativos</div>
     </div>
 
-    <nav>
-        <a href="/">Inicio</a>
-        <a href="/">Servicios</a>
-        <a href="/login">Ingresar</a>
-    </nav>
+    <div class="auth-main">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-authtab="login">Iniciar sesión</button>
+        <button class="auth-tab" data-authtab="registro">Crear cuenta</button>
+      </div>
 
-</header>
+      
 
-<div class="login-container">
-
-
-    <div class="login-box">
-
-
-        <h1>RutaExpress</h1>
-
-        <h2>Iniciar sesión  </h2>
-
-        <div th:if="${error}" style="color: red; margin-bottom: 15px;">
-    <p th:text="${error}"></p>
-</div>
-
-        <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
-
-
-            <div class="input-group">
-
-                <label>Nombre completo</label>
-
-                <input 
-                    type="text"
-                    th:field="*{nombre}"
-                    placeholder="Juan Pérez"
-                    required>
-
+      <!-- LOGIN -->
+    <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
+      <div class="auth-subpanel " th:classappend="${panel=='login'} ? 'active'" data-authpanel="login">
+        <div class="field"><label>Nombre</label><input th:field="*{nombre}" type="text" placeholder="Juan P"></div>
+        <div class="field"><label>Contraseña</label><input th:field="*{password}" type="password" placeholder="••••••••"></div>
+        <div style="display:flex;justify-content:space-around ;align-items:center;margin:20px 16px;font-size:.8rem;">
+          <div th:if="${error}" style="color: red; ">
+                <p th:text="${error}"></p>
             </div>
+          <a href="#" style="font-size:.8rem;color:var(--amber-dark);text-decoration:none;">Informacion </a>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
+        
+    </div>
+    </form> 
+      <!-- REGISTRO -->
+    <form th:action="@{/validar}" th:object="${usuario}" method="post">
 
+      <div class="auth-subpanel " th:classappend="${panel=='registro'} ? 'active'" data-authpanel="registro">
+        <p class="hint" style="margin:10px 0;">Selecciona tu tipo de usuario</p>
+      <div class="role-picker">
+        <div class="role-pick active" data-authrole="remitente"><i data-icon="send"></i><input type="radio" th:field="*{rol}" value="CLIENTE" style="display:none;"/><span>Cliente</span></div>
+        <div class="role-pick" data-authrole="repartidor"><i data-icon="truck"></i> <input type="radio" th:field="*{rol}" value="REPARTIDOR" style="display:none;"/><span>Repartidor</span></div>
+        <div class="role-pick" data-authrole="admin"> <i data-icon="chart"></i> <input  type="radio" th:field="*{rol}" value="ADMINISTRADOR" style="display:none;"/><span>Administrador</span></div>
+      </div>
 
-            <div class="input-group">
+        <div class="field-row">
 
-                <label>Contraseña</label>
-
-                <input 
-                    type="password"
-                    th:field="*{password}"
-
-                    placeholder="********"
-                    required>
-
-            </div>
-
-
-
-            <button type="submit">
-                Iniciar sesión
-            </button>
-
-
-        </form> 
-
-
-
-        <p>
-
-            ¿no tienes cuenta?
-
-            <a href="/registro">
-                Crear cuenta
-            </a>
-
-        </p>
-
-
+          <div class="field"><label>Nombres</label><input th:field="*{nombre}" type="text" placeholder="Ej. Ana Ruiz"></div>
+          <div class="field"><label>Teléfono</label><input th:field="*{telefono}" type="text" placeholder="09XXXXXXXX"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Correo electrónico</label><input th:field="*{email}" type="email" placeholder="tu@correo.com"></div>
+        </div>
+        <div class="field"><label>Contraseña</label><input th:field="*{password}" type="password" placeholder="Crea una contraseña"></div>
+        <button type="submit" class="btn btn-dark btn-block" >Crear cuenta</button>
+      </div>
+    </form>
 
     </div>
-
-
+  </div>
 </div>
-
+    <script th:src="@{/scripts/controlDepaneles.js}"></script>
 
 </body>
 

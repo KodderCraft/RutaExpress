@@ -458,6 +458,8 @@ footer {
 }
 
 .dropdown-content{
+    /* border: 2px solid red ; */
+    
     display: none;
     position: absolute;
     right: 0;
@@ -469,10 +471,11 @@ footer {
 }
 
 .dropdown-content a{
+    
     display: block;
     padding: 12px 16px;
     text-decoration: none;
-    color: #333;
+    color: #323232;
 }
 
 .dropdown-content a:hover{

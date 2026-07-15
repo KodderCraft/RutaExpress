@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-        <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/stilos.css}">
 
 </head>
 <body>
@@ -10,10 +11,376 @@
     <!-- para el cliente  -->
     <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}" ></div>
 
-    <!-- <span th:text="${session.usuario.nombre}"></span>
-    <span th:text="${session.usuario.email}"></span>
-    <span th:text="${session.usuario.rol}"></span> -->
+    <div class="main">
+    <!-- INICIO -->
+    <div class="panel active" data-panel="inicio">
+      <div class="topbar">
+        <div><h1>Hola, <span th:text="${session.usuario.nombre}"></span>  👋</h1><div class="sub">Esto es lo que pasa con tus envíos hoy</div></div>
+        <div class="topbar-actions">
+          <div class="bell"><i data-icon="bell"></i></div>
+          <button class="btn btn-primary" onclick="goPanel('remitente','nuevo')"><i data-icon="plus"></i>Nuevo envío</button>
+        </div>
+      </div>
 
-    <div th:replace="~{componentes/footer :: footer}" ></div>
+      <div class="grid stat-grid">
+        <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div><span class="delta up">+2 hoy</span></div><div class="value">4</div><div class="label">Envíos activos</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div><span class="delta up">+18%</span></div><div class="value">27</div><div class="label">Entregados este mes</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value">$186.40</div><div class="label">Gastado este mes</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="alert"></i></div></div><div class="value">1</div><div class="label">Requiere tu atención</div></div>
+      </div>
+
+      <div class="grid two-col">
+        <div class="card" style=" width: 90%;">
+          <h3>Envíos recientes</h3>
+          <p class="hint">Seguimiento rápido de tus últimos paquetes</p>
+          <div class="table-wrap">
+            <table>
+              <tr><th>Código</th><th>Destinatario</th><th>Estado</th><th>Repartidor</th><th></th></tr>
+              <tr>
+                <td class="code">SE-48213</td>
+                <td>Carlos Peña</td>
+                <td><span class="badge reparto">En reparto</span></td>
+                <td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge T.</div></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="goPanel('remitente','rastrear')">Rastrear</button></td>
+              </tr>
+              <tr>
+                <td class="code">SE-48190</td>
+                <td>Ana Ruiz</td>
+                <td><span class="badge transito">En tránsito</span></td>
+                <td><div class="row-flex"><div class="mini-avatar">LP</div>Luis P.</div></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="goPanel('remitente','rastrear')">Rastrear</button></td>
+              </tr>
+              <tr>
+                <td class="code">SE-48072</td>
+                <td>Kiosco Central</td>
+                <td><span class="badge entregado">Entregado</span></td>
+                <td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge T.</div></td>
+                <td><button class="btn btn-ghost btn-sm">Calificar</button></td>
+              </tr>
+              <tr>
+                <td class="code">SE-47960</td>
+                <td>Diego Salas</td>
+                <td><span class="badge incidencia">Incidencia</span></td>
+                <td><div class="row-flex"><div class="mini-avatar">--</div>Sin asignar</div></td>
+                <td><button class="btn btn-coral btn-sm">Ver detalle</button></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="width: 100%;">
+          <h3>Envío SE-48213</h3>
+          <p class="hint">Camino a Carlos Peña · Cuenca</p>
+          <div class="route-tracker" style="margin-top:18px;">
+            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">Recogido</div><div class="time">9:10 a.m.</div></div>
+            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">En bodega</div><div class="time">10:40 a.m.</div></div>
+            <div class="step current"><div class="dot"><i data-icon="truck"></i></div><div class="label">En reparto</div><div class="time">Ahora</div></div>
+            <div class="step"><div class="dot"><i data-icon="mapPin"></i></div><div class="label">Entregado</div><div class="time">Est. 3:30 p.m.</div></div>
+          </div>
+          <div class="mapbox" style="min-height:150px;">
+            <div class="map-pill"><span class="dotlive"></span>En vivo</div>
+            <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 160 C 100 40, 180 190, 260 60 S 380 40, 385 30" stroke="#B9C3DE" stroke-width="3" fill="none" stroke-dasharray="6 8"/>
+              <circle cx="20" cy="160" r="6" fill="#0E8C7F"/>
+              <circle cx="385" cy="30" r="6" fill="#E7495A"/>
+              <circle cx="230" cy="95" r="9" fill="#FF9F1C"/>
+              <path d="M223 92h11v7h-11zM234 94h5l3 3v2h-8z" fill="#14213D"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- NUEVO ENVÍO -->
+
+    <div class="panel" data-panel="nuevo">
+
+    <div class="topbar">
+        <div>
+            <h1>Crear un nuevo envío</h1>
+            <div class="sub">Completa los datos de recogida y entrega</div>
+        </div>
+    </div>
+
+    <div class="grid two-col">
+
+        <div class="card" style="width: 100%;">
+
+            <h3>Detalles del envío</h3>
+
+            <div class="field-row">
+                <div class="field">
+                    <label id="Direccion">Dirección de recogida</label>
+                    <input type="text" value="Av. Solano 4-56, Cuenca">
+                </div>
+
+                <div class="field">
+                    <label>Dirección de entrega</label>
+                    <input type="text" placeholder="Ej. Calle Larga 8-21">
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Nombre del destinatario</label>
+                    <input type="text" placeholder="Ej. Carlos Peña">
+                </div>
+
+                <div class="field">
+                    <label>Teléfono del destinatario</label>
+                    <input type="text" placeholder="09XXXXXXXX">
+                </div>
+            </div>
+
+            <div class="field-row">
+
+                <div class="field">
+                    <label>Tipo de paquete</label>
+                    <select>
+                        <option>Documento</option>
+                        <option selected>Paquete pequeño (hasta 5 kg)</option>
+                        <option>Paquete mediano (hasta 15 kg)</option>
+                        <option>Paquete grande / carga</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Valor declarado (Opcional)</label>
+                    <input type="text" placeholder="$0.00">
+                </div>
+
+            </div>
+
+            <div class="field">
+                <label>Instrucciones para el repartidor</label>
+                <textarea rows="3" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
+
+                <button class="btn btn-dark" onclick="showQuote()">
+                    <i data-icon="search"></i>
+                    Calcular cotización
+                </button>
+
+                <div id="quoteCard" class="quote-card" style="display:none;">
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:25px;flex-wrap:wrap;">
+
+                        <div>
+
+                            <div style="font-size:.8rem;color:#9AA6C6;">
+                                Tarifa estimada
+                            </div>
+
+                            <div class="price">$4.80</div>
+
+                            <div style="font-size:.8rem;color:#C1C9E4;">
+                                Entrega estimada: Hoy 3:00 - 5:00 p.m.
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-primary">
+                            Confirmar y pagar
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card" style="width: 100%;">
+            <h3>Ubicación del envío</h3>
+            <div id="mapa"
+                 style="width:100%; height:380px; border-radius:12px; border:1px dashed #7f8db3; display:flex; justify-content:center; align-items:center;">
+
+                Aquí irá el mapa (Google Maps / Leaflet)
+
+            </div>
+            
+        
+            <input type="hidden" id="latOrigen">
+              <input type="hidden" id="lngOrigen">
+
+              <input type="hidden" id="latDestino">
+              <input type="hidden" id="lngDestino">
+          </div>
+
+
+        <div class="card" style="width: 100%;">
+
+            <h3>Resumen del envío</h3>
+
+            <p class="hint">Zona: Centro histórico → El Vergel</p>
+
+            <div class="divider"></div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:.85rem;">
+
+                <div style="display:flex;justify-content:space-between;">
+                    <span>Distancia estimada</span>
+                    <b>3.2 km</b>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;">
+                    <span>Tiempo estimado</span>
+                    <b>35 - 50 min</b>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;">
+                    <span>Repartidores disponibles</span>
+                    <b>6 cerca</b>
+                </div>
+
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="note">
+                Puedes programar la recogida para más tarde o solicitar una recogida inmediata.
+            </div>
+
+        </div>
+
+        
+    </div>
+
+</div>
+
+    <!-- MIS ENVÍOS -->
+    <div class="panel" data-panel="misenvios">
+      <div class="topbar"><div><h1>Mis envíos</h1><div class="sub">Historial completo y estado actual</div></div>
+        <div class="searchbox"><i data-icon="search"></i><input placeholder="Buscar por código o destinatario"></div>
+      </div>
+      <div class="card">
+        <div class="pill-list" style="margin-bottom:16px;">
+          <div class="pill active">Todos</div><div class="pill">En tránsito</div><div class="pill">En reparto</div><div class="pill">Entregados</div><div class="pill">Con incidencia</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Código</th><th>Destinatario</th><th>Fecha</th><th>Estado</th><th>Repartidor</th><th>Total</th><th></th></tr>
+            <tr><td class="code">SE-48213</td><td>Carlos Peña</td><td>13 jul</td><td><span class="badge reparto">En reparto</span></td><td>Jorge T.</td><td>$4.80</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td class="code">SE-48190</td><td>Ana Ruiz</td><td>13 jul</td><td><span class="badge transito">En tránsito</span></td><td>Luis P.</td><td>$6.20</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td class="code">SE-48072</td><td>Kiosco Central</td><td>11 jul</td><td><span class="badge entregado">Entregado</span></td><td>Jorge T.</td><td>$3.50</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td class="code">SE-47960</td><td>Diego Salas</td><td>10 jul</td><td><span class="badge incidencia">Incidencia</span></td><td>—</td><td>$5.00</td><td><button class="btn btn-coral btn-sm">Resolver</button></td></tr>
+            <tr><td class="code">SE-47811</td><td>Farmacia Norte</td><td>8 jul</td><td><span class="badge entregado">Entregado</span></td><td>Rosa M.</td><td>$4.10</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RASTREAR -->
+    <div class="panel" data-panel="rastrear">
+      <div class="topbar"><div><h1>Rastrear un paquete</h1><div class="sub">Ingresa el código de guía para ver el estado en vivo</div></div></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;gap:10px;">
+          <input class="mono" value="SE-48213" style="max-width:220px;">
+          <button class="btn btn-primary">Rastrear</button>
+        </div>
+      </div>
+      <div class="grid two-col">
+        <div class="card">
+          <h3>Estado del envío</h3>
+          <div class="route-tracker">
+            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">Recogido</div><div class="time">9:10 a.m.</div></div>
+            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">En bodega</div><div class="time">10:40 a.m.</div></div>
+            <div class="step current"><div class="dot"><i data-icon="truck"></i></div><div class="label">En reparto</div><div class="time">Ahora</div></div>
+            <div class="step"><div class="dot"><i data-icon="mapPin"></i></div><div class="label">Entregado</div><div class="time">Est. 3:30 p.m.</div></div>
+          </div>
+          <div class="mapbox">
+            <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 160 C 100 40, 180 190, 260 60 S 380 40, 385 30" stroke="#B9C3DE" stroke-width="3" fill="none" stroke-dasharray="6 8"/>
+              <circle cx="20" cy="160" r="6" fill="#0E8C7F"/><circle cx="385" cy="30" r="6" fill="#E7495A"/>
+              <circle cx="230" cy="95" r="9" fill="#FF9F1C"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Tu repartidor</h3>
+          <div class="row-flex" style="margin-bottom:14px;"><div class="avatar" style="background:var(--ink-3);color:#fff;">JT</div><div><b>Jorge Torres</b><div style="color:var(--mute);font-size:.8rem;">⭐ 4.9 · Moto · 812 entregas</div></div></div>
+          <button class="btn btn-ghost btn-block" style="margin-bottom:8px;"><i data-icon="phone"></i>Llamar</button>
+          <button class="btn btn-ghost btn-block"><i data-icon="bell"></i>Enviar mensaje</button>
+          <div class="divider"></div>
+          <p class="hint" style="margin-bottom:8px;">Cuando se entregue, podrás calificar el servicio:</p>
+          <div class="stars"><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGOS -->
+    <div class="panel" data-panel="pagos">
+      <div class="topbar"><div><h1>Pagos</h1><div class="sub">Métodos de pago y facturación</div></div></div>
+      <div class="grid two-col">
+        <div class="card">
+          <h3>Métodos guardados</h3>
+          <table>
+            <tr><th>Método</th><th>Detalle</th><th></th></tr>
+            <tr><td><div class="row-flex"><i data-icon="wallet"></i>Tarjeta</div></td><td>Visa •••• 4482</td><td><span class="badge activo">Predeterminada</span></td></tr>
+            <tr><td><div class="row-flex"><i data-icon="wallet"></i>Efectivo</div></td><td>Pago contra entrega</td><td><button class="btn btn-ghost btn-sm">Usar</button></td></tr>
+          </table>
+          <button class="btn btn-ghost" style="margin-top:14px;"><i data-icon="plus"></i>Añadir método de pago</button>
+        </div>
+        <div class="card">
+          <h3>Facturación de julio</h3>
+          <div style="font-family:'Space Grotesk';font-size:1.8rem;font-weight:700;">$41.60</div>
+          <p class="hint">7 envíos facturados</p>
+          <button class="btn btn-ghost btn-block">Descargar recibo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+    <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
+    <script th:src="@{/scripts/controlDepaneles.js}"></script>
 </body>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&libraries=places&callback=initMap"></script>
+
+<script th:inline="javascript">
+let mapa;
+let mar;
+
+function initMap() {
+
+    // Crear mapa
+    mapa = new google.maps.Map(
+        document.getElementById("mapa"),
+        {
+            zoom: 15,
+            center: { lat: -0.2222, lng: -78.5222 }
+        }
+    );
+
+    // Crear marcador
+    mar = new google.maps.Marker({
+
+        position: { lat: -0.2222, lng: -78.5222 },
+
+        map: mapa,
+
+        draggable: true,
+
+        title: "Origen"
+
+    });
+
+    // Cuando termine de mover el marcador
+    mar.addListener("dragend", function (event) {
+
+        let lat = event.latLng.lat();
+        let lng = event.latLng.lng();
+
+        console.log("Latitud:", lat);
+        console.log("Longitud:", lng);
+
+    });
+
+}
+</script>
+
 </html>

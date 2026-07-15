@@ -1,48 +1,16 @@
-<aside class="sidebar" th:fragment="sidebarCliente" >
-
-    <div class="sidebar-logo">
-        <h2>RutaExpress</h2>
+<div class="app active" id="app-remitente" th:fragment="sidebarCliente">
+  <div class="sidebar" data-scope="remitente">
+    <div class="sidebar-title">Remitente</div>
+    <div class="nav-item active" data-panel="inicio"><i data-icon="home"></i>Inicio</div>
+    <div class="nav-item" data-panel="nuevo"><i data-icon="box"></i>Nuevo envío</div>
+    <div class="nav-item" data-panel="misenvios"><i data-icon="list"></i>Mis envíos</div>
+    <div class="nav-item" data-panel="rastrear"><i data-icon="search"></i>Rastrear paquete</div>
+    <div class="nav-item" data-panel="pagos"><i data-icon="wallet"></i>Pagos</div>
+    <div class="sidebar-foot">
+      <!-- <div class="avatar">MJ
+        
+      </div> -->
+      <div class="avatar" th:text="${#strings.substring(session.usuario.nombre, 0, 1)}"></div>
+      <div class="who"><b><p th:text="${session.usuario.nombre}"></p></b><span th:text="${session.usuario.rol}"></span></div>
     </div>
-
-    <div class="sidebar-user">
-        <div class="avatar">
-            👤
-        </div>
-
-        <h4 th:text="${session.usuario.nombre}"></h4>
-        <span th:text="${session.usuario.rol}">Cliente</span>
-    </div>
-
-    <nav class="sidebar-menu">
-
-        <a th:href="@{/cliente/dashboard}">
-            🏠 Dashboard
-        </a>
-
-        <a th:href="@{/cliente/nuevo-envio}">
-            📦 Nuevo envío
-        </a>
-
-        <a th:href="@{/cliente/mis-envios}">
-            🚚 Mis envíos
-        </a>
-
-        <a th:href="@{/cliente/seguimiento}">
-            📍 Seguimiento
-        </a>
-
-        <a th:href="@{/cliente/pagos}">
-            💳 Pagos
-        </a>
-
-        <a th:href="@{/cliente/perfil}">
-            👤 Mi perfil
-        </a>
-
-        <a th:href="@{/cliente/configuracion}">
-            ⚙ Configuración
-        </a>
-
-    </nav>
-
-</aside>
+  </div>

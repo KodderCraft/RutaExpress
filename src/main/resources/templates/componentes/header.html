@@ -1,53 +1,45 @@
-<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>RutaExpress - Servicio de Entregas</title>
-
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-
 <body>
-
-<header th:fragment="header" >
-
-    <div class="logo">
-        <a href="/" style="text-decoration: none;"><h1>RutaExpress</h1></a> 
-    </div>
-
-<nav class="navbar">
-
-
-    <div class="menu">
-        <a class="dropbtn" th:href="@{/}">Inicio</a>
-        <a class="dropbtn" th:href="@{/}">Servicios</a>
     
-
-    <div th:if="${session.usuario == null}">
-        <a class="btn-login" th:href="@{/login}">Ingresar</a>
-    </div>
-
-    <div th:if="${session.usuario != null}" class="dropdown">
-
-        <button class="dropbtn">
-        <span th:text="${session.usuario.nombre}"></span> 
-        </button>
-
-        <div class="dropdown-content">
-            <a th:href="@{/dashboard}">Mi perfil</a>
-            <a th:href="@{/configuracion}">Configuración</a>
-            <!-- <a th:href="@{/preguntas}">Preguntas frecuentes</a> -->
-            <hr>
-            <a th:href="@{/logout}">Cerrar sesión</a>
+    <div class="topbrand" th:fragment="header">
+        <div class="brand">
+            <i data-icon="box"></i>
+            <div>RutaExpress<br><small>Panel de la plataforma</small></div>
         </div>
+
+        <div class="role-tabs">
+            <a th:href="@{/}" class="role-tab active" data-role="remitente"><i data-icon="send"></i><span class="txt">Inicio</span></a>
+            <a th:href="@{/}" class="role-tab" data-role="repartidor"><i data-icon="truck"></i><span class="txt">Servicios</span></a>
+            <a th:href="@{/dashboard}" class="role-tab" data-role="admin"><i data-icon="chart" ></i><span class="txt" >Perfil</span></a>
+            <div th:if="${session.usuario == null}">
+            <a class="role-tab" th:href="@{/login}">Ingresar</a>
+            </div>
+
+            <div th:if="${session.usuario != null}" class="dropdown">
+
+                <button class="role-tab ">
+                <span th:text="${session.usuario.nombre}"></span> 
+                </button>
+                <div class="dropdown-content">
+                        <span style="background-color: white;">
+                        <a th:href="@{/dashboard}">Mi perfil</a>
+                        <a th:href="@{/dashboard}">Configuración</a>
+                        <a th:href="@{/dashboard}">Preguntas frecuentes</a>
+                        <hr>
+                        <a th:href="@{/logout}">Cerrar sesión</a>
+                    </span>
+                    </div>
+                </div>
+            </div>            
+
+
+
         </div>
+
     </div>
-
-</nav>
-</header>
-
+  
+<script th:src="@{/scripts/controlDepaneles.js}"></script>
 </body>
+
 </html>
