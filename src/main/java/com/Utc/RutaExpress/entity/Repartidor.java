@@ -20,16 +20,20 @@ public class Repartidor {
 
     private String placa;
 
+    // Zona/barrio que cubre este repartidor
+    private String zona;
+
     @Column(nullable = false)
     private boolean disponible = true;
 
     public Repartidor() {
     }
 
-    public Repartidor(Usuario usuario, String vehiculoTipo, String placa) {
+    public Repartidor(Usuario usuario, String vehiculoTipo, String placa, String zona) {
         this.usuario = usuario;
         this.vehiculoTipo = vehiculoTipo;
         this.placa = placa;
+        this.zona = zona;
     }
 
     public Long getId() {
@@ -58,6 +62,14 @@ public class Repartidor {
 
     public void setPlaca(String placa) {
         this.placa = placa;
+    }
+
+    public String getZona() {
+        return zona;
+    }
+
+    public void setZona(String zona) {
+        this.zona = zona;
     }
 
     public boolean isDisponible() {
