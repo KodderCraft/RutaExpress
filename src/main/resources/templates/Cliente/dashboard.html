@@ -9,13 +9,14 @@
     <div th:replace="~{componentes/header :: header}" ></div>
     
     <!-- para el cliente  -->
-    <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}" ></div>
-
-    <div class="main">
+    <!-- <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}" ></div> -->
+<div class="app active" id="app-remitente" >
+<div th:replace="~{componentes/sidebarCliente :: sidebarCliente}"></div>
+  <div class="main">
     <!-- INICIO -->
     <div class="panel active" data-panel="inicio">
       <div class="topbar">
-        <div><h1>Hola, <span th:text="${session.usuario.nombre}"></span>  👋</h1><div class="sub">Esto es lo que pasa con tus envíos hoy</div></div>
+        <div><h1>Hola, <span th:text="${session.usuario.nombre}"></span> </h1><div class="sub">Esto es lo que pasa con tus envíos hoy</div></div>
         <div class="topbar-actions">
           <div class="bell"><i data-icon="bell"></i></div>
           <button class="btn btn-primary" onclick="goPanel('remitente','nuevo')"><i data-icon="plus"></i>Nuevo envío</button>
@@ -30,7 +31,7 @@
       </div>
 
       <div class="grid two-col">
-        <div class="card" style=" width: 90%;">
+        <div class="card">
           <h3>Envíos recientes</h3>
           <p class="hint">Seguimiento rápido de tus últimos paquetes</p>
           <div class="table-wrap">
@@ -67,7 +68,7 @@
             </table>
           </div>
         </div>
-        <div class="card" style="width: 100%;">
+        <div class="card">
           <h3>Envío SE-48213</h3>
           <p class="hint">Camino a Carlos Peña · Cuenca</p>
           <div class="route-tracker" style="margin-top:18px;">
@@ -90,166 +91,61 @@
       </div>
     </div>
 
-
     <!-- NUEVO ENVÍO -->
-
     <div class="panel" data-panel="nuevo">
-
-    <div class="topbar">
-        <div>
-            <h1>Crear un nuevo envío</h1>
-            <div class="sub">Completa los datos de recogida y entrega</div>
-        </div>
-    </div>
-
-    <div class="grid two-col">
-
-        <div class="card" style="width: 100%;">
-
-            <h3>Detalles del envío</h3>
-
-            <div class="field-row">
-                <div class="field">
-                    <label id="Direccion">Dirección de recogida</label>
-                    <input type="text" value="Av. Solano 4-56, Cuenca">
-                </div>
-
-                <div class="field">
-                    <label>Dirección de entrega</label>
-                    <input type="text" placeholder="Ej. Calle Larga 8-21">
-                </div>
-            </div>
-
-            <div class="field-row">
-                <div class="field">
-                    <label>Nombre del destinatario</label>
-                    <input type="text" placeholder="Ej. Carlos Peña">
-                </div>
-
-                <div class="field">
-                    <label>Teléfono del destinatario</label>
-                    <input type="text" placeholder="09XXXXXXXX">
-                </div>
-            </div>
-
-            <div class="field-row">
-
-                <div class="field">
-                    <label>Tipo de paquete</label>
-                    <select>
-                        <option>Documento</option>
-                        <option selected>Paquete pequeño (hasta 5 kg)</option>
-                        <option>Paquete mediano (hasta 15 kg)</option>
-                        <option>Paquete grande / carga</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>Valor declarado (Opcional)</label>
-                    <input type="text" placeholder="$0.00">
-                </div>
-
-            </div>
-
-            <div class="field">
-                <label>Instrucciones para el repartidor</label>
-                <textarea rows="3" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea>
-            </div>
-
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
-
-                <button class="btn btn-dark" onclick="showQuote()">
-                    <i data-icon="search"></i>
-                    Calcular cotización
-                </button>
-
-                <div id="quoteCard" class="quote-card" style="display:none;">
-
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:25px;flex-wrap:wrap;">
-
-                        <div>
-
-                            <div style="font-size:.8rem;color:#9AA6C6;">
-                                Tarifa estimada
-                            </div>
-
-                            <div class="price">$4.80</div>
-
-                            <div style="font-size:.8rem;color:#C1C9E4;">
-                                Entrega estimada: Hoy 3:00 - 5:00 p.m.
-                            </div>
-
-                        </div>
-
-                        <button class="btn btn-primary">
-                            Confirmar y pagar
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card" style="width: 100%;">
-            <h3>Ubicación del envío</h3>
-            <div id="mapa"
-                 style="width:100%; height:380px; border-radius:12px; border:1px dashed #7f8db3; display:flex; justify-content:center; align-items:center;">
-
-                Aquí irá el mapa (Google Maps / Leaflet)
-
-            </div>
-            
+      <div class="topbar"><div><h1>Crear un nuevo envío</h1><div class="sub">Completa los datos de recogida y entrega</div></div></div>
+      <div class="grid two-col">
         
-            <input type="hidden" id="latOrigen">
-              <input type="hidden" id="lngOrigen">
-
-              <input type="hidden" id="latDestino">
-              <input type="hidden" id="lngDestino">
+        <div class="card">
+          <h3>Detalles del envío</h3>
+          <div class="field-row">
+            <div class="field"><label>Dirección de recogida</label><input type="text" value="Av. Solano 4-56, Cuenca"></div>
+            <div class="field"><label>Dirección de entrega</label><input type="text" placeholder="Ej. Calle Larga 8-21"></div>
           </div>
-
-
-        <div class="card" style="width: 100%;">
-
-            <h3>Resumen del envío</h3>
-
-            <p class="hint">Zona: Centro histórico → El Vergel</p>
-
-            <div class="divider"></div>
-
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:.85rem;">
-
-                <div style="display:flex;justify-content:space-between;">
-                    <span>Distancia estimada</span>
-                    <b>3.2 km</b>
-                </div>
-
-                <div style="display:flex;justify-content:space-between;">
-                    <span>Tiempo estimado</span>
-                    <b>35 - 50 min</b>
-                </div>
-
-                <div style="display:flex;justify-content:space-between;">
-                    <span>Repartidores disponibles</span>
-                    <b>6 cerca</b>
-                </div>
-
+          <div class="field-row">
+            <div class="field"><label>Nombre del destinatario</label><input type="text" placeholder="Ej. Carlos Peña"></div>
+            <div class="field"><label>Teléfono del destinatario</label><input type="text" placeholder="09XXXXXXXX"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Tipo de paquete</label>
+              <select>
+                <option>Documento</option>
+                <option selected>Paquete pequeño (hasta 5 kg)</option>
+                <option>Paquete mediano (hasta 15 kg)</option>
+                <option>Paquete grande / carga</option>
+              </select>
             </div>
+            <div class="field"><label>Valor declarado (opcional, para seguro)</label><input type="text" placeholder="$ 0.00"></div>
+          </div>
+          <div class="field"><label>Instrucciones para el repartidor</label><textarea rows="2" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea></div>
+          <button class="btn btn-dark" onclick="showQuote()"><i data-icon="search"></i>Calcular cotización</button>
 
-            <div class="divider"></div>
-
-            <div class="note">
-                Puedes programar la recogida para más tarde o solicitar una recogida inmediata.
+          <div class="quote-card" id="quoteCard" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+              <div>
+                <div style="color:#9AA6C6;font-size:.78rem;">Tarifa estimada</div>
+                <div class="price">$4.80</div>
+                <div style="color:#C1C9E4;font-size:.8rem;margin-top:4px;">Entrega estimada: hoy, 3–5 p.m.</div>
+              </div>
+              <button class="btn btn-primary">Confirmar y pagar</button>
             </div>
-
+          </div>
         </div>
 
-        
+        <div class="card">
+          <h3>Resumen</h3>
+          <p class="hint">Zona: Centro histórico → El Vergel</p>
+          <div class="divider"></div>
+          <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;"><span>Distancia estimada</span><b>3.2 km</b></div>
+            <div style="display:flex;justify-content:space-between;"><span>Tiempo estimado</span><b>35–50 min</b></div>
+            <div style="display:flex;justify-content:space-between;"><span>Repartidores disponibles</span><b>6 cerca</b></div>
+          </div>
+          <div class="divider"></div>
+          <div class="note">Puedes programar la recogida para más tarde desde "Instrucciones" o elegir recogida inmediata (predeterminado).</div>
+        </div>
+      </div>
     </div>
-
-</div>
 
     <!-- MIS ENVÍOS -->
     <div class="panel" data-panel="misenvios">
@@ -333,8 +229,8 @@
       </div>
     </div>
   </div>
+</div>
 
-  
 
     <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
     <script th:src="@{/scripts/controlDepaneles.js}"></script>

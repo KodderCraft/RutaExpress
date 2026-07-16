@@ -40,16 +40,28 @@
     });
   });
   
-
+  
   document.querySelectorAll('.role-pick').forEach(pick=>{
     pick.addEventListener('click', ()=>{
-      document.querySelectorAll('.role-pick').forEach(p=>p.classList.remove('active'));
-      pick.classList.add('active');
-      pick.querySelector("input").checked = true;
-      selectedAuthRole = pick.dataset.authrole;
+        document.querySelectorAll('.role-pick')
+            .forEach(p=>p.classList.remove('active'));
+        pick.classList.add('active');
+        const radio = pick.querySelector("input");
+        radio.checked = true;
+        selectedAuthRole = pick.dataset.authrole;
+        const datosRepartidor = document.querySelectorAll('.datosRepartidor');
+        datosRepartidor.forEach(div=>{
+            if(radio.value === "REPARTIDOR"){
+                div.style.display = "block";
+            }else{
+                div.style.display = "none";
+            }
+        });
     });
-  });
+});
 
+
+  
   function enterApp(){
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('mainTopbrand').style.display = 'flex';
@@ -65,14 +77,14 @@
   }
 
   // Role switcher
-  // document.querySelectorAll('.role-tab').forEach(btn=>{
-  //   btn.addEventListener('click', ()=>{
-  //     document.querySelectorAll('.role-tab').forEach(b=>b.classList.remove('active'));
-  //     btn.classList.add('active');
-  //     document.querySelectorAll('.app').forEach(a=>a.classList.remove('active'));
-  //     document.getElementById('app-'+btn.dataset.role).classList.add('active');
-  //   });
-  // });
+  document.querySelectorAll('.role-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.role-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      // document.querySelectorAll('.app').forEach(a=>a.classList.remove('active'));
+      // document.getElementById('app-'+btn.dataset.role).classList.add('active');
+    });
+  });
   // function goPanel(role, panel){
   //   document.querySelectorAll('.role-tab').forEach(b=>b.classList.toggle('active', b.dataset.role===role));
   //   document.querySelectorAll('.app').forEach(a=>a.classList.toggle('active', a.id==='app-'+role));

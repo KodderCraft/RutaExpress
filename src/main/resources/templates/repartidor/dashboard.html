@@ -1,19 +1,145 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-        <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/stilos.css}">
 
 </head>
 <body>
     <div th:replace="~{componentes/header :: header}" ></div>
-    
     <!-- para el cliente  -->
-    <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}" ></div>
+    <div class="app active" id="app-repartidor">
+        <div class="sidebar" data-scope="repartidor" >
+        <div class="sidebar-title">Repartidor</div>
+        <div class="nav-item active" data-panel="inicio"><i data-icon="home"></i>Ruta de hoy</div>
+        <div class="nav-item" data-panel="mapa"><i data-icon="mapPin"></i>Mapa</div>
+        <div class="nav-item" data-panel="entrega"><i data-icon="box"></i>Entrega actual</div>
+        <div class="nav-item" data-panel="ganancias"><i data-icon="wallet"></i>Ganancias</div>
+        <div class="sidebar-foot">
+        <div class="avatar" style="background:var(--teal);color:#fff;">JT</div>
+        <div class="who"><b>Jorge Torres</b><span>Moto · Zona Centro</span></div>
+        </div>
+    </div>
 
-    <!-- <span th:text="${session.usuario.nombre}"></span>
-    <span th:text="${session.usuario.email}"></span>
-    <span th:text="${session.usuario.rol}"></span> -->
+        <div class="main">
+            <!-- INICIO / RUTA -->
+            <div class="panel active" data-panel="inicio">
+            <div class="topbar">
+                <div><h1>Tu ruta de hoy</h1><div class="sub">5 entregas asignadas · orden optimizado</div></div>
+                <div class="topbar-actions">
+                <span style="font-size:.84rem;font-weight:600;color:var(--mute);">Disponible</span>
+                <div class="toggle on" id="availToggle" onclick="this.classList.toggle('on')"></div>
+                </div>
+            </div>
 
-    <div th:replace="~{componentes/footer :: footer}" ></div>
+            <div class="grid stat-grid">
+                <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div></div><div class="value">5</div><div class="label">Entregas hoy</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div></div><div class="value">2</div><div class="label">Completadas</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value">$14.20</div><div class="label">Ganado hoy</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="clock"></i></div></div><div class="value">42 min</div><div class="label">Tiempo estimado restante</div></div>
+            </div>
+
+            <div class="card">
+                <h3>Paradas en orden</h3>
+                <p class="hint">Optimizadas según tráfico y distancia</p>
+                <table>
+                <tr><th>#</th><th>Código</th><th>Cliente</th><th>Dirección</th><th>Tipo</th><th>Estado</th><th></th></tr>
+                <tr><td class="mono">1</td><td class="code">SE-48072</td><td>Kiosco Central</td><td>Calle Larga 5-30</td><td>Recogida</td><td><span class="badge entregado">Hecho</span></td><td>—</td></tr>
+                <tr><td class="mono">2</td><td class="code">SE-47960</td><td>Diego Salas</td><td>Av. Huayna Cápac 3-12</td><td>Entrega</td><td><span class="badge entregado">Hecho</span></td><td>—</td></tr>
+                <tr><td class="mono">3</td><td class="code">SE-48213</td><td>Carlos Peña</td><td>Calle Larga 8-21</td><td>Entrega</td><td><span class="badge reparto">En curso</span></td><td><button class="btn btn-primary btn-sm" onclick="goPanel('repartidor','entrega')">Abrir</button></td></tr>
+                <tr><td class="mono">4</td><td class="code">SE-48250</td><td>Farmacia Norte</td><td>Gran Colombia 12-40</td><td>Recogida</td><td><span class="badge pendiente">Pendiente</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+                <tr><td class="mono">5</td><td class="code">SE-48261</td><td>Rosa Medina</td><td>Av. Loja 4-90</td><td>Entrega</td><td><span class="badge pendiente">Pendiente</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+                </table>
+            </div>
+            </div>
+
+            <!-- MAPA -->
+            <div class="panel" data-panel="mapa">
+            <div class="topbar"><div><h1>Mapa de ruta</h1><div class="sub">Parada 3 de 5 · Carlos Peña</div></div></div>
+            <div class="mapbox" style="min-height:420px;">
+                <div class="map-pill"><span class="dotlive"></span>GPS activo</div>
+                <svg viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30 380 C 120 300, 90 220, 190 210 S 260 120, 260 90 S 400 60, 470 40" stroke="#B9C3DE" stroke-width="3" fill="none" stroke-dasharray="6 8"/>
+                <circle cx="30" cy="380" r="7" fill="#0E8C7F"/>
+                <circle cx="190" cy="210" r="9" fill="#14213D"/><text x="186" y="214" font-size="9" fill="#fff" font-family="IBM Plex Mono">1</text>
+                <circle cx="260" cy="90" r="9" fill="#FF9F1C"/><text x="256" y="94" font-size="9" fill="#1B1300" font-family="IBM Plex Mono">3</text>
+                <circle cx="470" cy="40" r="7" fill="#E7495A"/>
+                </svg>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="btn btn-primary"><i data-icon="mapPin"></i>Iniciar navegación</button>
+                <button class="btn btn-ghost"><i data-icon="phone"></i>Llamar al cliente</button>
+            </div>
+            </div>
+
+            <!-- ENTREGA ACTUAL -->
+            <div class="panel" data-panel="entrega">
+            <div class="topbar"><div><h1>Entrega actual</h1><div class="sub">Parada 3 · SE-48213</div></div></div>
+            <div class="grid two-col">
+                <div class="card">
+                <h3>Carlos Peña</h3>
+                <p class="hint">Calle Larga 8-21, apartamento 3B · Cuenca</p>
+                <div class="divider"></div>
+                <div class="field"><label>Escanear código del paquete</label>
+                    <div style="border:1px dashed var(--line);border-radius:10px;padding:24px;text-align:center;color:var(--mute);">
+                    <i data-icon="qr" style="width:34px;height:34px;"></i>
+                    <div style="margin-top:8px;font-size:.82rem;">Toca para escanear el QR o código de barras</div>
+                    </div>
+                </div>
+                <div class="field"><label>Código de verificación del cliente</label><input class="mono" placeholder="Ej. 7429"></div>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-teal btn-block"><i data-icon="check"></i>Marcar entregado</button>
+                    <button class="btn btn-coral btn-block"><i data-icon="alert"></i>No se pudo entregar</button>
+                </div>
+                </div>
+                <div class="card">
+                <h3>Detalle del paquete</h3>
+                <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;justify-content:space-between;"><span>Tipo</span><b>Paquete pequeño</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Peso</span><b>1.8 kg</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Valor declarado</span><b>$25.00</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Pago</span><b>Ya pagado</b></div>
+                </div>
+                <div class="divider"></div>
+                <p class="hint" style="margin-bottom:6px;">Instrucciones del remitente</p>
+                <div class="note">Tocar el timbre del apartamento 3B. Si no responde, llamar antes de dejar con el conserje.</div>
+                </div>
+            </div>
+            </div>
+
+            <!-- GANANCIAS -->
+            <div class="panel" data-panel="ganancias">
+            <div class="topbar"><div><h1>Ganancias</h1><div class="sub">Resumen semanal e historial de pagos</div></div></div>
+            <div class="grid two-col">
+                <div class="card">
+                <h3>Últimos 7 días</h3>
+                <div class="bars">
+                    <div class="bar" style="height:55%;"><span>Lun</span></div>
+                    <div class="bar" style="height:70%;"><span>Mar</span></div>
+                    <div class="bar" style="height:40%;"><span>Mié</span></div>
+                    <div class="bar" style="height:85%;"><span>Jue</span></div>
+                    <div class="bar" style="height:60%;"><span>Vie</span></div>
+                    <div class="bar" style="height:95%;"><span>Sáb</span></div>
+                    <div class="bar" style="height:30%;"><span>Hoy</span></div>
+                </div>
+                </div>
+                <div class="card stat-card">
+                <div class="label">Total de la semana</div>
+                <div class="value">$96.30</div>
+                <div class="divider"></div>
+                <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;justify-content:space-between;"><span>Entregas completadas</span><b>34</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Calificación promedio</span><b>4.9 ⭐</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Próximo pago</span><b>Viernes</b></div>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    </div>
+
+<script th:src="@{/scripts/controlDepaneles.js}"></script>
+
 </body>
 </html>

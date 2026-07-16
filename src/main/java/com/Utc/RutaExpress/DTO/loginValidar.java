@@ -4,7 +4,14 @@ package com.Utc.RutaExpress.DTO;
 public class loginValidar {
     private String nombre;
     private String password;
+    private String correo;
 
+    public String getCorreo() {
+        return correo;
+    }
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
     public loginValidar(){}
         public String getnombre() {
         return nombre;
@@ -21,4 +28,6 @@ public class loginValidar {
     public void setPassword(String password) {
         this.password = password;
     }
+
+
 }
