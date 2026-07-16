@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-// Tabla envios: paquete que un cliente registra para que un repartidor lo entregue
 @Entity
 @Table(name = "envios")
 public class Envio {
@@ -13,143 +12,91 @@ public class Envio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Codigo publico para rastrear el envio (ej. SE-00001); lo genera el backend, no el cliente
-    @Column(nullable = false, unique = true)
     private String codigoGuia;
 
-    @ManyToOne
-    @JoinColumn(name = "remitente_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "remitente_id")
     private Usuario remitente;
 
-    @ManyToOne
-    @JoinColumn(name = "destinatario_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destinatario_id")
     private Usuario destinatario;
 
-    @Column(nullable = false)
-    private String direccionRecogida;
-
-    @Column(nullable = false)
-    private String direccionEntrega;
-
-    // Sin @Column(nullable = false): el envio puede no tener repartidor asignado todavia
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "repartidor_id")
-    private Usuario repartidor;
+    private Repartidor repartidor;
 
-    private BigDecimal peso;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "direccion_recogida_id")
+    private Direccion direccionRecogida;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "direccion_entrega_id")
+    private Direccion direccionEntrega;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tarifa_id")
+    private Tarifa tarifa;
+
+    private String tipoServicio;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoServicio tipoServicio;
+    private EstadoEnvio estado;
 
-    // Lo calcula el backend (costoBase de la tarifa + peso * costoKgAdicional); el cliente nunca lo envia
     private BigDecimal costoTotal;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EstadoEnvio estado = EstadoEnvio.REGISTRADO;
+    private Double distanciaKm;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaRegistro = LocalDateTime.now();
+    private Integer tiempoEstimadoMin;
+
+    private LocalDateTime fechaRegistro;
 
     private LocalDateTime fechaEntrega;
 
-    public Envio() {
-    }
+    public Envio() {}
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getCodigoGuia() {
-        return codigoGuia;
-    }
+    public String getCodigoGuia() { return codigoGuia; }
+    public void setCodigoGuia(String codigoGuia) { this.codigoGuia = codigoGuia; }
 
-    public void setCodigoGuia(String codigoGuia) {
-        this.codigoGuia = codigoGuia;
-    }
+    public Usuario getRemitente() { return remitente; }
+    public void setRemitente(Usuario remitente) { this.remitente = remitente; }
 
-    public Usuario getRemitente() {
-        return remitente;
-    }
+    public Usuario getDestinatario() { return destinatario; }
+    public void setDestinatario(Usuario destinatario) { this.destinatario = destinatario; }
 
-    public void setRemitente(Usuario remitente) {
-        this.remitente = remitente;
-    }
+    public Repartidor getRepartidor() { return repartidor; }
+    public void setRepartidor(Repartidor repartidor) { this.repartidor = repartidor; }
 
-    public Usuario getDestinatario() {
-        return destinatario;
-    }
+    public Direccion getDireccionRecogida() { return direccionRecogida; }
+    public void setDireccionRecogida(Direccion direccionRecogida) { this.direccionRecogida = direccionRecogida; }
 
-    public void setDestinatario(Usuario destinatario) {
-        this.destinatario = destinatario;
-    }
+    public Direccion getDireccionEntrega() { return direccionEntrega; }
+    public void setDireccionEntrega(Direccion direccionEntrega) { this.direccionEntrega = direccionEntrega; }
 
-    public String getDireccionRecogida() {
-        return direccionRecogida;
-    }
+    public Tarifa getTarifa() { return tarifa; }
+    public void setTarifa(Tarifa tarifa) { this.tarifa = tarifa; }
 
-    public void setDireccionRecogida(String direccionRecogida) {
-        this.direccionRecogida = direccionRecogida;
-    }
+    public String getTipoServicio() { return tipoServicio; }
+    public void setTipoServicio(String tipoServicio) { this.tipoServicio = tipoServicio; }
 
-    public String getDireccionEntrega() {
-        return direccionEntrega;
-    }
+    public EstadoEnvio getEstado() { return estado; }
+    public void setEstado(EstadoEnvio estado) { this.estado = estado; }
 
-    public void setDireccionEntrega(String direccionEntrega) {
-        this.direccionEntrega = direccionEntrega;
-    }
+    public BigDecimal getCostoTotal() { return costoTotal; }
+    public void setCostoTotal(BigDecimal costoTotal) { this.costoTotal = costoTotal; }
 
-    public Usuario getRepartidor() {
-        return repartidor;
-    }
+    public Double getDistanciaKm() { return distanciaKm; }
+    public void setDistanciaKm(Double distanciaKm) { this.distanciaKm = distanciaKm; }
 
-    public void setRepartidor(Usuario repartidor) {
-        this.repartidor = repartidor;
-    }
+    public Integer getTiempoEstimadoMin() { return tiempoEstimadoMin; }
+    public void setTiempoEstimadoMin(Integer tiempoEstimadoMin) { this.tiempoEstimadoMin = tiempoEstimadoMin; }
 
-    public BigDecimal getPeso() {
-        return peso;
-    }
+    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
+    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
 
-    public void setPeso(BigDecimal peso) {
-        this.peso = peso;
-    }
-
-    public TipoServicio getTipoServicio() {
-        return tipoServicio;
-    }
-
-    public void setTipoServicio(TipoServicio tipoServicio) {
-        this.tipoServicio = tipoServicio;
-    }
-
-    public BigDecimal getCostoTotal() {
-        return costoTotal;
-    }
-
-    public void setCostoTotal(BigDecimal costoTotal) {
-        this.costoTotal = costoTotal;
-    }
-
-    public EstadoEnvio getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoEnvio estado) {
-        this.estado = estado;
-    }
-
-    public LocalDateTime getFechaRegistro() {
-        return fechaRegistro;
-    }
-
-    public LocalDateTime getFechaEntrega() {
-        return fechaEntrega;
-    }
-
-    public void setFechaEntrega(LocalDateTime fechaEntrega) {
-        this.fechaEntrega = fechaEntrega;
-    }
+    public LocalDateTime getFechaEntrega() { return fechaEntrega; }
+    public void setFechaEntrega(LocalDateTime fechaEntrega) { this.fechaEntrega = fechaEntrega; }
 }

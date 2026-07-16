@@ -3,7 +3,6 @@ package com.Utc.RutaExpress.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-// Tabla pagos: cobro asociado a un envio
 @Entity
 @Table(name = "pagos")
 public class Pago {
@@ -12,63 +11,31 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "envio_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "envio_id")
     private Envio envio;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MetodoPago metodo;
+    private EstadoPago estado;
 
-    @Column(nullable = false)
+    private String metodo;
+
     private BigDecimal monto;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EstadoPago estado = EstadoPago.PENDIENTE;
+    public Pago() {}
 
-    public Pago() {
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Pago(Envio envio, MetodoPago metodo, BigDecimal monto) {
-        this.envio = envio;
-        this.metodo = metodo;
-        this.monto = monto;
-    }
+    public Envio getEnvio() { return envio; }
+    public void setEnvio(Envio envio) { this.envio = envio; }
 
-    public Long getId() {
-        return id;
-    }
+    public EstadoPago getEstado() { return estado; }
+    public void setEstado(EstadoPago estado) { this.estado = estado; }
 
-    public Envio getEnvio() {
-        return envio;
-    }
+    public String getMetodo() { return metodo; }
+    public void setMetodo(String metodo) { this.metodo = metodo; }
 
-    public void setEnvio(Envio envio) {
-        this.envio = envio;
-    }
-
-    public MetodoPago getMetodo() {
-        return metodo;
-    }
-
-    public void setMetodo(MetodoPago metodo) {
-        this.metodo = metodo;
-    }
-
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
-
-    public EstadoPago getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoPago estado) {
-        this.estado = estado;
-    }
+    public BigDecimal getMonto() { return monto; }
+    public void setMonto(BigDecimal monto) { this.monto = monto; }
 }
