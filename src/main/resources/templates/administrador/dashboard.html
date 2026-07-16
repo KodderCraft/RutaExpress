@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+        <link rel="stylesheet" th:href="@{/css/stilos.css}">
+
+</head>
+<body>
+    <div th:replace="~{componentes/header :: header}" ></div>
+    
+    <!-- para el cliente  -->
+    
+    <div class="app active" id="app-admin">
+      
+      <div th:replace="~{componentes/sidebarAdmin :: sidebarAdmin}" ></div>
+
+  <div class="main">
+    <!-- PANEL GENERAL -->
+    <div class="panel active" data-panel="panel">
+      <div class="topbar"><div><h1>Panel general</h1><div class="sub">Operación en tiempo real · 13 de julio</div></div><div class="bell"><i data-icon="bell"></i></div></div>
+
+      <div class="grid stat-grid">
+        <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div><span class="delta up">+12%</span></div><div class="value">312</div><div class="label">Envíos hoy</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="truck"></i></div></div><div class="value">184</div><div class="label">En tránsito / reparto</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div><span class="delta up">96.4%</span></div><div class="value">298</div><div class="label">Entregados a tiempo</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="alert"></i></div><span class="delta down">3 nuevas</span></div><div class="value">7</div><div class="label">Incidencias abiertas</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="user"></i></div></div><div class="value">64</div><div class="label">Repartidores activos</div></div>
+        <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="wallet"></i></div><span class="delta up">+8%</span></div><div class="value">$2,140</div><div class="label">Ingresos de hoy</div></div>
+      </div>
+
+      <div class="grid two-col">
+        <div class="card">
+          <h3>Envíos por día — últimos 7 días</h3>
+          <div class="bars">
+            <div class="bar" style="height:50%;"><span>Lun</span></div>
+            <div class="bar" style="height:64%;"><span>Mar</span></div>
+            <div class="bar" style="height:58%;"><span>Mié</span></div>
+            <div class="bar" style="height:76%;"><span>Jue</span></div>
+            <div class="bar" style="height:70%;"><span>Vie</span></div>
+            <div class="bar" style="height:90%;"><span>Sáb</span></div>
+            <div class="bar" style="height:82%;"><span>Hoy</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Repartidores en el mapa</h3>
+          <div class="mapbox" style="min-height:170px;">
+            <div class="map-pill"><span class="dotlive"></span>64 en línea</div>
+            <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="70" cy="60" r="6" fill="#FF9F1C"/><circle cx="140" cy="120" r="6" fill="#FF9F1C"/>
+              <circle cx="230" cy="70" r="6" fill="#FF9F1C"/><circle cx="300" cy="140" r="6" fill="#FF9F1C"/>
+              <circle cx="180" cy="40" r="6" fill="#FF9F1C"/><circle cx="340" cy="60" r="6" fill="#FF9F1C"/>
+              <circle cx="100" cy="160" r="6" fill="#FF9F1C"/><circle cx="260" cy="150" r="6" fill="#FF9F1C"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENVÍOS -->
+    <div class="panel" data-panel="envios">
+      <div class="topbar"><div><h1>Gestión de envíos</h1><div class="sub">Asigna, reasigna y supervisa todos los envíos</div></div>
+        <div class="searchbox"><i data-icon="search"></i><input placeholder="Buscar código o cliente"></div>
+      </div>
+      <div class="card">
+        <div class="pill-list" style="margin-bottom:16px;">
+          <div class="pill active">Todos (312)</div><div class="pill">En tránsito (96)</div><div class="pill">En reparto (88)</div><div class="pill">Entregados (298)</div><div class="pill">Incidencias (7)</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Código</th><th>Remitente</th><th>Destinatario</th><th>Zona</th><th>Estado</th><th>Repartidor</th><th></th></tr>
+            <tr><td class="code">SE-48213</td><td>María Jiménez</td><td>Carlos Peña</td><td>Centro</td><td><span class="badge reparto">En reparto</span></td><td>Jorge T.</td><td><button class="btn btn-ghost btn-sm">Reasignar</button></td></tr>
+            <tr><td class="code">SE-48250</td><td>Farmacia Norte</td><td>Rosa Medina</td><td>Norte</td><td><span class="badge transito">En tránsito</span></td><td>Jorge T.</td><td><button class="btn btn-ghost btn-sm">Reasignar</button></td></tr>
+            <tr><td class="code">SE-47960</td><td>Diego Salas</td><td>Ana Ruiz</td><td>El Vergel</td><td><span class="badge incidencia">Incidencia</span></td><td>Sin asignar</td><td><button class="btn btn-primary btn-sm">Asignar</button></td></tr>
+            <tr><td class="code">SE-48072</td><td>Kiosco Central</td><td>Carlos Peña</td><td>Centro</td><td><span class="badge entregado">Entregado</span></td><td>Jorge T.</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td class="code">SE-48261</td><td>Rosa Medina</td><td>Diego Salas</td><td>Sur</td><td><span class="badge pendiente">Pendiente</span></td><td>Sin asignar</td><td><button class="btn btn-primary btn-sm">Asignar</button></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div class="panel" data-panel="usuarios">
+      <div class="topbar"><div><h1>Usuarios</h1><div class="sub">Remitentes y destinatarios registrados en la plataforma</div></div></div>
+      <div class="card">
+        <div class="subtabs" data-scope="usuarios-sub">
+          <button class="subtab active" data-sub="remitentes">Remitentes</button>
+          <button class="subtab" data-sub="destinatarios">Destinatarios</button>
+        </div>
+        <div class="subpanel active" data-sub="remitentes">
+          <table>
+            <tr><th>Usuario</th><th>Envíos totales</th><th>Registrado</th><th>Estado</th><th></th></tr>
+            <tr><td><div class="row-flex"><div class="mini-avatar">MJ</div>María Jiménez</div></td><td>142</td><td>Ene 2025</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td><div class="row-flex"><div class="mini-avatar">KC</div>Kiosco Central</td><td>310</td><td>Ago 2024</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td><div class="row-flex"><div class="mini-avatar">DS</div>Diego Salas</td><td>18</td><td>Mar 2026</td><td><span class="badge suspendido">Suspendido</span></td><td><button class="btn btn-ghost btn-sm">Revisar</button></td></tr>
+          </table>
+        </div>
+        <div class="subpanel" data-sub="destinatarios">
+          <table>
+            <tr><th>Usuario</th><th>Recibidos</th><th>Dirección frecuente</th><th>Estado</th><th></th></tr>
+            <tr><td><div class="row-flex"><div class="mini-avatar">CP</div>Carlos Peña</div></td><td>27</td><td>Calle Larga 8-21</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td><div class="row-flex"><div class="mini-avatar">AR</div>Ana Ruiz</div></td><td>9</td><td>Av. Remigio Crespo 3-40</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPARTIDORES -->
+    <div class="panel" data-panel="repartidores">
+      <div class="topbar"><div><h1>Repartidores</h1><div class="sub">Estado, desempeño y zonas asignadas</div></div>
+        <button class="btn btn-primary"><i data-icon="plus"></i>Registrar repartidor</button>
+      </div>
+      <div class="card">
+        <table>
+          <tr><th>Repartidor</th><th>Zona</th><th>Estado</th><th>Entregas</th><th>Calificación</th><th></th></tr>
+          <tr><td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge Torres</div></td><td>Centro</td><td><span class="badge reparto">En ruta</span></td><td>812</td><td>4.9 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
+          <tr><td><div class="row-flex"><div class="mini-avatar">LP</div>Luis Paredes</div></td><td>El Vergel</td><td><span class="badge reparto">En ruta</span></td><td>530</td><td>4.7 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
+          <tr><td><div class="row-flex"><div class="mini-avatar">RM</div>Rosa Medina</div></td><td>Norte</td><td><span class="badge activo">Disponible</span></td><td>274</td><td>4.8 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
+          <tr><td><div class="row-flex"><div class="mini-avatar">PS</div>Pablo Serrano</div></td><td>Sur</td><td><span class="badge pendiente">Desconectado</span></td><td>96</td><td>4.5 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ZONAS Y TARIFAS -->
+    <div class="panel" data-panel="zonas">
+      <div class="topbar"><div><h1>Zonas y tarifas</h1><div class="sub">Configura precios base por zona de cobertura</div></div>
+        <button class="btn btn-primary"><i data-icon="plus"></i>Nueva zona</button>
+      </div>
+      <div class="card">
+        <table>
+          <tr><th>Zona</th><th>Tarifa base</th><th>Costo por km adicional</th><th>Repartidores</th><th></th></tr>
+          <tr><td>Centro histórico</td><td>$3.50</td><td>$0.60</td><td>18</td><td><button class="btn btn-ghost btn-sm">Editar</button></td></tr>
+          <tr><td>El Vergel</td><td>$4.00</td><td>$0.65</td><td>12</td><td><button class="btn btn-ghost btn-sm">Editar</button></td></tr>
+          <tr><td>Norte</td><td>$4.20</td><td>$0.70</td><td>15</td><td><button class="btn btn-ghost btn-sm">Editar</button></td></tr>
+          <tr><td>Sur</td><td>$4.50</td><td>$0.70</td><td>10</td><td><button class="btn btn-ghost btn-sm">Editar</button></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- INCIDENCIAS -->
+    <div class="panel" data-panel="incidencias">
+      <div class="topbar"><div><h1>Incidencias y reportes</h1><div class="sub">Casos que requieren revisión manual</div></div></div>
+      <div class="card">
+        <table>
+          <tr><th>Código</th><th>Tipo</th><th>Reportado por</th><th>Fecha</th><th>Estado</th><th></th></tr>
+          <tr><td class="code">SE-47960</td><td>Destinatario no localizado</td><td>Repartidor</td><td>10 jul</td><td><span class="badge incidencia">Abierta</span></td><td><button class="btn btn-primary btn-sm">Revisar</button></td></tr>
+          <tr><td class="code">SE-47820</td><td>Paquete dañado</td><td>Remitente</td><td>9 jul</td><td><span class="badge incidencia">Abierta</span></td><td><button class="btn btn-primary btn-sm">Revisar</button></td></tr>
+          <tr><td class="code">SE-47701</td><td>Retraso prolongado</td><td>Sistema</td><td>8 jul</td><td><span class="badge entregado">Resuelta</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- <span th:text="${session.usuario.nombre}"></span>
+    <span th:text="${session.usuario.email}"></span>
+    <span th:text="${session.usuario.rol}"></span> -->
+
+    <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
+<script th:src="@{/scripts/controlDepaneles.js}"></script>
+
+</body>
+</html>

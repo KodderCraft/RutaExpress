@@ -17,10 +17,13 @@ public class UsuarioService {
     public Usuario guardarCliente(Usuario cliente){
         return usuarioRepository.save(cliente);
     }
-
+    public boolean existeCorreo(String email){
+    return usuarioRepository.existsByEmail(email);
+}
     public Usuario login(loginValidar login){
         Optional<Usuario> cliente = usuarioRepository.findBynombre(login.getnombre());
 
+        
         if(cliente.isEmpty()){
             return null;
         }
@@ -33,5 +36,7 @@ public class UsuarioService {
 
         return null;
     }
+    
+    
 
 }

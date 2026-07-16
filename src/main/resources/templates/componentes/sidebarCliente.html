@@ -1,5 +1,4 @@
-<div class="app active" id="app-remitente" th:fragment="sidebarCliente">
-  <div class="sidebar" data-scope="remitente">
+<div class="sidebar" data-scope="remitente" th:fragment="sidebarCliente" >
     <div class="sidebar-title">Remitente</div>
     <div class="nav-item active" data-panel="inicio"><i data-icon="home"></i>Inicio</div>
     <div class="nav-item" data-panel="nuevo"><i data-icon="box"></i>Nuevo envío</div>
@@ -7,10 +6,7 @@
     <div class="nav-item" data-panel="rastrear"><i data-icon="search"></i>Rastrear paquete</div>
     <div class="nav-item" data-panel="pagos"><i data-icon="wallet"></i>Pagos</div>
     <div class="sidebar-foot">
-      <!-- <div class="avatar">MJ
-        
-      </div> -->
-      <div class="avatar" th:text="${#strings.substring(session.usuario.nombre, 0, 1)}"></div>
-      <div class="who"><b><p th:text="${session.usuario.nombre}"></p></b><span th:text="${session.usuario.rol}"></span></div>
+      <div class="avatar">MJ</div>
+      <div class="who"><b>María Jiménez</b><span>Cuenta personal</span></div>
     </div>
   </div>

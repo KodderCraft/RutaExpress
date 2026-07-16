@@ -49,20 +49,20 @@
       <!-- LOGIN -->
     <form th:action="@{/loginValidar}"  th:object="${loginRequest}" method="post">
       <div class="auth-subpanel active" data-authpanel="login">
-        <div class="field"><label>Nombre</label><input th:field="*{nombre}" type="text" placeholder="Juan P"></div>
-        <div class="field"><label>Contraseña</label><input th:field="*{password}" type="password" placeholder="••••••••"></div>
         <div style="display:flex;justify-content:space-around ;align-items:center;margin:20px 16px;font-size:.8rem;">
-          <div th:if="${error}" style="color: red; ">
+          <div th:if="${error}" style="color: rgb(212, 95, 95); ">
                 <p th:text="${error}"></p>
             </div>
           <a href="#" style="font-size:.8rem;color:var(--amber-dark);text-decoration:none;">Informacion </a>
         </div>
+        <div class="field"><label>Nombre</label><input th:field="*{nombre}" type="text" placeholder="Juan P"></div>
+        <div class="field"><label>Contraseña</label><input th:field="*{password}" type="password" placeholder="••••••••"></div>
         <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
         
     </div>
     </form> 
       <!-- REGISTRO -->
-    <form th:action="@{/validar}" th:object="${usuario}" method="post">
+    <form th:action="@{/validar}" th:object="${registro}" method="post">
 
       <div class="auth-subpanel "  data-authpanel="registro">
         <p class="hint" style="margin:10px 0;">Selecciona tu tipo de usuario</p>
@@ -79,6 +79,22 @@
         </div>
         <div class="field-row">
           <div class="field"><label>Correo electrónico</label><input th:field="*{email}" type="email" placeholder="tu@correo.com"></div>
+          
+          <div   class="field datosRepartidor" style="display:none;">
+
+             <select th:field="*{vehiculoTipo}" >
+               <option value="">Seleccione</option>
+               <option value="MOTOCICLETA">Motocicleta</option>
+               <option value="AUTOMOVIL">Automóvil</option>
+               <option value="CAMIONETA">Camioneta</option>
+              </select>
+              
+          </div>
+          <div class="field datosRepartidor" style="display:none;">
+            <label >Placa</label>
+            <input type="text" th:field="*{placa}" placeholder="123-XTR">
+          </div>
+
         </div>
         <div class="field"><label>Contraseña</label><input th:field="*{password}" type="password" placeholder="Crea una contraseña"></div>
         <button type="submit" class="btn btn-dark btn-block" >Crear cuenta</button>

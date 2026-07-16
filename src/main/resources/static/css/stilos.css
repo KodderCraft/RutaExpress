@@ -20,7 +20,7 @@
     --shadow:0 2px 14px rgba(20,33,61,.07);
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0;scroll-behavior: smooth;}
   body{
     font-family:'Inter',sans-serif;
     color:var(--text);
@@ -48,7 +48,7 @@
     cursor:pointer;font-size:.86rem;font-weight:600;display:flex;gap:8px;align-items:center;transition:.15s; text-decoration: none;
   }
   .role-tab .icon{width:16px;height:16px;}
-  .role-tab.active{background:var(--paper);color:var(--ink);}
+  /* .role-tab.active{background:var(--paper);color:var(--ink);} */
   .role-tab:hover:not(.active){background:rgba(255,255,255,.08);color:#fff;}
 
    /* ===== AUTH SCREEN (login / registro) ===== */
@@ -93,7 +93,7 @@
   }
   .nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
   .nav-item.active{background:rgba(255,159,28,.15);color:#fff;border-left-color:var(--amber);}
-  .sidebar-foot{margin-top:auto; width: 85%; padding:14px;border-top:1px solid rgba(255,255,255,.09);display:flex;gap:10px;align-items:center; border:red 2px solid ; }
+  .sidebar-foot{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.09);display:flex;gap:10px;align-items:center;}
   .avatar{width:34px;height:34px;border-radius:50%;background:var(--amber);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex:none;}
   .sidebar-foot .who{font-size:.8rem;line-height:1.25;}
   .sidebar-foot .who b{display:block;color:#fff;font-size:.84rem;}

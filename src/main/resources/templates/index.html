@@ -3,465 +3,459 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>RutaExpress - Servicio de Entregas</title>
+    <title>RutaExpress - Servicio de Entregas</title>
 
 
-<link rel="stylesheet" th:href="@{/css/stilos.css}">
+    <link rel="stylesheet" th:href="@{/css/stilos.css}">
 
 
-<style>
+    <style>
+        :root {
+            --ink: #14213D;
+            --ink-2: #1E2E52;
+            --paper: #F6F5F0;
+            --white: #FFFFFF;
 
-:root{
-    --ink:#14213D;
-    --ink-2:#1E2E52;
-    --paper:#F6F5F0;
-    --white:#FFFFFF;
+            --amber: #FF9F1C;
+            --amber-dark: #DB8300;
 
-    --amber:#FF9F1C;
-    --amber-dark:#DB8300;
+            --teal: #0E8C7F;
 
-    --teal:#0E8C7F;
+            --text: #1C2333;
+            --mute: #69708A;
 
-    --text:#1C2333;
-    --mute:#69708A;
+            --line: #E3DFD2;
 
-    --line:#E3DFD2;
+            --radius: 18px;
 
-    --radius:18px;
+            --shadow: 0 10px 30px rgba(20, 33, 61, .12);
+        }
 
-    --shadow:0 10px 30px rgba(20,33,61,.12);
-}
 
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
 
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:'Inter',sans-serif;
-}
 
 
+        body {
 
-body{
+            background: var(--paper);
+            color: var(--text);
 
-    background:var(--paper);
-    color:var(--text);
+        }
 
-}
 
 
+        .inicio {
 
-.inicio{
+            min-height: 85vh;
 
-    min-height:85vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+            padding: 80px 10%;
 
-    padding:80px 10%;
+            gap: 50px;
 
-    gap:50px;
+            background:
+                linear-gradient(120deg,
+                    #F6F5F0,
+                    #FFF1DC);
 
-    background:
-    linear-gradient(
-        120deg,
-        #F6F5F0,
-        #FFF1DC
-    );
+        }
 
-}
 
 
+        .contenido {
 
-.contenido{
+            max-width: 600px;
 
-    max-width:600px;
+        }
 
-}
 
 
+        .contenido h2 {
 
-.contenido h2{
+            font-size: 52px;
 
-    font-size:52px;
+            line-height: 1.1;
 
-    line-height:1.1;
+            color: var(--ink);
 
-    color:var(--ink);
+            margin-bottom: 25px;
 
-    margin-bottom:25px;
+        }
 
-}
 
 
+        .contenido p {
 
-.contenido p{
+            font-size: 18px;
 
-    font-size:18px;
+            line-height: 1.7;
 
-    line-height:1.7;
+            color: var(--mute);
 
-    color:var(--mute);
+        }
 
-}
 
 
+        .botones {
 
-.botones{
+            display: flex;
 
-    display:flex;
+            gap: 20px;
 
-    gap:20px;
+            margin-top: 35px;
 
-    margin-top:35px;
+        }
 
-}
 
 
+        .btn {
 
-.btn{
+            text-decoration: none;
 
-    text-decoration:none;
+            padding: 15px 32px;
 
-    padding:15px 32px;
+            border-radius: var(--radius);
 
-    border-radius:var(--radius);
+            background: var(--amber);
 
-    background:var(--amber);
+            color: white;
 
-    color:white;
+            font-weight: 700;
 
-    font-weight:700;
+            transition: .3s;
 
-    transition:.3s;
+            display: inline-block;
 
-    display:inline-block;
+        }
 
-}
 
 
+        .btn:hover {
 
-.btn:hover{
+            background: var(--amber-dark);
 
-    background:var(--amber-dark);
+            transform: translateY(-3px);
 
-    transform:translateY(-3px);
+        }
 
-}
 
 
+        .btn.secundario {
 
-.btn.secundario{
+            background: var(--ink);
 
-    background:var(--ink);
+        }
 
-}
 
 
+        .btn.secundario:hover {
 
-.btn.secundario:hover{
+            background: var(--ink-2);
 
-    background:var(--ink-2);
+        }
 
-}
 
 
 
 
+        .imagen {
 
-.imagen{
+            background: white;
 
-    background:white;
+            padding: 25px;
 
-    padding:25px;
+            border-radius: 50%;
 
-    border-radius:50%;
+            box-shadow: var(--shadow);
 
-    box-shadow:var(--shadow);
+        }
 
-}
 
 
+        .imagen img {
 
-.imagen img{
+            width: 380px;
 
-    width:380px;
+            height: 380px;
 
-    height:380px;
+            border-radius: 50%;
 
-    border-radius:50%;
+            object-fit: cover;
 
-    object-fit:cover;
+        }
 
-}
 
 
 
 
+        /* SERVICIOS */
 
-/* SERVICIOS */
 
+        .servicios,
+        .como-funciona,
+        .beneficios,
+        .accion {
 
-.servicios,
-.como-funciona,
-.beneficios,
-.accion{
+            padding: 70px 10%;
 
-    padding:70px 10%;
+            text-align: center;
 
-    text-align:center;
+        }
 
-}
 
 
+        .servicios h2,
+        .como-funciona h2,
+        .beneficios h2,
+        .accion h2 {
 
-.servicios h2,
-.como-funciona h2,
-.beneficios h2,
-.accion h2{
+            color: var(--ink);
 
-    color:var(--ink);
+            font-size: 35px;
 
-    font-size:35px;
+            margin-bottom: 45px;
 
-    margin-bottom:45px;
+        }
 
-}
 
 
 
 
+        .cards {
 
-.cards{
+            display: grid;
 
-    display:grid;
+            grid-template-columns: repeat(3, 1fr);
 
-    grid-template-columns:repeat(3,1fr);
+            gap: 25px;
 
-    gap:25px;
+        }
 
-}
 
 
 
 
+        .card {
 
-.card{
+            background: white;
 
-    background:white;
+            padding: 35px;
 
-    padding:35px;
+            border-radius: var(--radius);
 
-    border-radius:var(--radius);
+            box-shadow: var(--shadow);
 
-    box-shadow:var(--shadow);
+            transition: .3s;
 
-    transition:.3s;
+        }
 
-}
 
 
+        .card:hover {
 
-.card:hover{
+            transform: translateY(-8px);
 
-    transform:translateY(-8px);
+        }
 
-}
 
 
+        .card h3 {
 
-.card h3{
+            color: var(--ink);
 
-    color:var(--ink);
+            margin-bottom: 15px;
 
-    margin-bottom:15px;
+        }
 
-}
 
 
+        .card p {
 
-.card p{
+            color: var(--mute);
 
-    color:var(--mute);
+            line-height: 1.5;
 
-    line-height:1.5;
+        }
 
-}
 
 
 
 
+        /* PASOS */
 
-/* PASOS */
 
+        .pasos {
 
-.pasos{
+            display: grid;
 
-    display:grid;
+            grid-template-columns: repeat(4, 1fr);
 
-    grid-template-columns:repeat(4,1fr);
+            gap: 20px;
 
-    gap:20px;
+        }
 
-}
 
 
+        .paso {
 
-.paso{
+            background: white;
 
-    background:white;
+            padding: 30px;
 
-    padding:30px;
+            border-radius: var(--radius);
 
-    border-radius:var(--radius);
+            box-shadow: var(--shadow);
 
-    box-shadow:var(--shadow);
+        }
 
-}
 
 
+        .paso span {
 
-.paso span{
+            display: inline-flex;
 
-    display:inline-flex;
+            width: 45px;
 
-    width:45px;
+            height: 45px;
 
-    height:45px;
+            justify-content: center;
 
-    justify-content:center;
+            align-items: center;
 
-    align-items:center;
+            background: var(--amber);
 
-    background:var(--amber);
+            color: white;
 
-    color:white;
+            border-radius: 50%;
 
-    border-radius:50%;
+            font-weight: bold;
 
-    font-weight:bold;
+            margin-bottom: 15px;
 
-    margin-bottom:15px;
+        }
 
-}
 
 
 
 
+        /* BENEFICIOS */
 
-/* BENEFICIOS */
 
+        .beneficio-list {
 
-.beneficio-list{
+            display: flex;
 
-    display:flex;
+            justify-content: center;
 
-    justify-content:center;
+            gap: 25px;
 
-    gap:25px;
+            flex-wrap: wrap;
 
-    flex-wrap:wrap;
+        }
 
-}
 
 
+        .beneficio-list div {
 
-.beneficio-list div{
+            background: white;
 
-    background:white;
+            padding: 25px;
 
-    padding:25px;
+            width: 220px;
 
-    width:220px;
+            border-radius: var(--radius);
 
-    border-radius:var(--radius);
+            box-shadow: var(--shadow);
 
-    box-shadow:var(--shadow);
+            font-size: 18px;
 
-    font-size:18px;
+        }
 
-}
 
 
 
 
+        /* FINAL */
 
-/* FINAL */
 
+        .accion {
 
-.accion{
+            background: var(--ink);
 
-    background:var(--ink);
+            color: white;
 
-    color:white;
+        }
 
-}
 
 
+        .accion h2 {
 
-.accion h2{
+            color: white;
 
-    color:white;
+        }
 
-}
 
 
+        .accion p {
 
-.accion p{
+            margin-bottom: 30px;
 
-    margin-bottom:30px;
+            color: #ddd;
 
-    color:#ddd;
+        }
 
-}
 
 
 
 
+        @media(max-width:900px) {
 
-@media(max-width:900px){
+            .inicio {
 
-    .inicio{
+                flex-direction: column;
 
-        flex-direction:column;
+                text-align: center;
 
-        text-align:center;
+            }
 
-    }
 
+            .cards {
 
-    .cards{
+                grid-template-columns: 1fr;
 
-        grid-template-columns:1fr;
+            }
 
-    }
 
+            .pasos {
 
-    .pasos{
+                grid-template-columns: 1fr;
 
-        grid-template-columns:1fr;
+            }
 
-    }
 
+            .imagen img {
 
-    .imagen img{
+                width: 260px;
 
-        width:260px;
+                height: 260px;
 
-        height:260px;
+            }
 
-    }
-
-}
-
-
-
-</style>
+        }
+    </style>
 
 </head>
 
@@ -470,212 +464,225 @@ body{
 <body>
 
 
-<div th:replace="~{componentes/header :: header}"></div>
+    <div th:replace="~{componentes/header :: header}"></div>
 
 
 
-<section class="inicio">
+    <section class="inicio">
 
 
-<div class="contenido">
+        <div class="contenido">
 
 
-<h2>
-Entregas rápidas, seguras y confiables
-</h2>
+            <h2>
+                Entregas rápidas, seguras y confiables
+            </h2>
 
 
-<p>
-Conecta tus paquetes con cualquier destino.
-Selecciona la ubicación, calcula la ruta y realiza
-el seguimiento de tu envío en tiempo real.
-</p>
+            <p>
+                Conecta tus paquetes con cualquier destino.
+                Selecciona la ubicación, calcula la ruta y realiza
+                el seguimiento de tu envío en tiempo real.
+            </p>
 
 
-<div class="botones">
+            <div class="botones">
 
-<a th:href="@{/login}" class="btn">
-Crear cuenta
-</a>
+    <a th:if="${session.usuario == null}"
+       th:href="@{/login}"
+       class="btn primario">
+        Acceder al Sistema
+    </a>
 
+    <a th:if="${session.usuario != null and session.usuario.rol.name() == 'CLIENTE'}"
+       th:href="@{/cliente/dashboard}"
+       class="btn secundario">
+        Ir a mi panel
+    </a>
 
-<a th:href="@{/login}" class="btn secundario">
-Iniciar sesión
-</a>
+    <a th:if="${session.usuario != null and session.usuario.rol.name() == 'REPARTIDOR'}"
+       th:href="@{/repartidor/dashboard}"
+       class="btn secundario">
+        Ir a mi panel
+    </a>
 
-
-</div>
-
-
-</div>
-
-
-
-<div class="imagen">
-
-<img src="/images/logo.jpg"
-alt="RutaExpress">
-
-</div>
-
-
-
-</section>
-
-
-
-
-<section class="servicios">
-
-
-<h2>
-Nuestros servicios
-</h2>
-
-
-
-<div class="cards">
-
-
-<div class="card">
-
-<h3>📦 Envíos</h3>
-
-<p>
-Envía paquetes de forma rápida y segura.
-</p>
+    <a th:if="${session.usuario != null and session.usuario.rol.name() == 'ADMINISTRADOR'}"
+       th:href="@{/administrador/dashboard}"
+       class="btn secundario">
+        Ir a mi panel
+    </a>
 
 </div>
 
 
+        </div>
 
-<div class="card">
 
-<h3>📍 Seguimiento</h3>
 
-<p>
-Consulta la ubicación de tu envío.
-</p>
+        <div class="imagen">
 
-</div>
+            <img src="/images/logo.jpg" alt="RutaExpress">
 
+        </div>
 
 
 
-<div class="card">
+    </section>
 
-<h3>🗺️ Rutas inteligentes</h3>
 
-<p>
-Calculamos rutas eficientes.
-</p>
 
-</div>
 
+    <section class="servicios" id="servicio">
 
 
-</div>
+        <h2>
+            Nuestros servicios
+        </h2>
 
 
-</section>
 
+        <div class="cards">
 
 
+            <div class="card">
 
-<section class="como-funciona">
+                <h3>📦 Envíos</h3>
 
+                <p>
+                    Envía paquetes de forma rápida y segura.
+                </p>
 
-<h2>
-¿Cómo funciona?
-</h2>
+            </div>
 
 
-<div class="pasos">
 
+            <div class="card">
 
-<div class="paso">
+                <h3>📍 Seguimiento</h3>
 
-<span>1</span>
+                <p>
+                    Consulta la ubicación de tu envío.
+                </p>
 
-<h3>Registro</h3>
+            </div>
 
-<p>
-Crea tu cuenta y registra tu paquete.
-</p>
 
-</div>
 
 
-<div class="paso">
+            <div class="card">
 
-<span>2</span>
+                <h3>🗺️ Rutas inteligentes</h3>
 
-<h3>Ruta</h3>
+                <p>
+                    Calculamos rutas eficientes.
+                </p>
 
-<p>
-Calculamos el mejor recorrido.
-</p>
+            </div>
 
-</div>
 
 
-<div class="paso">
+        </div>
 
-<span>3</span>
 
-<h3>Seguimiento</h3>
+    </section>
 
-<p>
-Observa el estado del envío.
-</p>
 
-</div>
 
 
-<div class="paso">
+    <section class="como-funciona">
 
-<span>4</span>
 
-<h3>Entrega</h3>
+        <h2>
+            ¿Cómo funciona?
+        </h2>
 
-<p>
-Recibe tu paquete seguro.
-</p>
 
-</div>
+        <div class="pasos">
 
 
-</div>
+            <div class="paso">
 
+                <span>1</span>
 
-</section>
+                <h3>Registro</h3>
 
+                <p>
+                    Crea tu cuenta y registra tu paquete.
+                </p>
 
+            </div>
 
 
-<section class="accion">
+            <div class="paso">
 
+                <span>2</span>
 
-<h2>
-Comienza a enviar con RutaExpress
-</h2>
+                <h3>Ruta</h3>
 
+                <p>
+                    Calculamos el mejor recorrido.
+                </p>
 
-<p>
-La forma fácil de transportar tus paquetes.
-</p>
+            </div>
 
 
-<a href="/login" class="btn">
-Crear cuenta
-</a>
+            <div class="paso">
 
+                <span>3</span>
 
-</section>
+                <h3>Seguimiento</h3>
 
+                <p>
+                    Observa el estado del envío.
+                </p>
 
+            </div>
 
-<div th:replace="~{componentes/footer :: footer}"></div>
+
+            <div class="paso">
+
+                <span>4</span>
+
+                <h3>Entrega</h3>
+
+                <p>
+                    Recibe tu paquete seguro.
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+
+    <section class="accion">
+
+
+        <h2>
+            Comienza a enviar con RutaExpress
+        </h2>
+
+
+        <p>
+            La forma fácil de transportar tus paquetes.
+        </p>
+
+
+        <a href="/login" class="btn">
+            Crear cuenta
+        </a>
+
+
+    </section>
+
+
+
+    <div th:replace="~{componentes/footer :: footer}"></div>
 
     <script th:src="@{/scripts/controlDepaneles.js}"></script>
 
