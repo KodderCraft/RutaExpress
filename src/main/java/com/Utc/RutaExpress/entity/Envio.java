@@ -53,6 +53,8 @@ public class Envio {
 
     private LocalDateTime fechaEntrega;
 
+    private LocalDateTime fechaAsignacion;
+
     public Envio() {}
 
     public Long getId() { return id; }
@@ -99,4 +101,7 @@ public class Envio {
 
     public LocalDateTime getFechaEntrega() { return fechaEntrega; }
     public void setFechaEntrega(LocalDateTime fechaEntrega) { this.fechaEntrega = fechaEntrega; }
+
+    public LocalDateTime getFechaAsignacion() { return fechaAsignacion; }
+    public void setFechaAsignacion(LocalDateTime fechaAsignacion) { this.fechaAsignacion = fechaAsignacion; }
 }

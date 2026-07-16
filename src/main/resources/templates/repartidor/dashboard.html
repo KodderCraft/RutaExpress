@@ -12,6 +12,7 @@
         <div class="sidebar" data-scope="repartidor" >
         <div class="sidebar-title">Repartidor</div>
         <div class="nav-item active" data-panel="inicio"><i data-icon="home"></i>Ruta de hoy</div>
+        <div class="nav-item" data-panel="disponibles"><i data-icon="list"></i>Disponibles</div>
         <div class="nav-item" data-panel="mapa"><i data-icon="mapPin"></i>Mapa</div>
         <div class="nav-item" data-panel="entrega"><i data-icon="box"></i>Entrega actual</div>
         <div class="nav-item" data-panel="ganancias"><i data-icon="wallet"></i>Ganancias</div>
@@ -49,6 +50,48 @@
                 <tr><td class="mono">3</td><td class="code">SE-48213</td><td>Carlos Peña</td><td>Calle Larga 8-21</td><td>Entrega</td><td><span class="badge reparto">En curso</span></td><td><button class="btn btn-primary btn-sm" onclick="goPanel('repartidor','entrega')">Abrir</button></td></tr>
                 <tr><td class="mono">4</td><td class="code">SE-48250</td><td>Farmacia Norte</td><td>Gran Colombia 12-40</td><td>Recogida</td><td><span class="badge pendiente">Pendiente</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
                 <tr><td class="mono">5</td><td class="code">SE-48261</td><td>Rosa Medina</td><td>Av. Loja 4-90</td><td>Entrega</td><td><span class="badge pendiente">Pendiente</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+                </table>
+            </div>
+            </div>
+
+            <!-- DISPONIBLES -->
+            <div class="panel" data-panel="disponibles">
+            <div class="topbar">
+                <div><h1>Envíos disponibles</h1><div class="sub">Elige las entregas que quieras realizar hoy</div></div>
+            </div>
+
+            <div class="card" th:if="${mensaje}">
+                <p class="hint" style="color:var(--teal);" th:text="${mensaje}"></p>
+            </div>
+            <div class="card" th:if="${error}">
+                <p class="hint" style="color:var(--coral);" th:text="${error}"></p>
+            </div>
+
+            <div class="card stat-card">
+                <div class="label">Meta diaria</div>
+                <div class="value"><span th:text="${reclamadosHoy}"></span> / <span th:text="${metaDiaria}"></span></div>
+                <div class="label">Envíos elegidos hoy</div>
+            </div>
+
+            <div class="card">
+                <h3>Disponibles para elegir</h3>
+                <p class="hint">Envíos sin repartidor asignado</p>
+                <table>
+                <tr><th>Código</th><th>Destinatario</th><th>Dirección de entrega</th><th>Tipo</th><th></th></tr>
+                <tr th:each="envio : ${enviosDisponibles}">
+                    <td class="code" th:text="${envio.codigoGuia}"></td>
+                    <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
+                    <td th:text="${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'}"></td>
+                    <td th:text="${envio.tipoServicio}"></td>
+                    <td>
+                        <form th:action="@{/repartidor/envios/{id}/reclamar(id=${envio.id})}" method="post" style="display:inline;">
+                            <button class="btn btn-primary btn-sm" type="submit">Elegir</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(enviosDisponibles)}">
+                    <td colspan="5" class="hint">No hay envíos disponibles por ahora.</td>
+                </tr>
                 </table>
             </div>
             </div>
