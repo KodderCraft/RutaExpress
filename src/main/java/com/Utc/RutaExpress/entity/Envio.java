@@ -26,15 +26,10 @@ public class Envio {
     private Usuario destinatario;
 
     @Column(nullable = false)
+    private String direccionRecogida;
+
+    @Column(nullable = false)
     private String direccionEntrega;
-
-    @ManyToOne
-    @JoinColumn(name = "sucursal_origen_id", nullable = false)
-    private Sucursal sucursalOrigen;
-
-    @ManyToOne
-    @JoinColumn(name = "sucursal_destino_id", nullable = false)
-    private Sucursal sucursalDestino;
 
     // Sin @Column(nullable = false): el envio puede no tener repartidor asignado todavia
     @ManyToOne
@@ -90,28 +85,20 @@ public class Envio {
         this.destinatario = destinatario;
     }
 
+    public String getDireccionRecogida() {
+        return direccionRecogida;
+    }
+
+    public void setDireccionRecogida(String direccionRecogida) {
+        this.direccionRecogida = direccionRecogida;
+    }
+
     public String getDireccionEntrega() {
         return direccionEntrega;
     }
 
     public void setDireccionEntrega(String direccionEntrega) {
         this.direccionEntrega = direccionEntrega;
-    }
-
-    public Sucursal getSucursalOrigen() {
-        return sucursalOrigen;
-    }
-
-    public void setSucursalOrigen(Sucursal sucursalOrigen) {
-        this.sucursalOrigen = sucursalOrigen;
-    }
-
-    public Sucursal getSucursalDestino() {
-        return sucursalDestino;
-    }
-
-    public void setSucursalDestino(Sucursal sucursalDestino) {
-        this.sucursalDestino = sucursalDestino;
     }
 
     public Usuario getRepartidor() {
