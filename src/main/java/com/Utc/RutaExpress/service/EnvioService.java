@@ -1,28 +1,66 @@
 package com.Utc.RutaExpress.service;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.Utc.RutaExpress.entity.Envio;
+import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
+import com.Utc.RutaExpress.repository.EnvioRepository;
 
-public interface EnvioService {
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
-    List<Envio> listarTodos();
+@Service
+public class EnvioService {
 
-    Envio buscarPorId(Long id);
+    private final EnvioRepository envioRepository;
 
-    Envio guardar(Envio envio);
+    public EnvioService(EnvioRepository envioRepository) {
+        this.envioRepository = envioRepository;
+    }
 
-    Envio actualizar(Long id, Envio envio);
+    public List<Envio> listarTodos() {
+        return envioRepository.findAll();
+    }
 
-    void eliminar(Long id);
+    public Envio buscarPorId(Long id) {
+        return envioRepository.findById(id).orElse(null);
+    }
 
-    List<Envio> listarDisponibles();
+    public Envio guardar(Envio envio) {
+        return envioRepository.save(envio);
+    }
 
-    boolean reclamar(Long envioId, Repartidor repartidor);
+    public Envio actualizar(Long id, Envio envio) {
+        envio.setId(id);
+        return envioRepository.save(envio);
+    }
 
-    long contarReclamadosHoy(Repartidor repartidor);
+    public void eliminar(Long id) {
+        envioRepository.deleteById(id);
+    }
 
-    List<Envio> listarAsignadosHoy(Repartidor repartidor);
+    public List<Envio> listarDisponibles() {
+        return envioRepository.findByEstadoAndRepartidorIsNull(EstadoEnvio.PENDIENTE);
+    }
 
+    @Transactional
+    public boolean reclamar(Long envioId, Repartidor repartidor) {
+        int filas = envioRepository.reclamar(envioId, repartidor, LocalDateTime.now());
+        return filas == 1;
+    }
+
+    public long contarReclamadosHoy(Repartidor repartidor) {
+        LocalDateTime inicio = LocalDate.now().atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return envioRepository.countByRepartidorAndFechaAsignacionBetween(repartidor, inicio, fin);
+    }
+
+    public List<Envio> listarAsignadosHoy(Repartidor repartidor) {
+        LocalDateTime inicio = LocalDate.now().atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return envioRepository.findByRepartidorAndFechaAsignacionBetween(repartidor, inicio, fin);
+    }
 }
