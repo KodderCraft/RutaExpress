@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/stilos.css}">
+<link rel="stylesheet" 
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 
 </head>
 <body>
@@ -14,7 +18,7 @@
 <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}"></div>
   <div class="main">
     <!-- INICIO -->
-    <div class="panel active" data-panel="inicio">
+    <div class="panel " data-panel="inicio">
       <div class="topbar">
         <div><h1>Hola, <span th:text="${session.usuario.nombre}"></span> </h1><div class="sub">Esto es lo que pasa con tus envíos hoy</div></div>
         <div class="topbar-actions">
@@ -92,15 +96,36 @@
     </div>
 
     <!-- NUEVO ENVÍO -->
-    <div class="panel" data-panel="nuevo">
+    <div class="panel active" data-panel="nuevo">
       <div class="topbar"><div><h1>Crear un nuevo envío</h1><div class="sub">Completa los datos de recogida y entrega</div></div></div>
       <div class="grid two-col">
         
-        <div class="card">
+        <!-- <div class="card">
           <h3>Detalles del envío</h3>
           <div class="field-row">
-            <div class="field"><label>Dirección de recogida</label><input type="text" value="Av. Solano 4-56, Cuenca"></div>
-            <div class="field"><label>Dirección de entrega</label><input type="text" placeholder="Ej. Calle Larga 8-21"></div>
+              <div class="field">
+                  <label>Dirección de recogida
+                    
+                  </label>
+                  
+                  <input id="direccionRecogida" readonly placeholder="Ej. calle 642">
+
+                  <button class="btn btn-dark" type="button" onclick="abrirMapa('recogida')">
+                      Agregar dirección
+                  </button>
+
+              </div>
+
+              <div class="field">
+        <label>Dirección de entrega</label>
+
+        <input id="direccionEntrega" readonly placeholder="Ej. calle 32">
+
+        <button class="btn btn-dark"  type="button" onclick="abrirMapa('entrega')">
+            Agregar dirección
+        </button>
+
+    </div>
           </div>
           <div class="field-row">
             <div class="field"><label>Nombre del destinatario</label><input type="text" placeholder="Ej. Carlos Peña"></div>
@@ -108,43 +133,148 @@
           </div>
           <div class="field-row">
             <div class="field"><label>Tipo de paquete</label>
-              <select>
-                <option>Documento</option>
-                <option selected>Paquete pequeño (hasta 5 kg)</option>
-                <option>Paquete mediano (hasta 15 kg)</option>
-                <option>Paquete grande / carga</option>
-              </select>
+              <button class="btn btn-teal" onclick="document.getElementById('modal-paquete').showModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Agregar Paquete
+            </button>
             </div>
             <div class="field"><label>Valor declarado (opcional, para seguro)</label><input type="text" placeholder="$ 0.00"></div>
           </div>
           <div class="field"><label>Instrucciones para el repartidor</label><textarea rows="2" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea></div>
-          <button class="btn btn-dark" onclick="showQuote()"><i data-icon="search"></i>Calcular cotización</button>
+          <button class="btn btn-dark" ><i data-icon="send"></i>Generar Envio</button>
+          <button class="btn  btn-primary" onclick="verRuta()" style=" color: rgb(252, 251, 251);"><i data-icon="mapPin"></i>Ver ruta</button>
 
-          <div class="quote-card" id="quoteCard" style="display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
-              <div>
-                <div style="color:#9AA6C6;font-size:.78rem;">Tarifa estimada</div>
-                <div class="price">$4.80</div>
-                <div style="color:#C1C9E4;font-size:.8rem;margin-top:4px;">Entrega estimada: hoy, 3–5 p.m.</div>
-              </div>
-              <button class="btn btn-primary">Confirmar y pagar</button>
+          <div class="field-row">
+     
+            <div class="quote-card" id="quoteCard" style="display:none; width: 40%;  margin-left: auto;">
             </div>
           </div>
-        </div>
+
+          
+        </div> -->
+        
+        <div class="card">
+  <h3>Detalles del envío</h3>
+
+  <!-- SECCIÓN 1: DIRECCIONES -->
+  <div class="field-row">
+    <div class="field">
+      <label for="direccionRecogida">Dirección de recogida</label>
+      <input id="direccionRecogida" name="direccion_recogida" readonly placeholder="Ej. calle 642">
+      <!-- Input oculto para guardar el ID de la dirección una vez se guarde en la BD -->
+      <input type="hidden" id="direccionRecogidaId" name="direccion_recogida_id">
+      <button class="btn btn-dark" type="button" onclick="abrirMapa('recogida')">
+        Agregar dirección
+      </button>
+    </div>
+
+    <div class="field">
+      <label for="direccionEntrega">Dirección de entrega</label>
+      <input id="direccionEntrega" name="direccion_entrega" readonly placeholder="Ej. calle 32">
+      <!-- Input oculto para guardar el ID de la dirección una vez se guarde en la BD -->
+      <input type="hidden" id="direccionEntregaId" name="direccion_entrega_id">
+      <button class="btn btn-dark" type="button" onclick="abrirMapa('entrega')">
+        Agregar dirección
+      </button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: REMITENTE (Quién envía) -->
+  <div class="field-row">
+    <div class="field">
+      <label for="nombreRemitente">Nombre del remitente</label>
+      <input type="text" id="nombreRemitente" name="nombre_remitente" placeholder="Ej. María López">
+    </div>
+    <div class="field">
+      <label for="telefonoRemitente">Teléfono del remitente</label>
+      <input type="text" id="telefonoRemitente" name="telefono_remitente" placeholder="09XXXXXXXX">
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: DESTINATARIO (Quién recibe) -->
+  <div class="field-row">
+    <div class="field">
+      <label for="nombreDestinatario">Nombre del destinatario</label>
+      <input type="text" id="nombreDestinatario" name="nombre_destinatario" placeholder="Ej. Carlos Peña">
+    </div>
+    <div class="field">
+      <label for="telefonoDestinatario">Teléfono del destinatario</label>
+      <input type="text" id="telefonoDestinatario" name="telefono_destinatario" placeholder="09XXXXXXXX">
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4: DETALLES DEL SERVICIO Y PAQUETE -->
+  <div class="field-row">
+    <div class="field">
+      <label for="tipoServicio">Tipo de servicio</label>
+      <select id="tipoServicio" name="tipo_servicio">
+        <option value="estandar">Estándar</option>
+        <option value="express">Express (Mismo día)</option>
+        <option value="prioritario">Prioritario</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tipo de paquete</label>
+      <button type="button" class="btn btn-teal" onclick="document.getElementById('modal-paquete').showModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Agregar Paquete
+      </button>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="valorDeclarado">Valor declarado (opcional, para seguro)</label>
+      <input type="text" id="valorDeclarado" name="valor_declarado" placeholder="$ 0.00">
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="instrucciones">Instrucciones para el repartidor</label>
+    <textarea id="instrucciones" name="instrucciones" rows="2" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea>
+  </div>
+
+  <!-- CAMPOS OCULTOS PARA LOGÍSTICA (Se llenan automáticamente con JS tras calcular la ruta) -->
+  <input type="hidden" id="distanciaKm" name="distancia_km">
+  <input type="hidden" id="tiempoEstimadoMin" name="tiempo_estimado_min">
+  <input type="hidden" id="costoTotal" name="costo_total">
+
+  <!-- ACCIONES -->
+  <div class="field-row">
+    <button type="button" class="btn btn-primary" onclick="verRuta()" style="color: rgb(252, 251, 251);">
+      <i data-icon="mapPin"></i>Ver ruta
+    </button>
+    <button type="submit" class="btn btn-dark">
+      <i data-icon="send"></i>Generar Envío
+    </button>
+  </div>
+
+  <!-- COTIZACIÓN VISUAL -->
+  <div class="field-row">
+    <div class="quote-card" id="quoteCard" style="display:none; width: 40%; margin-left: auto;">
+      <!-- Aquí pintarás el costo, distancia y tiempo calculados antes de enviar -->
+    </div>
+  </div>
+</div>
 
         <div class="card">
           <h3>Resumen</h3>
           <p class="hint">Zona: Centro histórico → El Vergel</p>
           <div class="divider"></div>
           <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
-            <div style="display:flex;justify-content:space-between;"><span>Distancia estimada</span><b>3.2 km</b></div>
-            <div style="display:flex;justify-content:space-between;"><span>Tiempo estimado</span><b>35–50 min</b></div>
-            <div style="display:flex;justify-content:space-between;"><span>Repartidores disponibles</span><b>6 cerca</b></div>
+            <div style="display:flex;justify-content:space-between;"><span>Distancia estimada</span><b id="distanciaRuta"> ---</b></div>
+            <div style="display:flex;justify-content:space-between;"><span>Carro, Tiempo estimado </span><b id="tiempoRuta">---</b></div>
+            <div style="display:flex;justify-content:space-between;"><span>Repartidores disponibles</span><b>---</b></div>
           </div>
           <div class="divider"></div>
-          <div class="note">Puedes programar la recogida para más tarde desde "Instrucciones" o elegir recogida inmediata (predeterminado).</div>
         </div>
+
+
       </div>
+
     </div>
 
     <!-- MIS ENVÍOS -->
@@ -228,54 +358,478 @@
         </div>
       </div>
     </div>
+
+    <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div>
   </div>
+  </div>
+
+
+
+<!-- Modal mapa -->
+<div id="modalMapa" class="modal">
+
+    <div class="modal-content">
+
+        <h3 id="tituloMapa">Seleccionar dirección</h3>
+
+        <div id="mapSeleccion" style="height:400px;"></div>
+
+        <button class="btn btn-dark"  onclick="guardarDireccion()">
+            Guardar Ubicacion
+        </button>
+
+        <button class="btn btn-dark"  onclick="cerrarMapa()">
+            Cancelar
+        </button>
+
+    </div>
+
 </div>
 
 
+
+
+<dialog id="modal-paquete">
+  <header>
+    <h2>Registro de Paquete / Envío</h2>
+  </header>
+
+  <main>
+    <form >
+      <input type="hidden" id="envio_id" name="envio_id" />
+
+      <h3 class="label">Dimensisones y Peso</h3>
+
+      <section class="field-row" >
+        <div >  
+          <label  for="alto">Alto (m/cm):</label>
+          <input  type="number" id="alto" name="alto" step="0.01" placeholder="0.00" />
+        </div>
+
+        <div>
+          <label for="ancho">Ancho (m/cm):</label>
+          <input type="number" id="ancho" name="ancho" step="0.01" placeholder="0.00" />      
+        </div>
+
+        <div>
+
+          <label for="largo">Largo (m/cm):</label>
+          <input type="number" id="largo" name="largo" step="0.01" placeholder="0.00" />
+        </div>
+          <div>
+            
+            <label for="peso">Peso (kg):</label>
+            <input type="number" id="peso" name="peso" step="0.01" placeholder="0.00" />
+          </div>  
+      </section>
+
+   
+
+      <section>
+        <h3>Detalles del Contenido</h3>
+
+       <label for="tipo">Tipo de Paquete:</label>
+        <select id="tipo" name="tipo" required>
+          <option value="" disabled selected>Seleccione una opción...</option>
+          <option value="caja">Caja</option>
+          <option value="sobre">Sobre / Documento</option>
+          <option value="pallet">Pallet</option>
+          <option value="paquete_irregular">Paquete Irregular</option>
+          <option value="bolsa_seguridad">Bolsa de Seguridad</option>
+          <option value="otro">Otro</option>
+        </select>
+
+        <label for="valor_declarado">Valor Declarado ($):</label>
+        <input type="number" id="valor_declarado" name="valor_declarado" step="0.01" placeholder="0.00" />
+
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalles adicionales del contenido..."></textarea>
+
+        <br />
+
+        <label for="fragil">
+          <input style="width:20px;" type="checkbox" id="fragil" name="fragil" value="true" />
+          ¿Es material frágil?
+        </label>
+      </section>
+
+     
+
+      <div>
+        <button class="btn" type="button" onclick="this.closest('dialog').close()">Cancelar</button>
+        <button class="btn btn-primary" type="submit">Guardar Datos</button>
+      </div>
+    </form>
+  </main>
+</dialog>
+
     <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
-    <script th:src="@{/scripts/controlDepaneles.js}"></script>
-</body>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&libraries=places&callback=initMap"></script>
-
+  </body>
+  
+<script th:src="@{/scripts/controlDepaneles.js}"></script>
+  
+<!-- <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&libraries=places"></script> -->
 <script th:inline="javascript">
-let mapa;
-let mar;
 
-function initMap() {
+let mapaSeleccion = null;
 
-    // Crear mapa
-    mapa = new google.maps.Map(
-        document.getElementById("mapa"),
-        {
-            zoom: 15,
-            center: { lat: -0.2222, lng: -78.5222 }
-        }
+let mapaRuta = null;
+
+let marcador = null;
+
+let tipoDireccion = "";
+
+let direccionSeleccionada = "";
+
+
+let puntoRecogida = null;
+
+let puntoEntrega = null;
+
+
+let lineaRuta = null;
+
+  function toggleModal(modalId, show) {
+  const modal = document.getElementById(modalId);
+  if (show) {
+    modal.style.display="block";
+  } else {
+    modal.style.display="none";
+
+    document.getElementById('form-paquete').reset(); // Limpia campos al cerrar
+  }
+}
+
+function abrirMapa(tipo){
+
+    tipoDireccion = tipo;
+
+
+    document.getElementById("modalMapa")
+    .style.display="flex";
+
+
+    setTimeout(()=>{
+
+        crearMapaSeleccion();
+
+    },300);
+
+}
+
+function crearMapaSeleccion(){
+
+
+    if(mapaSeleccion){
+
+        mapaSeleccion.invalidateSize();
+
+        return;
+
+    }
+
+
+    mapaSeleccion = L.map('mapSeleccion')
+    .setView(
+        [-2.90055,-79.00453],
+        14
     );
 
-    // Crear marcador
-    mar = new google.maps.Marker({
 
-        position: { lat: -0.2222, lng: -78.5222 },
+    L.tileLayer(
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution:'OpenStreetMap'
+        }
+    ).addTo(mapaSeleccion);
 
-        map: mapa,
 
-        draggable: true,
 
-        title: "Origen"
+    mapaSeleccion.on('click',function(e){
+
+
+        if(marcador){
+
+            mapaSeleccion.removeLayer(marcador);
+
+        }
+
+
+        marcador =
+        L.marker([
+            e.latlng.lat,
+            e.latlng.lng
+        ])
+        .addTo(mapaSeleccion);
+
+
+
+        obtenerDireccion(
+            e.latlng.lat,
+            e.latlng.lng
+        );
+
 
     });
 
-    // Cuando termine de mover el marcador
-    mar.addListener("dragend", function (event) {
 
-        let lat = event.latLng.lat();
-        let lng = event.latLng.lng();
+}
 
-        console.log("Latitud:", lat);
-        console.log("Longitud:", lng);
+function obtenerDireccion(lat,lng){
 
+
+fetch(
+`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`
+)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+    direccionSeleccionada =
+    data.display_name;
+
+
+    console.log(direccionSeleccionada);
+
+
+});
+
+
+}
+
+
+function guardarDireccion(){
+
+
+    if(!marcador){
+
+        alert("Seleccione una ubicación");
+
+        return;
+
+    }
+
+
+
+    let pos = marcador.getLatLng();
+
+
+
+    if(tipoDireccion==="recogida"){
+
+
+        puntoRecogida={
+
+            lat:pos.lat,
+
+            lng:pos.lng
+
+        };
+
+
+        direccionRecogida.value =
+        direccionSeleccionada;
+
+
+
+    }else{
+
+
+        puntoEntrega={
+
+            lat:pos.lat,
+
+            lng:pos.lng
+
+        };
+
+
+        direccionEntrega.value =
+        direccionSeleccionada;
+
+    }
+
+
+
+    cerrarMapa();
+
+}
+
+function cerrarMapa(){
+
+
+    document.getElementById("modalMapa")
+    .style.display="none";
+
+
+    if(marcador){
+
+        mapaSeleccion.removeLayer(marcador);
+
+        marcador=null;
+
+    }
+
+}
+
+function crearMapaRuta(){
+    if(mapaRuta){
+
+        mapaRuta.invalidateSize();
+
+        return;
+
+    }
+
+
+
+    mapaRuta = L.map('mapRuta')
+    .setView(
+        [-2.90055,-79.00453],
+        14
+    );
+
+
+    L.tileLayer(
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution:'OpenStreetMap'
+        }
+    )
+    .addTo(mapaRuta);
+
+}
+
+// function verRuta(){
+
+  
+//   if(!puntoRecogida || !puntoEntrega){
+    
+//     alert(
+//       "Seleccione origen y destino"
+//     );
+    
+//     return;
+    
+//   }
+  
+
+      
+//     crearMapaRuta();
+
+
+
+//     let url =
+//     `https://router.project-osrm.org/route/v1/driving/${puntoRecogida.lng},${puntoRecogida.lat};${puntoEntrega.lng},${puntoEntrega.lat}?overview=full&geometries=geojson`;
+
+
+
+//     fetch(url)
+
+//     .then(res=>res.json())
+
+//     .then(data=>{
+
+
+//         let coordenadas =
+//         data.routes[0]
+//         .geometry
+//         .coordinates;
+
+
+
+//         let puntos =
+//         coordenadas.map(p=>[
+//             p[1],
+//             p[0]
+//         ]);
+
+
+
+//         if(lineaRuta){
+
+//             mapaRuta.removeLayer(lineaRuta);
+
+//         }
+
+
+
+//         lineaRuta =
+//         L.polyline(
+//             puntos,
+//             {
+//                 color:"blue",
+//                 weight:5
+//             }
+//         )
+//         .addTo(mapaRuta);
+
+
+
+//         mapaRuta.fitBounds(
+//             lineaRuta.getBounds()
+//         );
+
+
+//     });
+
+//       let distancia = (mapaRuta.distance / 1000).toFixed(2);
+
+//       let tiempo = Math.ceil(mapaRuta.duration / 60);
+
+//       document.getElementById("distanciaRuta")
+//       .innerText = distancia + " km";
+
+//       document.getElementById("tiempoRuta")
+//       .innerText = tiempo + " min";
+
+
+
+// }
+function verRuta() {
+  if (!puntoRecogida || !puntoEntrega) {
+    alert("Seleccione origen y destino");
+    return;
+  }
+
+  crearMapaRuta();
+
+  let url = `https://router.project-osrm.org/route/v1/driving/${puntoRecogida.lng},${puntoRecogida.lat};${puntoEntrega.lng},${puntoEntrega.lat}?overview=full&geometries=geojson`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      // 1. Dibujar la ruta en el mapa
+      let coordenadas = data.routes[0].geometry.coordinates;
+      let puntos = coordenadas.map(p => [p[1], p[0]]);
+
+      if (lineaRuta) {
+        mapaRuta.removeLayer(lineaRuta);
+      }
+
+      lineaRuta = L.polyline(puntos, {
+        color: "blue",
+        weight: 5
+      }).addTo(mapaRuta);
+
+      mapaRuta.fitBounds(lineaRuta.getBounds());
+
+      
+      let rutaData = data.routes[0]; 
+
+      let distancia = (rutaData.distance / 1000).toFixed(2);
+
+      let tiempo = Math.ceil(rutaData.duration / 60);
+
+      document.getElementById("distanciaRuta").innerText = distancia + " km";
+      document.getElementById("tiempoRuta").innerText = tiempo + " min";
+
+    })
+    .catch(error => {
+      console.error("Error al obtener la ruta:", error);
     });
-
 }
 </script>
 
