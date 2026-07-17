@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.Utc.RutaExpress.entity.Envio;
+import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
 import com.Utc.RutaExpress.entity.Usuario;
 import com.Utc.RutaExpress.service.EnvioService;
@@ -17,6 +18,7 @@ import com.Utc.RutaExpress.service.RepartidorService;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -45,13 +47,20 @@ public class RepartidorController {
 
         if (repartidorOpt.isPresent()) {
             Repartidor repartidor = repartidorOpt.get();
+            List<Envio> asignadosHoy = envioService.listarAsignadosHoy(repartidor);
+            long completadasHoy = asignadosHoy.stream()
+                    .filter(envio -> envio.getEstado() == EstadoEnvio.ENTREGADO)
+                    .count();
+
             model.addAttribute("enviosDisponibles", envioService.listarDisponibles());
-            model.addAttribute("asignadosHoy", envioService.listarAsignadosHoy(repartidor));
+            model.addAttribute("asignadosHoy", asignadosHoy);
             model.addAttribute("reclamadosHoy", envioService.contarReclamadosHoy(repartidor));
+            model.addAttribute("completadasHoy", completadasHoy);
         } else {
             model.addAttribute("enviosDisponibles", Collections.<Envio>emptyList());
             model.addAttribute("asignadosHoy", Collections.<Envio>emptyList());
             model.addAttribute("reclamadosHoy", 0L);
+            model.addAttribute("completadasHoy", 0L);
         }
 
         return "repartidor/dashboard";

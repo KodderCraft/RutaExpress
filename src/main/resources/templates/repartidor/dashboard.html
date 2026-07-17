@@ -26,7 +26,7 @@
             <!-- INICIO / RUTA -->
             <div class="panel active" data-panel="inicio">
             <div class="topbar">
-                <div><h1>Tu ruta de hoy</h1><div class="sub">5 entregas asignadas · orden optimizado</div></div>
+                <div><h1>Tu ruta de hoy</h1><div class="sub"><span th:text="${#lists.size(asignadosHoy)}"></span> entregas asignadas</div></div>
                 <div class="topbar-actions">
                 <span style="font-size:.84rem;font-weight:600;color:var(--mute);">Disponible</span>
                 <div class="toggle on" id="availToggle" onclick="this.classList.toggle('on')"></div>
@@ -34,23 +34,37 @@
             </div>
 
             <div class="grid stat-grid">
-                <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div></div><div class="value">5</div><div class="label">Entregas hoy</div></div>
-                <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div></div><div class="value">2</div><div class="label">Completadas</div></div>
-                <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value">$14.20</div><div class="label">Ganado hoy</div></div>
-                <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="clock"></i></div></div><div class="value">42 min</div><div class="label">Tiempo estimado restante</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div></div><div class="value" th:text="${#lists.size(asignadosHoy)}">0</div><div class="label">Entregas hoy</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div></div><div class="value" th:text="${completadasHoy}">0</div><div class="label">Completadas</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value">$0.00</div><div class="label">Ganado hoy</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="clock"></i></div></div><div class="value">—</div><div class="label">Tiempo estimado restante</div></div>
             </div>
 
             <div class="card">
                 <h3>Paradas en orden</h3>
-                <p class="hint">Optimizadas según tráfico y distancia</p>
+                <p class="hint">Envíos que has elegido hoy</p>
+                <div class="table-wrap">
                 <table>
-                <tr><th>#</th><th>Código</th><th>Cliente</th><th>Dirección</th><th>Tipo</th><th>Estado</th><th></th></tr>
-                <tr><td class="mono">1</td><td class="code">SE-48072</td><td>Kiosco Central</td><td>Calle Larga 5-30</td><td>Recogida</td><td><span class="badge entregado">Hecho</span></td><td>—</td></tr>
-                <tr><td class="mono">2</td><td class="code">SE-47960</td><td>Diego Salas</td><td>Av. Huayna Cápac 3-12</td><td>Entrega</td><td><span class="badge entregado">Hecho</span></td><td>—</td></tr>
-                <tr><td class="mono">3</td><td class="code">SE-48213</td><td>Carlos Peña</td><td>Calle Larga 8-21</td><td>Entrega</td><td><span class="badge reparto">En curso</span></td><td><button class="btn btn-primary btn-sm" onclick="goPanel('repartidor','entrega')">Abrir</button></td></tr>
-                <tr><td class="mono">4</td><td class="code">SE-48250</td><td>Farmacia Norte</td><td>Gran Colombia 12-40</td><td>Recogida</td><td><span class="badge pendiente">Pendiente</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-                <tr><td class="mono">5</td><td class="code">SE-48261</td><td>Rosa Medina</td><td>Av. Loja 4-90</td><td>Entrega</td><td><span class="badge pendiente">Pendiente</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+                <tr><th>Código</th><th>Cliente</th><th>Dirección</th><th>Tipo</th><th>Estado</th></tr>
+                <tr th:each="envio : ${asignadosHoy}">
+                    <td class="code" th:text="${envio.codigoGuia}"></td>
+                    <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
+                    <td th:text="${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'}"></td>
+                    <td th:text="${envio.tipoServicio}"></td>
+                    <td th:switch="${envio.estado.name()}">
+                        <span th:case="'ENTREGADO'" class="badge entregado" th:text="${envio.estado}"></span>
+                        <span th:case="'EN_CAMINO'" class="badge reparto" th:text="${envio.estado}"></span>
+                        <span th:case="'RECOGIDO'" class="badge transito" th:text="${envio.estado}"></span>
+                        <span th:case="'CANCELADO'" class="badge incidencia" th:text="${envio.estado}"></span>
+                        <span th:case="*" class="badge pendiente" th:text="${envio.estado}"></span>
+                    </td>
+                </tr>
                 </table>
+                <div class="empty" th:if="${#lists.isEmpty(asignadosHoy)}">
+                    <i data-icon="box"></i>
+                    <p>Todavía no has elegido ninguna entrega hoy. Ve a "Disponibles" para elegir.</p>
+                </div>
+                </div>
             </div>
             </div>
 
@@ -60,22 +74,30 @@
                 <div><h1>Envíos disponibles</h1><div class="sub">Elige las entregas que quieras realizar hoy</div></div>
             </div>
 
-            <div class="card" th:if="${mensaje}">
-                <p class="hint" style="color:var(--teal);" th:text="${mensaje}"></p>
+            <div class="card" th:if="${mensaje}" style="border-left:4px solid var(--teal);background:var(--teal-tint);">
+                <p style="margin:0;color:var(--teal);font-weight:600;" th:text="${mensaje}"></p>
             </div>
-            <div class="card" th:if="${error}">
-                <p class="hint" style="color:var(--coral);" th:text="${error}"></p>
+            <div class="card" th:if="${error}" style="border-left:4px solid var(--coral);background:var(--coral-tint);">
+                <p style="margin:0;color:var(--coral);font-weight:600;" th:text="${error}"></p>
             </div>
 
-            <div class="card stat-card">
-                <div class="label">Meta diaria</div>
-                <div class="value"><span th:text="${reclamadosHoy}"></span> / <span th:text="${metaDiaria}"></span></div>
-                <div class="label">Envíos elegidos hoy</div>
+            <div class="grid stat-grid">
+                <div class="card stat-card">
+                    <div class="top"><div class="icon-wrap amber"><i data-icon="check"></i></div></div>
+                    <div class="value"><span th:text="${reclamadosHoy}"></span>/<span th:text="${metaDiaria}"></span></div>
+                    <div class="label">Meta diaria elegida</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="top"><div class="icon-wrap teal"><i data-icon="box"></i></div></div>
+                    <div class="value" th:text="${#lists.size(enviosDisponibles)}">0</div>
+                    <div class="label">Envíos disponibles ahora</div>
+                </div>
             </div>
 
             <div class="card">
                 <h3>Disponibles para elegir</h3>
                 <p class="hint">Envíos sin repartidor asignado</p>
+                <div class="table-wrap">
                 <table>
                 <tr><th>Código</th><th>Destinatario</th><th>Dirección de entrega</th><th>Tipo</th><th></th></tr>
                 <tr th:each="envio : ${enviosDisponibles}">
@@ -89,10 +111,12 @@
                         </form>
                     </td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(enviosDisponibles)}">
-                    <td colspan="5" class="hint">No hay envíos disponibles por ahora.</td>
-                </tr>
                 </table>
+                <div class="empty" th:if="${#lists.isEmpty(enviosDisponibles)}">
+                    <i data-icon="box"></i>
+                    <p>No hay envíos disponibles por ahora.</p>
+                </div>
+                </div>
             </div>
             </div>
 
