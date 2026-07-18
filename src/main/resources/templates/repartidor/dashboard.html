@@ -62,8 +62,11 @@
                         <span th:case="'EN_CAMINO'" class="badge reparto" th:text="${envio.estado}"></span>
                         <span th:case="'RECOGIDO'" class="badge transito" th:text="${envio.estado}"></span>
                         <span th:case="'CANCELADO'" class="badge incidencia" th:text="${envio.estado}"></span>
+                        <span th:case="'DEVUELTO'" class="badge incidencia" th:text="${envio.estado}"></span>
                         <span th:case="*" class="badge pendiente" th:text="${envio.estado}"></span>
                         <span class="badge incidencia" th:if="${envio.vencido}">VENCIDO</span>
+                        <div class="hint" th:if="${envio.intentosEntrega != null and envio.intentosEntrega > 0}"
+                             th:text="'Intento ' + ${envio.intentosEntrega} + '/' + ${maxIntentosEntrega}"></div>
                     </td>
                     <td style="display:flex;gap:8px;">
                         <button type="button" class="btn btn-ghost btn-sm" onclick="verDetalleEnvio(this)"
@@ -82,7 +85,7 @@
                                       data-vencido=${envio.vencido}">
                             Detalle
                         </button>
-                        <a th:if="${envio.estado.name() != 'ENTREGADO' and envio.estado.name() != 'CANCELADO'}"
+                        <a th:if="${envio.estado.name() != 'ENTREGADO' and envio.estado.name() != 'CANCELADO' and envio.estado.name() != 'DEVUELTO'}"
                            class="btn btn-teal btn-sm" th:href="@{/repartidor/dashboard(gestionar=${envio.id})}">Gestionar</a>
                         <form th:if="${envio.estado.name() == 'ENTREGADO'}"
                               th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post"
@@ -190,9 +193,12 @@
                         <span th:case="'EN_CAMINO'" class="badge reparto" th:text="${entregaActual.estado}"></span>
                         <span th:case="'RECOGIDO'" class="badge transito" th:text="${entregaActual.estado}"></span>
                         <span th:case="'CANCELADO'" class="badge incidencia" th:text="${entregaActual.estado}"></span>
+                        <span th:case="'DEVUELTO'" class="badge incidencia" th:text="${entregaActual.estado}"></span>
                         <span th:case="*" class="badge pendiente" th:text="${entregaActual.estado}"></span>
                     </span>
                     <span class="badge incidencia" th:if="${entregaActual.vencido}">VENCIDO</span>
+                    <span class="hint" th:if="${entregaActual.intentosEntrega != null and entregaActual.intentosEntrega > 0}"
+                          th:text="'Intento ' + ${entregaActual.intentosEntrega} + '/' + ${maxIntentosEntrega}"></span>
                 </div>
                 <div class="detail-dest-row">
                     <i data-icon="mapPin"></i>
@@ -203,6 +209,10 @@
 
             <div class="card" th:if="${entregaActual != null and entregaActual.vencido}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">
                 <p style="margin:0;color:var(--coral);font-weight:600;">Esta entrega superó su fecha límite. Se generó una incidencia para revisión del administrador.</p>
+            </div>
+
+            <div class="card" th:if="${entregaActual != null and entregaActual.estado.name() == 'DEVUELTO'}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">
+                <p style="margin:0;color:var(--coral);font-weight:600;">Se agotaron los intentos de entrega. Este paquete quedó marcado para devolución al remitente.</p>
             </div>
 
             <div class="grid two-col" th:if="${entregaActual != null}" style="margin-top:20px;">
@@ -225,7 +235,7 @@
                         </div>
                     </div>
 
-                    <div class="card" th:if="${entregaActual.estado.name() != 'ENTREGADO' and entregaActual.estado.name() != 'CANCELADO'}">
+                    <div class="card" th:if="${entregaActual.estado.name() != 'ENTREGADO' and entregaActual.estado.name() != 'CANCELADO' and entregaActual.estado.name() != 'DEVUELTO'}">
                         <div th:switch="${entregaActual.estado.name()}">
                             <form th:case="'PENDIENTE'" th:action="@{/repartidor/envios/{id}/avanzar-estado(id=${entregaActual.id})}" method="post">
                                 <button class="btn btn-dark btn-block" type="submit"><i data-icon="box"></i>Marcar como recogido</button>
