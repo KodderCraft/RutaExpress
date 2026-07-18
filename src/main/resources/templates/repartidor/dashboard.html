@@ -177,6 +177,7 @@
                         <span th:case="'ENTREGADO'" class="badge entregado" th:text="${entregaActual.estado}"></span>
                         <span th:case="'EN_CAMINO'" class="badge reparto" th:text="${entregaActual.estado}"></span>
                         <span th:case="'RECOGIDO'" class="badge transito" th:text="${entregaActual.estado}"></span>
+                        <span th:case="'CANCELADO'" class="badge incidencia" th:text="${entregaActual.estado}"></span>
                         <span th:case="*" class="badge pendiente" th:text="${entregaActual.estado}"></span>
                     </span>
                     <span class="badge incidencia" th:if="${entregaActual.vencido}">VENCIDO</span>
@@ -212,7 +213,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" th:if="${entregaActual.estado.name() != 'ENTREGADO' and entregaActual.estado.name() != 'CANCELADO'}">
                         <div th:switch="${entregaActual.estado.name()}">
                             <form th:case="'PENDIENTE'" th:action="@{/repartidor/envios/{id}/avanzar-estado(id=${entregaActual.id})}" method="post">
                                 <button class="btn btn-dark btn-block" type="submit"><i data-icon="box"></i>Marcar como recogido</button>
@@ -225,16 +226,19 @@
                             </form>
                         </div>
                         <div class="divider"></div>
-                        <div class="nopudo-header"><i data-icon="alert"></i>¿No se pudo entregar? Selecciona el motivo</div>
-                        <div class="reasons-row" style="margin-top:12px;" id="reasonsRow">
-                            <div class="reason-chip" onclick="seleccionarMotivo(this)">Cliente ausente</div>
-                            <div class="reason-chip" onclick="seleccionarMotivo(this)">Dirección incorrecta</div>
-                            <div class="reason-chip" onclick="seleccionarMotivo(this)">Rechazó el paquete</div>
-                            <div class="reason-chip" onclick="seleccionarMotivo(this)">Otro</div>
-                        </div>
-                        <div class="nopudo-confirm-row" style="margin-top:12px;">
-                            <button class="btn btn-coral" type="button">Confirmar entrega fallida</button>
-                        </div>
+                        <form th:action="@{/repartidor/envios/{id}/no-entregado(id=${entregaActual.id})}" method="post" onsubmit="return validarMotivo(this)">
+                            <div class="nopudo-header"><i data-icon="alert"></i>¿No se pudo entregar? Selecciona el motivo</div>
+                            <input type="hidden" name="motivo" id="motivoInput">
+                            <div class="reasons-row" style="margin-top:12px;" id="reasonsRow">
+                                <div class="reason-chip" onclick="seleccionarMotivo(this)">Cliente ausente</div>
+                                <div class="reason-chip" onclick="seleccionarMotivo(this)">Dirección incorrecta</div>
+                                <div class="reason-chip" onclick="seleccionarMotivo(this)">Rechazó el paquete</div>
+                                <div class="reason-chip" onclick="seleccionarMotivo(this)">Otro</div>
+                            </div>
+                            <div class="nopudo-confirm-row" style="margin-top:12px;">
+                                <button class="btn btn-coral" type="submit">Confirmar entrega fallida</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -263,14 +267,17 @@
                         <div class="modal-section-title"><span class="icon-chip teal"><i data-icon="truck"></i></span>Detalles del servicio</div>
                         <div style="display:flex;flex-direction:column;gap:12px;">
                             <div class="service-row"><span>Tipo</span><b th:text="${entregaActual.tipoServicio}"></b></div>
-                            <div class="service-row"><span>Costo</span><b th:text="${entregaActual.costoTotal != null ? entregaActual.costoTotal : '-'}"></b></div>
+                            <div class="service-row" th:if="${entregaActual.tarifa != null and entregaActual.tarifa.zona != null}"><span>Zona</span><b th:text="${entregaActual.tarifa.zona}"></b></div>
+                            <div class="service-row"><span>Costo</span><b th:text="${entregaActual.costoTotal != null ? '$' + entregaActual.costoTotal : '-'}"></b></div>
                             <div class="service-row"><span>Distancia</span><b th:text="${entregaActual.distanciaKm != null ? entregaActual.distanciaKm + ' km' : '-'}"></b></div>
-                            <div class="service-row"><span>Tiempo</span><b th:text="${entregaActual.tiempoEstimadoMin != null ? entregaActual.tiempoEstimadoMin + ' min' : '-'}"></b></div>
+                            <div class="service-row"><span>Tiempo estimado</span><b th:text="${entregaActual.tiempoEstimadoMin != null ? entregaActual.tiempoEstimadoMin + ' min' : '-'}"></b></div>
+                            <div class="service-row"><span>Asignado</span><b th:text="${entregaActual.fechaAsignacion != null ? #temporals.format(entregaActual.fechaAsignacion, 'dd/MM/yyyy HH:mm') : '-'}"></b></div>
                             <div class="service-row">
                                 <span>Fecha límite</span>
                                 <b th:text="${entregaActual.fechaLimite != null ? #temporals.format(entregaActual.fechaLimite, 'dd/MM/yyyy HH:mm') : '-'}"
                                    th:style="${entregaActual.vencido} ? 'color:var(--coral);' : ''"></b>
                             </div>
+                            <div class="service-row" th:if="${entregaActual.fechaEntrega != null}"><span>Entregado</span><b th:text="${#temporals.format(entregaActual.fechaEntrega, 'dd/MM/yyyy HH:mm')}"></b></div>
                         </div>
                     </div>
                 </div>

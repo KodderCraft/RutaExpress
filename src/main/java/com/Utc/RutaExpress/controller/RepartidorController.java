@@ -14,6 +14,7 @@ import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
 import com.Utc.RutaExpress.entity.Usuario;
 import com.Utc.RutaExpress.service.EnvioService;
+import com.Utc.RutaExpress.service.IncidenciaService;
 import com.Utc.RutaExpress.service.RepartidorService;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,13 +28,16 @@ public class RepartidorController {
 
     private final EnvioService envioService;
     private final RepartidorService repartidorService;
+    private final IncidenciaService incidenciaService;
 
     @Value("${app.repartidor.meta-diaria}")
     private int metaDiaria;
 
-    public RepartidorController(EnvioService envioService, RepartidorService repartidorService) {
+    public RepartidorController(EnvioService envioService, RepartidorService repartidorService,
+            IncidenciaService incidenciaService) {
         this.envioService = envioService;
         this.repartidorService = repartidorService;
+        this.incidenciaService = incidenciaService;
     }
 
     @GetMapping("/repartidor/dashboard")
@@ -113,6 +117,35 @@ public class RepartidorController {
         boolean exito = envioService.marcarEntregado(id, repartidorOpt.get());
         if (exito) {
             redirectAttributes.addFlashAttribute("mensaje", "Entrega marcada como completada.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "No se pudo actualizar este envío.");
+        }
+
+        return "redirect:/repartidor/dashboard?gestionar=" + id;
+    }
+
+    @PostMapping("/repartidor/envios/{id}/no-entregado")
+    public String noEntregado(@PathVariable Long id, @RequestParam String motivo, HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Repartidor> repartidorOpt = usuario == null
+                ? Optional.empty()
+                : repartidorService.buscarPorUsuarioId(usuario.getId());
+
+        if (repartidorOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "No se encontró tu perfil de repartidor.");
+            return "redirect:/repartidor/dashboard";
+        }
+
+        Repartidor repartidor = repartidorOpt.get();
+        Optional<Envio> envioOpt = envioService.buscarGestionable(id, repartidor);
+        boolean exito = envioOpt.isPresent() && envioService.marcarNoEntregado(id, repartidor);
+        if (exito) {
+            Envio envio = envioOpt.get();
+            incidenciaService.registrarSiNoExiste(envio,
+                    "Entrega fallida: " + envio.getCodigoGuia() + " - Motivo: " + motivo);
+            redirectAttributes.addFlashAttribute("mensaje",
+                    "Entrega marcada como no realizada. Se generó una incidencia para revisión.");
         } else {
             redirectAttributes.addFlashAttribute("error", "No se pudo actualizar este envío.");
         }

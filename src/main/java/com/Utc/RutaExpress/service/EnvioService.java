@@ -93,6 +93,18 @@ public class EnvioService {
     }
 
     @Transactional
+    public boolean marcarNoEntregado(Long envioId, Repartidor repartidor) {
+        Envio envio = envioRepository.findById(envioId).orElse(null);
+        if (envio == null || envio.getRepartidor() == null
+                || !envio.getRepartidor().getId().equals(repartidor.getId())) {
+            return false;
+        }
+        envio.setEstado(EstadoEnvio.CANCELADO);
+        envioRepository.save(envio);
+        return true;
+    }
+
+    @Transactional
     public boolean avanzarEstado(Long envioId, Repartidor repartidor) {
         Envio envio = envioRepository.findById(envioId).orElse(null);
         if (envio == null || envio.getRepartidor() == null

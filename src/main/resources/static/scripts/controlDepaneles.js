@@ -191,4 +191,15 @@
   function seleccionarMotivo(chip){
     chip.parentElement.querySelectorAll('.reason-chip').forEach(c=>c.classList.remove('selected'));
     chip.classList.add('selected');
+    const input = chip.closest('form').querySelector('#motivoInput');
+    if(input) input.value = chip.textContent.trim();
+  }
+
+  function validarMotivo(form){
+    const input = form.querySelector('#motivoInput');
+    if(!input || !input.value){
+      alert('Selecciona un motivo antes de confirmar.');
+      return false;
+    }
+    return confirm('¿Confirmas que no se pudo entregar este envío? Se generará una incidencia.');
   }
