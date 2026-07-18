@@ -32,4 +32,9 @@ public interface EnvioRepository extends JpaRepository<Envio, Long> {
     List<Envio> findByRepartidorAndFechaAsignacionBetween(Repartidor repartidor, LocalDateTime inicio, LocalDateTime fin);
 
     List<Envio> findByEstadoNotInAndFechaLimiteBefore(List<EstadoEnvio> estadosExcluidos, LocalDateTime ahora);
+
+    List<Envio> findByRepartidorAndEstadoAndFechaEntregaBetween(
+            Repartidor repartidor, EstadoEnvio estado, LocalDateTime inicio, LocalDateTime fin);
+
+    List<Envio> findTop10ByRepartidorAndEstadoOrderByFechaEntregaDesc(Repartidor repartidor, EstadoEnvio estado);
 }

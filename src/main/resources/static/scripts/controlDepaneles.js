@@ -177,6 +177,7 @@
     if(fechaLimiteEl){
       fechaLimiteEl.style.color = btn.dataset.vencido === 'true' ? 'var(--coral)' : '';
     }
+    dibujarMapaRuta('mapaRutaDetalle', 'rutaInfoDetalle', btn.dataset.recogida, btn.dataset.direccion);
     overlay.classList.add('open');
   }
 
@@ -204,13 +205,49 @@
     if(input) input.value = chip.textContent.trim();
   }
 
-  function validarMotivo(form){
+  // ===== Modal de confirmación (reemplaza confirm()/alert() nativos) =====
+  let formPendiente = null;
+
+  function confirmarAccion(form, mensaje){
+    formPendiente = form;
+    document.getElementById('confirmMensaje').textContent = mensaje;
+    document.getElementById('confirmCancelBtn').style.display = '';
+    document.getElementById('confirmAceptarBtn').textContent = 'Confirmar';
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function mostrarAlertaModal(mensaje){
+    formPendiente = null;
+    document.getElementById('confirmMensaje').textContent = mensaje;
+    document.getElementById('confirmCancelBtn').style.display = 'none';
+    document.getElementById('confirmAceptarBtn').textContent = 'Entendido';
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function confirmarAceptar(){
+    const form = formPendiente;
+    formPendiente = null;
+    cerrarConfirmModal();
+    if(form) form.submit();
+  }
+
+  function cerrarConfirmModal(e){
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('confirmModal').classList.remove('open');
+    formPendiente = null;
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') cerrarConfirmModal();
+  });
+
+  function confirmarNoEntregado(form){
     const input = form.querySelector('#motivoInput');
     if(!input || !input.value){
-      alert('Selecciona un motivo antes de confirmar.');
-      return false;
+      mostrarAlertaModal('Selecciona un motivo antes de confirmar.');
+      return;
     }
-    return confirm('¿Confirmas que no se pudo entregar este envío? Se generará una incidencia.');
+    confirmarAccion(form, '¿Confirmas que no se pudo entregar este envío? Se generará una incidencia.');
   }
 
   // ===== Mapa de ruta en "Gestión de envío" (repartidor) =====
@@ -222,14 +259,25 @@
     });
   }
 
-  function initMapaRutaGestion(){
-    const contenedor = document.getElementById('mapaRutaGestion');
-    if(!contenedor || typeof L === 'undefined') return;
-    const recogidaTexto = contenedor.dataset.recogida;
-    const entregaTexto = contenedor.dataset.entrega;
-    if(!recogidaTexto || !entregaTexto) return;
+  const mapasRuta = {};
 
-    const infoEl = document.getElementById('rutaInfo');
+  function dibujarMapaRuta(contenedorId, infoElId, recogidaTexto, entregaTexto){
+    const contenedor = document.getElementById(contenedorId);
+    if(!contenedor || typeof L === 'undefined') return;
+    const infoEl = infoElId ? document.getElementById(infoElId) : null;
+
+    if(mapasRuta[contenedorId]){
+      mapasRuta[contenedorId].remove();
+      delete mapasRuta[contenedorId];
+    }
+    contenedor.innerHTML = '';
+
+    if(!recogidaTexto || !entregaTexto){
+      if(infoEl) infoEl.textContent = '';
+      return;
+    }
+
+    if(infoEl) infoEl.textContent = 'Cargando ruta…';
 
     Promise.all([geocodificar(recogidaTexto), geocodificar(entregaTexto)])
       .then(([recogida, entrega]) => {
@@ -239,6 +287,7 @@
         }
 
         const mapa = L.map(contenedor).setView([recogida.lat, recogida.lng], 13);
+        mapasRuta[contenedorId] = mapa;
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: 'OpenStreetMap'
         }).addTo(mapa);
@@ -273,6 +322,10 @@
       });
   }
 
-  // Pausado temporalmente para no consumir Nominatim/OSRM mientras se trabaja en otras
-  // funcionalidades. Descomentar cuando se quiera reactivar el mapa de ruta.
-  // initMapaRutaGestion();
+  function initMapaRutaGestion(){
+    const contenedor = document.getElementById('mapaRutaGestion');
+    if(!contenedor) return;
+    dibujarMapaRuta('mapaRutaGestion', 'rutaInfo', contenedor.dataset.recogida, contenedor.dataset.entrega);
+  }
+
+  initMapaRutaGestion();

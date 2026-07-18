@@ -10,10 +10,12 @@ import com.Utc.RutaExpress.entity.Repartidor;
 import com.Utc.RutaExpress.repository.EnvioRepository;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -179,6 +181,25 @@ public class EnvioService {
         }
 
         return Optional.empty();
+    }
+
+    public List<Envio> listarEntregadosSemana(Repartidor repartidor) {
+        LocalDateTime inicio = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(7);
+        return envioRepository.findByRepartidorAndEstadoAndFechaEntregaBetween(
+                repartidor, EstadoEnvio.ENTREGADO, inicio, fin);
+    }
+
+    public BigDecimal calcularGanadoSemana(Repartidor repartidor) {
+        return listarEntregadosSemana(repartidor).stream()
+                .map(Envio::getCostoTotal)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public List<Envio> listarEntregasRecientes(Repartidor repartidor) {
+        return envioRepository.findTop10ByRepartidorAndEstadoOrderByFechaEntregaDesc(
+                repartidor, EstadoEnvio.ENTREGADO);
     }
 
     public List<Envio> listarVencidosNoResueltos() {

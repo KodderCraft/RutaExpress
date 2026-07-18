@@ -218,8 +218,10 @@
   .quote-card{background:var(--ink);color:#fff;border-radius:var(--radius);padding:20px;margin-top:16px;}
   .quote-card .price{font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:var(--amber);}
   .bars{display:flex;align-items:flex-end;gap:10px;height:140px;padding-top:10px;}
-  .bars .bar{flex:1;background:linear-gradient(180deg,var(--amber),var(--amber-dark));border-radius:6px 6px 2px 2px;position:relative;}
+  .bars .bar{flex:1;background:linear-gradient(180deg,var(--amber),var(--amber-dark));border-radius:6px 6px 2px 2px;position:relative;min-height:2px;}
+  .bars .bar.hoy{background:linear-gradient(180deg,var(--ink),var(--ink-3));}
   .bars .bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:.68rem;color:var(--mute);}
+  .bars .bar.hoy span{color:var(--ink);font-weight:700;}
   .note{font-size:.78rem;color:var(--mute);background:var(--paper);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;}
 
   /* ===== DETALLE DE ENVÍO (entrega actual) ===== */

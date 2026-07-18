@@ -19,12 +19,41 @@ import com.Utc.RutaExpress.service.RepartidorService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
 public class RepartidorController {
+
+    private static final List<DayOfWeek> ORDEN_SEMANA = List.of(
+            DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+    private static final List<String> ETIQUETAS_SEMANA = List.of(
+            "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom");
+
+    public static class BarraDia {
+        private final String label;
+        private final BigDecimal monto;
+        private final int porcentaje;
+        private final boolean hoy;
+
+        public BarraDia(String label, BigDecimal monto, int porcentaje, boolean hoy) {
+            this.label = label;
+            this.monto = monto;
+            this.porcentaje = porcentaje;
+            this.hoy = hoy;
+        }
+
+        public String getLabel() { return label; }
+        public BigDecimal getMonto() { return monto; }
+        public int getPorcentaje() { return porcentaje; }
+        public boolean isHoy() { return hoy; }
+    }
 
     private final EnvioService envioService;
     private final RepartidorService repartidorService;
@@ -69,6 +98,12 @@ public class RepartidorController {
             model.addAttribute("completadasHoy", completadasHoy);
             model.addAttribute("ganadoHoy", envioService.calcularGanadoHoy(repartidor));
 
+            List<Envio> entregadosSemana = envioService.listarEntregadosSemana(repartidor);
+            model.addAttribute("ganadoSemana", envioService.calcularGanadoSemana(repartidor));
+            model.addAttribute("entregasSemana", (long) entregadosSemana.size());
+            model.addAttribute("barrasSemana", construirBarrasSemana(entregadosSemana));
+            model.addAttribute("entregasRecientes", envioService.listarEntregasRecientes(repartidor));
+
             Optional<Envio> envioGestionado = gestionar != null
                     ? envioService.buscarGestionable(gestionar, repartidor)
                     : Optional.<Envio>empty();
@@ -80,11 +115,42 @@ public class RepartidorController {
             model.addAttribute("reclamadosHoy", 0L);
             model.addAttribute("completadasHoy", 0L);
             model.addAttribute("ganadoHoy", java.math.BigDecimal.ZERO);
+            model.addAttribute("ganadoSemana", java.math.BigDecimal.ZERO);
+            model.addAttribute("entregasSemana", 0L);
+            model.addAttribute("barrasSemana", construirBarrasSemana(Collections.emptyList()));
+            model.addAttribute("entregasRecientes", Collections.<Envio>emptyList());
             model.addAttribute("entregaActual", null);
             model.addAttribute("mostrarGestion", false);
         }
 
         return "repartidor/dashboard";
+    }
+
+    private List<BarraDia> construirBarrasSemana(List<Envio> entregadosSemana) {
+        Map<DayOfWeek, BigDecimal> porDia = new EnumMap<>(DayOfWeek.class);
+        for (DayOfWeek dia : ORDEN_SEMANA) {
+            porDia.put(dia, BigDecimal.ZERO);
+        }
+        for (Envio envio : entregadosSemana) {
+            if (envio.getFechaEntrega() != null && envio.getCostoTotal() != null) {
+                DayOfWeek dia = envio.getFechaEntrega().getDayOfWeek();
+                porDia.merge(dia, envio.getCostoTotal(), BigDecimal::add);
+            }
+        }
+
+        BigDecimal maximo = porDia.values().stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        DayOfWeek hoy = java.time.LocalDate.now().getDayOfWeek();
+
+        List<BarraDia> barras = new java.util.ArrayList<>();
+        for (int i = 0; i < ORDEN_SEMANA.size(); i++) {
+            DayOfWeek dia = ORDEN_SEMANA.get(i);
+            BigDecimal monto = porDia.get(dia);
+            int porcentaje = maximo.compareTo(BigDecimal.ZERO) > 0
+                    ? monto.multiply(BigDecimal.valueOf(100)).divide(maximo, 0, java.math.RoundingMode.HALF_UP).intValue()
+                    : 0;
+            barras.add(new BarraDia(ETIQUETAS_SEMANA.get(i), monto, porcentaje, dia == hoy));
+        }
+        return barras;
     }
 
     @PostMapping("/repartidor/envios/{id}/reclamar")

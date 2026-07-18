@@ -83,14 +83,14 @@
                             <button type="submit" class="btn btn-dark btn-sm">Reintentar</button>
                         </form>
                         <form th:if="${envio.estado.name() == 'ENTREGADO'}"
-                              th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post"
-                              style="display:inline;" onsubmit="return confirm('¿Eliminar este envío entregado del historial?')">
-                            <button type="submit" class="btn btn-coral btn-sm">Eliminar</button>
+                              th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post" style="display:inline;">
+                            <button type="button" class="btn btn-coral btn-sm"
+                                    onclick="confirmarAccion(this.form, '¿Eliminar este envío entregado del historial?')">Eliminar</button>
                         </form>
                         <form th:if="${envio.estado.name() == 'DEVUELTO'}"
-                              th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post"
-                              style="display:inline;" onsubmit="return confirm('¿Eliminar este envío? Volverá a la lista de disponibles para que alguien más lo entregue.')">
-                            <button type="submit" class="btn btn-coral btn-sm">Eliminar</button>
+                              th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post" style="display:inline;">
+                            <button type="button" class="btn btn-coral btn-sm"
+                                    onclick="confirmarAccion(this.form, '¿Eliminar este envío? Volverá a la lista de disponibles para que alguien más lo entregue.')">Eliminar</button>
                         </form>
                     </td>
                 </tr>
@@ -230,9 +230,9 @@
 
             <div class="card" th:if="${entregaActual != null and entregaActual.estado.name() == 'DEVUELTO'}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">
                 <p style="margin:0 0 12px;color:var(--coral);font-weight:600;">Se agotaron los intentos de entrega. Este paquete quedó marcado para devolución al remitente.</p>
-                <form th:action="@{/repartidor/envios/{id}/eliminar(id=${entregaActual.id})}" method="post"
-                      onsubmit="return confirm('¿Eliminar este envío? Volverá a la lista de disponibles para que alguien más lo entregue.')">
-                    <button class="btn btn-coral btn-block" type="submit">Eliminar</button>
+                <form th:action="@{/repartidor/envios/{id}/eliminar(id=${entregaActual.id})}" method="post">
+                    <button class="btn btn-coral btn-block" type="button"
+                            onclick="confirmarAccion(this.form, '¿Eliminar este envío? Volverá a la lista de disponibles para que alguien más lo entregue.')">Eliminar</button>
                 </form>
             </div>
 
@@ -278,7 +278,7 @@
                             </form>
                         </div>
                         <div class="divider"></div>
-                        <form th:action="@{/repartidor/envios/{id}/no-entregado(id=${entregaActual.id})}" method="post" onsubmit="return validarMotivo(this)">
+                        <form th:action="@{/repartidor/envios/{id}/no-entregado(id=${entregaActual.id})}" method="post">
                             <div class="nopudo-header"><i data-icon="alert"></i>¿No se pudo entregar? Selecciona el motivo</div>
                             <input type="hidden" name="motivo" id="motivoInput">
                             <div class="reasons-row" style="margin-top:12px;" id="reasonsRow">
@@ -288,7 +288,7 @@
                                 <div class="reason-chip" onclick="seleccionarMotivo(this)">Otro</div>
                             </div>
                             <div class="nopudo-confirm-row" style="margin-top:12px;">
-                                <button class="btn btn-coral" type="submit">Confirmar entrega fallida</button>
+                                <button class="btn btn-coral" type="button" onclick="confirmarNoEntregado(this.form)">Confirmar entrega fallida</button>
                             </div>
                         </form>
                     </div>
@@ -349,28 +349,55 @@
 
             <!-- GANANCIAS -->
             <div class="panel" data-panel="ganancias">
-            <div class="topbar"><div><h1>Ganancias</h1><div class="sub">Resumen semanal e historial de pagos</div></div></div>
-            <div class="grid two-col">
-                <div class="card">
-                <h3>Últimos 7 días</h3>
-                <div class="bars">
-                    <div class="bar" style="height:55%;"><span>Lun</span></div>
-                    <div class="bar" style="height:70%;"><span>Mar</span></div>
-                    <div class="bar" style="height:40%;"><span>Mié</span></div>
-                    <div class="bar" style="height:85%;"><span>Jue</span></div>
-                    <div class="bar" style="height:60%;"><span>Vie</span></div>
-                    <div class="bar" style="height:95%;"><span>Sáb</span></div>
-                    <div class="bar" style="height:30%;"><span>Hoy</span></div>
-                </div>
+            <div class="topbar"><div><h1>Ganancias</h1><div class="sub">Resumen semanal y entregas recientes</div></div></div>
+
+            <div class="grid stat-grid">
+                <div class="card stat-card">
+                    <div class="top"><div class="icon-wrap teal"><i data-icon="wallet"></i></div></div>
+                    <div class="value" th:text="'$' + ${#numbers.formatDecimal(ganadoHoy, 1, 2)}">$0.00</div>
+                    <div class="label">Ganado hoy</div>
                 </div>
                 <div class="card stat-card">
-                <div class="label">Total de la semana</div>
-                <div class="value">$96.30</div>
-                <div class="divider"></div>
-                <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:flex;justify-content:space-between;"><span>Entregas completadas</span><b>34</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span>Calificación promedio</span><b>4.9 ⭐</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span>Próximo pago</span><b>Viernes</b></div>
+                    <div class="top"><div class="icon-wrap amber"><i data-icon="chart"></i></div></div>
+                    <div class="value" th:text="'$' + ${#numbers.formatDecimal(ganadoSemana, 1, 2)}">$0.00</div>
+                    <div class="label">Ganado esta semana</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div></div>
+                    <div class="value" th:text="${entregasSemana}">0</div>
+                    <div class="label">Entregas completadas esta semana</div>
+                </div>
+            </div>
+
+            <div class="grid two-col">
+                <div class="card">
+                <h3>Ganado por día</h3>
+                <p class="hint">Lunes a domingo</p>
+                <div class="bars">
+                    <div class="bar" th:each="barra : ${barrasSemana}"
+                         th:classappend="${barra.hoy} ? 'hoy' : ''"
+                         th:style="'height:' + ${barra.porcentaje} + '%;'"
+                         th:title="'$' + ${#numbers.formatDecimal(barra.monto, 1, 2)}">
+                        <span th:text="${barra.label}"></span>
+                    </div>
+                </div>
+                </div>
+                <div class="card">
+                <h3>Historial de entregas</h3>
+                <p class="hint">Últimas entregas completadas</p>
+                <div class="table-wrap">
+                <table>
+                <tr><th>Código</th><th>Entregado</th><th>Costo</th></tr>
+                <tr th:each="envio : ${entregasRecientes}">
+                    <td class="code" th:text="${envio.codigoGuia}"></td>
+                    <td th:text="${envio.fechaEntrega != null ? #temporals.format(envio.fechaEntrega, 'dd/MM HH:mm') : '-'}"></td>
+                    <td th:text="${envio.costoTotal != null ? '$' + envio.costoTotal : '-'}"></td>
+                </tr>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(entregasRecientes)}">
+                    <i data-icon="box"></i>
+                    <p>Todavía no completas ninguna entrega.</p>
+                </div>
                 </div>
                 </div>
             </div>
@@ -414,6 +441,8 @@
                             <div class="route-dotcol"><div class="route-dot end"></div></div>
                             <div class="route-textcol"><span class="hint">Dirección de entrega</span><span class="val" id="dDireccion"></span></div>
                         </div>
+                        <div id="mapaRutaDetalle" class="route-map"></div>
+                        <p class="hint" id="rutaInfoDetalle" style="margin-top:8px;"></p>
                     </div>
 
                     <div class="divider"></div>
@@ -432,6 +461,24 @@
                     <div class="divider"></div>
 
                     <p class="modal-footer-note"><i data-icon="clock" class="modal-field-icon"></i>Asignado · <span id="dFecha"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="confirmModal" onclick="cerrarConfirmModal(event)">
+            <div class="modal-box" style="max-width:380px;">
+                <div class="modal-head">
+                    <div class="modal-title-row">
+                        <span class="icon-chip coral"><i data-icon="alert"></i></span>
+                    </div>
+                    <button type="button" class="modal-close" onclick="cerrarConfirmModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMensaje" style="margin:0 0 20px;font-size:.92rem;color:var(--text);"></p>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;">
+                        <button type="button" class="btn btn-ghost btn-sm" id="confirmCancelBtn" onclick="cerrarConfirmModal()">Cancelar</button>
+                        <button type="button" class="btn btn-coral btn-sm" id="confirmAceptarBtn" onclick="confirmarAceptar()">Confirmar</button>
+                    </div>
                 </div>
             </div>
         </div>
