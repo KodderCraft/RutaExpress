@@ -75,9 +75,8 @@ public class EnvioService {
         return envioRepository.findByRepartidorAndFechaAsignacionBetween(repartidor, inicio, fin);
     }
 
-    public Optional<Envio> buscarEntregaActual(Repartidor repartidor) {
-        return envioRepository.findFirstByRepartidorAndEstadoInOrderByFechaAsignacionAsc(
-                repartidor, List.of(EstadoEnvio.PENDIENTE, EstadoEnvio.RECOGIDO, EstadoEnvio.EN_CAMINO));
+    public Optional<Envio> buscarGestionable(Long envioId, Repartidor repartidor) {
+        return envioRepository.findByIdAndRepartidor(envioId, repartidor);
     }
 
     @Transactional

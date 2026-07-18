@@ -19,8 +19,7 @@ public interface EnvioRepository extends JpaRepository<Envio, Long> {
 
     List<Envio> findByEstadoAndRepartidorIsNull(EstadoEnvio estado);
 
-    Optional<Envio> findFirstByRepartidorAndEstadoInOrderByFechaAsignacionAsc(
-            Repartidor repartidor, List<EstadoEnvio> estados);
+    Optional<Envio> findByIdAndRepartidor(Long id, Repartidor repartidor);
 
     @Modifying
     @Query("UPDATE Envio e SET e.repartidor = :repartidor, e.fechaAsignacion = :fecha, e.fechaLimite = :fechaLimite " +

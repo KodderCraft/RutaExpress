@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.Utc.RutaExpress.entity.Envio;
@@ -36,7 +37,8 @@ public class RepartidorController {
     }
 
     @GetMapping("/repartidor/dashboard")
-    public String mostrarDashboardRepartidor(HttpSession session, Model model) {
+    public String mostrarDashboardRepartidor(HttpSession session, Model model,
+            @RequestParam(required = false) Long gestionar) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("usuario", usuario);
         model.addAttribute("metaDiaria", metaDiaria);
@@ -56,13 +58,19 @@ public class RepartidorController {
             model.addAttribute("asignadosHoy", asignadosHoy);
             model.addAttribute("reclamadosHoy", envioService.contarReclamadosHoy(repartidor));
             model.addAttribute("completadasHoy", completadasHoy);
-            model.addAttribute("entregaActual", envioService.buscarEntregaActual(repartidor).orElse(null));
+
+            Optional<Envio> envioGestionado = gestionar != null
+                    ? envioService.buscarGestionable(gestionar, repartidor)
+                    : Optional.<Envio>empty();
+            model.addAttribute("entregaActual", envioGestionado.orElse(null));
+            model.addAttribute("mostrarGestion", envioGestionado.isPresent());
         } else {
             model.addAttribute("enviosDisponibles", Collections.<Envio>emptyList());
             model.addAttribute("asignadosHoy", Collections.<Envio>emptyList());
             model.addAttribute("reclamadosHoy", 0L);
             model.addAttribute("completadasHoy", 0L);
             model.addAttribute("entregaActual", null);
+            model.addAttribute("mostrarGestion", false);
         }
 
         return "repartidor/dashboard";
@@ -109,7 +117,7 @@ public class RepartidorController {
             redirectAttributes.addFlashAttribute("error", "No se pudo actualizar este envío.");
         }
 
-        return "redirect:/repartidor/dashboard";
+        return "redirect:/repartidor/dashboard?gestionar=" + id;
     }
 
     @PostMapping("/repartidor/envios/{id}/avanzar-estado")
@@ -131,6 +139,6 @@ public class RepartidorController {
             redirectAttributes.addFlashAttribute("error", "No se pudo actualizar el estado de este envío.");
         }
 
-        return "redirect:/repartidor/dashboard";
+        return "redirect:/repartidor/dashboard?gestionar=" + id;
     }
 }
