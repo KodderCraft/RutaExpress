@@ -15,5 +15,7 @@ public interface IncidenciaRepository extends JpaRepository<Incidencia, Long> {
 
     List<Incidencia> findAllByOrderByIdDesc();
 
+    // Usado antes de borrar un envio ENTREGADO (EnvioService.eliminarEntregado): la FK
+    // incidencias.envio_id impide borrar el envio mientras tenga una incidencia asociada.
     void deleteByEnvio(Envio envio);
 }

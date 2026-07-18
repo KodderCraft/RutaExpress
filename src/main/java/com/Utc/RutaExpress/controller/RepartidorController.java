@@ -36,6 +36,9 @@ public class RepartidorController {
     private static final List<String> ETIQUETAS_SEMANA = List.of(
             "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom");
 
+    // Vista-modelo de una barra del grafico de "Ganado por dia" en Ganancias. porcentaje
+    // ya viene calculado sobre el maximo de la semana (ver construirBarrasSemana) para que
+    // el template solo tenga que usarlo directo en el height del CSS.
     public static class BarraDia {
         private final String label;
         private final BigDecimal monto;
@@ -98,6 +101,8 @@ public class RepartidorController {
             model.addAttribute("completadasHoy", completadasHoy);
             model.addAttribute("ganadoHoy", envioService.calcularGanadoHoy(repartidor));
 
+            // Panel "Ganancias": ganado hoy ya viene calculado arriba; el resto usa entregas
+            // reales de la semana (fechaEntrega), no lo asignado/en curso.
             List<Envio> entregadosSemana = envioService.listarEntregadosSemana(repartidor);
             model.addAttribute("ganadoSemana", envioService.calcularGanadoSemana(repartidor));
             model.addAttribute("entregasSemana", (long) entregadosSemana.size());
@@ -126,6 +131,9 @@ public class RepartidorController {
         return "repartidor/dashboard";
     }
 
+    // Agrupa las entregas de la semana por dia (Lun-Dom) y calcula el porcentaje de
+    // altura de cada barra en base al dia con mas ganado (si todos los dias estan en
+    // cero, todas las barras quedan en 0% en vez de dividir por cero).
     private List<BarraDia> construirBarrasSemana(List<Envio> entregadosSemana) {
         Map<DayOfWeek, BigDecimal> porDia = new EnumMap<>(DayOfWeek.class);
         for (DayOfWeek dia : ORDEN_SEMANA) {
@@ -218,9 +226,13 @@ public class RepartidorController {
 
         if (resultado.isPresent()) {
             Envio envio = resultado.get();
+            // Dedup por envio (IncidenciaService.registrarSiNoExiste): en varios intentos
+            // fallidos sobre el mismo envio solo queda la primera incidencia registrada.
             incidenciaService.registrarSiNoExiste(envio,
                     "Entrega fallida: " + envio.getCodigoGuia() + " - Motivo: " + motivo);
 
+            // El mensaje depende del estado resultante (reintento vs. devolucion), por eso
+            // marcarNoEntregado devuelve el envio actualizado en vez de solo un boolean.
             String mensaje = envio.getEstado() == EstadoEnvio.DEVUELTO
                     ? "Se agotaron los " + maxIntentosEntrega + " intentos. El paquete se marcará para devolución."
                     : "Entrega marcada como no realizada (intento " + envio.getIntentosEntrega() + "/"
@@ -269,6 +281,8 @@ public class RepartidorController {
 
         Optional<Envio> resultado = envioService.eliminarEntregado(id, repartidorOpt.get());
         if (resultado.isPresent()) {
+            // Si quedo en PENDIENTE es porque era un DEVUELTO y se liberó a Disponibles;
+            // cualquier otro caso (o el envio ya no existe) significa que se borró de verdad.
             String mensaje = resultado.get().getEstado() == EstadoEnvio.PENDIENTE
                     ? "Envío liberado. Volvió a la lista de disponibles para que alguien más lo entregue."
                     : "Envío eliminado del historial.";

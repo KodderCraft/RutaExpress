@@ -83,6 +83,10 @@ public class EnvioService {
         return envioRepository.findByRepartidorAndFechaAsignacionBetween(repartidor, inicio, fin);
     }
 
+    // Suma proyectada de "lo que se espera cobrar hoy": incluye envios en curso, no solo
+    // los ya ENTREGADO (el cobro es contra entrega, asi que esto es una proyeccion, no
+    // dinero confirmado). Solo se excluye CANCELADO; DEVUELTO SI cuenta hasta que el
+    // repartidor lo elimine explicitamente (ver eliminarEntregado).
     public BigDecimal calcularGanadoHoy(Repartidor repartidor) {
         return listarAsignadosHoy(repartidor).stream()
                 .filter(envio -> envio.getEstado() != EstadoEnvio.CANCELADO)
@@ -108,6 +112,9 @@ public class EnvioService {
         return true;
     }
 
+    // Registra un intento de entrega fallido. Devuelve Optional<Envio> (en vez de boolean)
+    // para que el controller pueda leer el estado resultante y armar el mensaje correcto
+    // (reintento vs. devolucion) sin tener que volver a consultar la base.
     @Transactional
     public Optional<Envio> marcarNoEntregado(Long envioId, Repartidor repartidor) {
         Envio envio = envioRepository.findById(envioId).orElse(null);
@@ -122,12 +129,16 @@ public class EnvioService {
         if (intentos >= maxIntentosEntrega) {
             envio.setEstado(EstadoEnvio.DEVUELTO);
         } else {
+            // Se queda asignado al mismo repartidor (a diferencia de CANCELADO/PENDIENTE),
+            // asi no desaparece de "Ruta de hoy" y puede reintentarse con reintentarEntrega.
             envio.setEstado(EstadoEnvio.NO_ENTREGADO);
         }
 
         return Optional.of(envioRepository.save(envio));
     }
 
+    // Vuelve un NO_ENTREGADO a EN_CAMINO para que el repartidor pueda intentar entregarlo
+    // de nuevo, sin pasar por "Disponibles" ni perder el conteo de intentos ya usados.
     @Transactional
     public boolean reintentarEntrega(Long envioId, Repartidor repartidor) {
         Envio envio = envioRepository.findById(envioId).orElse(null);
@@ -157,6 +168,12 @@ public class EnvioService {
         return true;
     }
 
+    // "Eliminar" hace cosas distintas segun el estado, por eso retorna el envio resultante:
+    // - ENTREGADO: se borra la fila de verdad (primero su Incidencia si tenia una, porque
+    //   la FK incidencias.envio_id impide borrar el envio mientras exista esa referencia).
+    // - DEVUELTO: no se borra, se LIBERA — vuelve a PENDIENTE sin repartidor y con los
+    //   intentos reiniciados, para que reaparezca en "Disponibles" y otro repartidor lo
+    //   intente desde cero.
     @Transactional
     public Optional<Envio> eliminarEntregado(Long envioId, Repartidor repartidor) {
         Envio envio = envioRepository.findById(envioId).orElse(null);
@@ -183,6 +200,9 @@ public class EnvioService {
         return Optional.empty();
     }
 
+    // Panel "Ganancias": a diferencia de calcularGanadoHoy (que proyecta lo asignado hoy),
+    // esto usa fechaEntrega -> solo cuenta dinero de envios que de verdad llegaron a
+    // ENTREGADO (cobro confirmado), dentro de la semana actual (lunes a domingo).
     public List<Envio> listarEntregadosSemana(Repartidor repartidor) {
         LocalDateTime inicio = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
         LocalDateTime fin = inicio.plusDays(7);
@@ -197,6 +217,7 @@ public class EnvioService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    // Historial de "Ganancias": las ultimas 10 entregas completadas, mas reciente primero.
     public List<Envio> listarEntregasRecientes(Repartidor repartidor) {
         return envioRepository.findTop10ByRepartidorAndEstadoOrderByFechaEntregaDesc(
                 repartidor, EstadoEnvio.ENTREGADO);

@@ -3,6 +3,9 @@
 <head>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/stilos.css}">
+    <!-- Leaflet: usado para el mapa de ruta real en Gestión de envío y en el modal de
+         Detalle (ver controlDepaneles.js: dibujarMapaRuta). Geocodifica con Nominatim y
+         traza la ruta con OSRM, ambos gratis y sin API key. -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -17,6 +20,8 @@
         <div class="nav-item" data-panel="disponibles"><i data-icon="list"></i>Disponibles</div>
         <div class="nav-item" data-panel="mapa"><i data-icon="mapPin"></i>Mapa</div>
         <div class="nav-item" data-panel="ganancias"><i data-icon="wallet"></i>Ganancias</div>
+        <!-- Nombre/avatar/vehículo reales del repartidor logueado (antes estaba fijo
+             "Jorge Torres" en el HTML sin relación con la sesión). -->
         <div class="sidebar-foot">
         <div class="avatar" style="background:var(--teal);color:#fff;"
              th:text="${usuario != null and usuario.nombre != null and #strings.length(usuario.nombre) > 0 ? #strings.substring(usuario.nombre,0,1) : '?'}">JT</div>
@@ -63,6 +68,9 @@
                     <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
                     <td th:text="${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'}"></td>
                     <td th:text="${envio.tipoServicio}"></td>
+                    <!-- NO_ENTREGADO y DEVUELTO reusan el estilo coral de CANCELADO/incidencia
+                         (ver stilos.css .badge.incidencia). Intento X/N solo se muestra si
+                         ya hubo al menos un intento fallido. -->
                     <td th:switch="${envio.estado.name()}">
                         <span th:case="'ENTREGADO'" class="badge entregado" th:text="${envio.estado}"></span>
                         <span th:case="'EN_CAMINO'" class="badge reparto" th:text="${envio.estado}"></span>
@@ -75,6 +83,12 @@
                         <div class="hint" th:if="${envio.intentosEntrega != null and envio.intentosEntrega > 0}"
                              th:text="'Intento ' + ${envio.intentosEntrega} + '/' + ${maxIntentosEntrega}"></div>
                     </td>
+                    <!-- Gestionar no aplica a estados terminales (ENTREGADO/CANCELADO/DEVUELTO).
+                         Reintentar solo aparece en NO_ENTREGADO (vuelve a EN_CAMINO). Eliminar
+                         hace cosas distintas segun el estado: en ENTREGADO borra la fila, en
+                         DEVUELTO libera el envio de vuelta a Disponibles (ver
+                         EnvioService.eliminarEntregado). Los confirm() nativos se reemplazaron
+                         por el modal #confirmModal (ver controlDepaneles.js). -->
                     <td style="display:flex;gap:8px;">
                         <a th:if="${envio.estado.name() != 'ENTREGADO' and envio.estado.name() != 'CANCELADO' and envio.estado.name() != 'DEVUELTO'}"
                            class="btn btn-teal btn-sm" th:href="@{/repartidor/dashboard(gestionar=${envio.id})}">Gestionar</a>
@@ -140,6 +154,11 @@
                     <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
                     <td th:text="${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'}"></td>
                     <td th:text="${envio.tipoServicio}"></td>
+                    <!-- Botón "Detalle" (antes solo existía en "Ruta de hoy", se movió acá
+                         para poder ver un envío antes de elegirlo, y se sacó de "Ruta de hoy"
+                         por ser redundante con "Gestionar"). Los data-* alimentan el modal
+                         #envioDetalleOverlay via verDetalleEnvio() en controlDepaneles.js,
+                         que también dibuja ahí el mapa de ruta con data-recogida/data-direccion. -->
                     <td style="display:flex;gap:8px;">
                         <button type="button" class="btn btn-ghost btn-sm" onclick="verDetalleEnvio(this)"
                             th:attr="data-codigo=${envio.codigoGuia},
@@ -228,6 +247,8 @@
                 <p style="margin:0;color:var(--coral);font-weight:600;">Esta entrega superó su fecha límite. Se generó una incidencia para revisión del administrador.</p>
             </div>
 
+            <!-- DEVUELTO: terminal, se agotaron los intentos. "Eliminar" acá no borra el
+                 envío, lo libera de vuelta a Disponibles (EnvioService.eliminarEntregado). -->
             <div class="card" th:if="${entregaActual != null and entregaActual.estado.name() == 'DEVUELTO'}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">
                 <p style="margin:0 0 12px;color:var(--coral);font-weight:600;">Se agotaron los intentos de entrega. Este paquete quedó marcado para devolución al remitente.</p>
                 <form th:action="@{/repartidor/envios/{id}/eliminar(id=${entregaActual.id})}" method="post">
@@ -236,6 +257,8 @@
                 </form>
             </div>
 
+            <!-- NO_ENTREGADO: todavía quedan reintentos. "Reintentar entrega" vuelve el
+                 envío a EN_CAMINO sin pasar por Disponibles (EnvioService.reintentarEntrega). -->
             <div class="card" th:if="${entregaActual != null and entregaActual.estado.name() == 'NO_ENTREGADO'}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">
                 <p style="margin:0 0 12px;color:var(--coral);font-weight:600;">
                     Esta entrega no se pudo realizar (intento <span th:text="${entregaActual.intentosEntrega}"></span>/<span th:text="${maxIntentosEntrega}"></span>). Puedes reintentarla cuando quieras.
@@ -313,6 +336,9 @@
                             <div class="route-dotcol"><div class="route-dot end"></div></div>
                             <div class="route-textcol"><span class="hint">Entrega</span><span class="val" th:text="${entregaActual.direccionEntrega != null ? entregaActual.direccionEntrega.direccionTexto : '-'}"></span></div>
                         </div>
+                        <!-- Mapa real de la ruta: solo se pinta si hay ambas direcciones.
+                             initMapaRutaGestion() en controlDepaneles.js lee data-recogida/
+                             data-entrega, geocodifica con Nominatim y dibuja con Leaflet+OSRM. -->
                         <div id="mapaRutaGestion" class="route-map"
                              th:if="${entregaActual.direccionRecogida != null and entregaActual.direccionEntrega != null}"
                              th:attr="data-recogida=${entregaActual.direccionRecogida.direccionTexto},
@@ -347,7 +373,12 @@
             </div>
             </div>
 
-            <!-- GANANCIAS -->
+            <!-- GANANCIAS: todo con datos reales (antes era 100% mockup fijo). Ganado hoy
+                 proyecta lo asignado hoy (calcularGanadoHoy); ganado/entregas de la semana y
+                 el historial solo cuentan envíos que llegaron a ENTREGADO, por fechaEntrega
+                 (listarEntregadosSemana/calcularGanadoSemana/listarEntregasRecientes en
+                 EnvioService). Se sacaron "Calificación promedio" y "Próximo pago" del mockup
+                 original: no hay sistema de calificaciones ni Pago real en el proyecto. -->
             <div class="panel" data-panel="ganancias">
             <div class="topbar"><div><h1>Ganancias</h1><div class="sub">Resumen semanal y entregas recientes</div></div></div>
 
@@ -373,6 +404,9 @@
                 <div class="card">
                 <h3>Ganado por día</h3>
                 <p class="hint">Lunes a domingo</p>
+                <!-- porcentaje ya viene calculado en el controller (RepartidorController.
+                     construirBarrasSemana) sobre el día con más ganado; la barra de hoy usa
+                     la clase .hoy (stilos.css) para resaltarse con otro color. -->
                 <div class="bars">
                     <div class="bar" th:each="barra : ${barrasSemana}"
                          th:classappend="${barra.hoy} ? 'hoy' : ''"
@@ -441,6 +475,9 @@
                             <div class="route-dotcol"><div class="route-dot end"></div></div>
                             <div class="route-textcol"><span class="hint">Dirección de entrega</span><span class="val" id="dDireccion"></span></div>
                         </div>
+                        <!-- Mismo mapa que en Gestión (dibujarMapaRuta), pero se dibuja cada
+                             vez que se abre este modal para un envío distinto (verDetalleEnvio
+                             en controlDepaneles.js), no al cargar la página. -->
                         <div id="mapaRutaDetalle" class="route-map"></div>
                         <p class="hint" id="rutaInfoDetalle" style="margin-top:8px;"></p>
                     </div>
@@ -465,6 +502,10 @@
             </div>
         </div>
 
+        <!-- Modal de confirmación genérico, reemplaza los confirm()/alert() nativos del
+             navegador. Dos modos controlados desde JS (confirmarAccion/mostrarAlertaModal
+             en controlDepaneles.js): confirmación (Cancelar/Confirmar, envía el form
+             pendiente) o alerta simple (un solo botón "Entendido"). -->
         <div class="modal-overlay" id="confirmModal" onclick="cerrarConfirmModal(event)">
             <div class="modal-box" style="max-width:380px;">
                 <div class="modal-head">

@@ -177,6 +177,8 @@
     if(fechaLimiteEl){
       fechaLimiteEl.style.color = btn.dataset.vencido === 'true' ? 'var(--coral)' : '';
     }
+    // dibujarMapaRuta se define más abajo, pero al ser una "function" (no una const
+    // arrow function) queda "hoisted" y se puede llamar acá sin problema.
     dibujarMapaRuta('mapaRutaDetalle', 'rutaInfoDetalle', btn.dataset.recogida, btn.dataset.direccion);
     overlay.classList.add('open');
   }
@@ -250,7 +252,11 @@
     confirmarAccion(form, '¿Confirmas que no se pudo entregar este envío? Se generará una incidencia.');
   }
 
-  // ===== Mapa de ruta en "Gestión de envío" (repartidor) =====
+  // ===== Mapa de ruta (Gestión de envío y modal de Detalle en Disponibles) =====
+  // El proyecto nunca guarda latitud/longitud de ninguna dirección (ni el selector de
+  // mapa del cliente al crear un envío las persiste), así que acá se geocodifica el
+  // TEXTO de la dirección en vivo, cada vez que se abre la pantalla. countrycodes=ec
+  // evita que direcciones como "Cuenca" se resuelvan a la ciudad homónima en España.
   function geocodificar(direccionTexto){
     const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(direccionTexto) + '&format=json&limit=1&countrycodes=ec';
     return fetch(url).then(res => res.json()).then(resultados => {
@@ -259,8 +265,14 @@
     });
   }
 
+  // Guarda la instancia de Leaflet por contenedor. El mapa del modal de Detalle se
+  // reutiliza para envíos distintos sin recargar la página, y Leaflet no permite
+  // reinicializar un contenedor sin antes hacer remove() del mapa anterior.
   const mapasRuta = {};
 
+  // Función genérica: geocodifica recogida/entrega, dibuja el mapa (Leaflet), los
+  // marcadores (verde/rojo) y la ruta entre ambos (OSRM), y escribe distancia/tiempo en
+  // infoElId. La usan tanto initMapaRutaGestion() como verDetalleEnvio().
   function dibujarMapaRuta(contenedorId, infoElId, recogidaTexto, entregaTexto){
     const contenedor = document.getElementById(contenedorId);
     if(!contenedor || typeof L === 'undefined') return;
@@ -322,6 +334,9 @@
       });
   }
 
+  // Se llama una vez al cargar la página: si el panel de Gestión está activo
+  // (mostrarGestion=true) el contenedor #mapaRutaGestion ya existe con los data-* del
+  // envío que se está gestionando (ver dashboard.html). Si no existe, no hace nada.
   function initMapaRutaGestion(){
     const contenedor = document.getElementById('mapaRutaGestion');
     if(!contenedor) return;

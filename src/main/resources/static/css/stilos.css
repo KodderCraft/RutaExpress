@@ -93,6 +93,9 @@
   }
   .nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
   .nav-item.active{background:rgba(255,159,28,.15);color:#fff;border-left-color:var(--amber);}
+  /* margin-top:auto (dentro del flex column de .sidebar) alcanza para dejarlo abajo.
+     Antes tenía position:fixed sin ancho definido, y el texto largo se salía del
+     recuadro de 236px del sidebar en vez de respetarlo. */
   .sidebar-foot{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.09);display:flex;gap:10px;align-items:center;}
   .avatar{width:34px;height:34px;border-radius:50%;background:var(--amber);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex:none;}
   .sidebar-foot .who{font-size:.8rem;line-height:1.25;min-width:0;}
@@ -219,6 +222,8 @@
   .quote-card .price{font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:var(--amber);}
   .bars{display:flex;align-items:flex-end;gap:10px;height:140px;padding-top:10px;}
   .bars .bar{flex:1;background:linear-gradient(180deg,var(--amber),var(--amber-dark));border-radius:6px 6px 2px 2px;position:relative;min-height:2px;}
+  /* Panel Ganancias: resalta la barra del día de hoy sobre las 7 barras reales (ver
+     RepartidorController.construirBarrasSemana). */
   .bars .bar.hoy{background:linear-gradient(180deg,var(--ink),var(--ink-3));}
   .bars .bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:.68rem;color:var(--mute);}
   .bars .bar.hoy span{color:var(--ink);font-weight:700;}
@@ -246,6 +251,8 @@
   .route-dot.end{background:var(--coral);}
   .route-line{width:2px;flex:1;background:var(--line);min-height:22px;}
   .route-textcol{display:flex;flex-direction:column;gap:2px;}
+  /* Contenedor del mapa Leaflet (Gestión y modal de Detalle). Necesita alto fijo porque
+     Leaflet mide el contenedor al inicializarse. */
   .route-map{height:220px;border-radius:var(--radius);margin-top:12px;overflow:hidden;}
   .field-pair{display:flex;flex-direction:column;gap:4px;flex:1;}
   .field-pair .hint,.route-textcol .hint{text-transform:uppercase;font-size:.66rem;font-weight:700;color:var(--mute);letter-spacing:.3px;margin:0;}
@@ -280,6 +287,8 @@
   .modal-body .field-row > div .hint{display:block;margin:0 0 4px;}
   .modal-body .field-row > div p{margin:0;font-weight:600;font-size:.9rem;color:var(--text);}
   .modal-body .field-row.stat-row{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));}
+  /* Modal de detalle: cada dato del servicio (Tipo/Costo/Distancia/...) en su propia
+     caja, antes era texto plano sin separación visual. */
   .stat-chip{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
   .modal-field{margin-bottom:14px;}
   .modal-field:last-child{margin-bottom:0;}

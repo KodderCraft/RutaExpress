@@ -34,6 +34,7 @@ public class IncidenciaService {
         }
     }
 
+    // Limpia la incidencia de un envio antes de borrarlo (ver EnvioService.eliminarEntregado).
     @Transactional
     public void eliminarPorEnvio(Envio envio) {
         incidenciaRepository.deleteByEnvio(envio);

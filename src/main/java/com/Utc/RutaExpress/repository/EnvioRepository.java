@@ -33,8 +33,11 @@ public interface EnvioRepository extends JpaRepository<Envio, Long> {
 
     List<Envio> findByEstadoNotInAndFechaLimiteBefore(List<EstadoEnvio> estadosExcluidos, LocalDateTime ahora);
 
+    // Para el panel "Ganancias": entregas de un repartidor dentro de un rango de fechas,
+    // filtrando por fechaEntrega (no fechaAsignacion) para contar solo cobros confirmados.
     List<Envio> findByRepartidorAndEstadoAndFechaEntregaBetween(
             Repartidor repartidor, EstadoEnvio estado, LocalDateTime inicio, LocalDateTime fin);
 
+    // Historial de "Ganancias": ultimas 10 entregas, mas reciente primero.
     List<Envio> findTop10ByRepartidorAndEstadoOrderByFechaEntregaDesc(Repartidor repartidor, EstadoEnvio estado);
 }

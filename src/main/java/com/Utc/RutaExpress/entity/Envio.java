@@ -57,6 +57,8 @@ public class Envio {
 
     private LocalDateTime fechaLimite;
 
+    // Cuenta los intentos de entrega fallidos. Al llegar a app.repartidor.max-intentos-entrega
+    // el envio pasa a DEVUELTO en vez de volver a NO_ENTREGADO (ver EnvioService.marcarNoEntregado).
     private Integer intentosEntrega = 0;
 
     public Envio() {}
