@@ -157,13 +157,35 @@ public class RepartidorController {
             String mensaje = envio.getEstado() == EstadoEnvio.DEVUELTO
                     ? "Se agotaron los " + maxIntentosEntrega + " intentos. El paquete se marcará para devolución."
                     : "Entrega marcada como no realizada (intento " + envio.getIntentosEntrega() + "/"
-                            + maxIntentosEntrega + "). Volverá a Disponibles para un nuevo intento.";
+                            + maxIntentosEntrega + "). Puedes reintentarla cuando quieras.";
             redirectAttributes.addFlashAttribute("mensaje", mensaje);
         } else {
             redirectAttributes.addFlashAttribute("error", "No se pudo actualizar este envío.");
         }
 
-        return "redirect:/repartidor/dashboard";
+        return "redirect:/repartidor/dashboard?gestionar=" + id;
+    }
+
+    @PostMapping("/repartidor/envios/{id}/reintentar")
+    public String reintentarEntrega(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Repartidor> repartidorOpt = usuario == null
+                ? Optional.empty()
+                : repartidorService.buscarPorUsuarioId(usuario.getId());
+
+        if (repartidorOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "No se encontró tu perfil de repartidor.");
+            return "redirect:/repartidor/dashboard";
+        }
+
+        boolean exito = envioService.reintentarEntrega(id, repartidorOpt.get());
+        if (exito) {
+            redirectAttributes.addFlashAttribute("mensaje", "Entrega reactivada. Ya puedes intentar entregarla de nuevo.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "No se pudo reintentar este envío.");
+        }
+
+        return "redirect:/repartidor/dashboard?gestionar=" + id;
     }
 
     @PostMapping("/repartidor/envios/{id}/eliminar")

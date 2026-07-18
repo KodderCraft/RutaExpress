@@ -119,12 +119,23 @@ public class EnvioService {
         if (intentos >= maxIntentosEntrega) {
             envio.setEstado(EstadoEnvio.DEVUELTO);
         } else {
-            envio.setEstado(EstadoEnvio.PENDIENTE);
-            envio.setRepartidor(null);
-            envio.setFechaAsignacion(null);
+            envio.setEstado(EstadoEnvio.NO_ENTREGADO);
         }
 
         return Optional.of(envioRepository.save(envio));
+    }
+
+    @Transactional
+    public boolean reintentarEntrega(Long envioId, Repartidor repartidor) {
+        Envio envio = envioRepository.findById(envioId).orElse(null);
+        if (envio == null || envio.getRepartidor() == null
+                || !envio.getRepartidor().getId().equals(repartidor.getId())
+                || envio.getEstado() != EstadoEnvio.NO_ENTREGADO) {
+            return false;
+        }
+        envio.setEstado(EstadoEnvio.EN_CAMINO);
+        envioRepository.save(envio);
+        return true;
     }
 
     @Transactional
