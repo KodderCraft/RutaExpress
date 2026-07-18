@@ -97,6 +97,11 @@
                               style="display:inline;" onsubmit="return confirm('¿Eliminar este envío entregado del historial?')">
                             <button type="submit" class="btn btn-coral btn-sm">Eliminar</button>
                         </form>
+                        <form th:if="${envio.estado.name() == 'DEVUELTO'}"
+                              th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post"
+                              style="display:inline;" onsubmit="return confirm('¿Eliminar este envío? Volverá a la lista de disponibles para que alguien más lo entregue.')">
+                            <button type="submit" class="btn btn-coral btn-sm">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
                 </table>
@@ -218,7 +223,11 @@
             </div>
 
             <div class="card" th:if="${entregaActual != null and entregaActual.estado.name() == 'DEVUELTO'}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">
-                <p style="margin:0;color:var(--coral);font-weight:600;">Se agotaron los intentos de entrega. Este paquete quedó marcado para devolución al remitente.</p>
+                <p style="margin:0 0 12px;color:var(--coral);font-weight:600;">Se agotaron los intentos de entrega. Este paquete quedó marcado para devolución al remitente.</p>
+                <form th:action="@{/repartidor/envios/{id}/eliminar(id=${entregaActual.id})}" method="post"
+                      onsubmit="return confirm('¿Eliminar este envío? Volverá a la lista de disponibles para que alguien más lo entregue.')">
+                    <button class="btn btn-coral btn-block" type="submit">Eliminar</button>
+                </form>
             </div>
 
             <div class="card" th:if="${entregaActual != null and entregaActual.estado.name() == 'NO_ENTREGADO'}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin:16px 0;">

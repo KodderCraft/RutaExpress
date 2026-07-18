@@ -14,4 +14,6 @@ public interface IncidenciaRepository extends JpaRepository<Incidencia, Long> {
     boolean existsByEnvio(Envio envio);
 
     List<Incidencia> findAllByOrderByIdDesc();
+
+    void deleteByEnvio(Envio envio);
 }

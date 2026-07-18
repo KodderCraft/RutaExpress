@@ -200,9 +200,12 @@ public class RepartidorController {
             return "redirect:/repartidor/dashboard";
         }
 
-        boolean exito = envioService.eliminarEntregado(id, repartidorOpt.get());
-        if (exito) {
-            redirectAttributes.addFlashAttribute("mensaje", "Envío eliminado del historial.");
+        Optional<Envio> resultado = envioService.eliminarEntregado(id, repartidorOpt.get());
+        if (resultado.isPresent()) {
+            String mensaje = resultado.get().getEstado() == EstadoEnvio.PENDIENTE
+                    ? "Envío liberado. Volvió a la lista de disponibles para que alguien más lo entregue."
+                    : "Envío eliminado del historial.";
+            redirectAttributes.addFlashAttribute("mensaje", mensaje);
         } else {
             redirectAttributes.addFlashAttribute("error", "No se pudo eliminar este envío.");
         }

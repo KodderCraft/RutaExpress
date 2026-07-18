@@ -24,6 +24,7 @@ public class EnvioService {
             EstadoEnvio.RECOGIDO, EstadoEnvio.EN_CAMINO);
 
     private final EnvioRepository envioRepository;
+    private final IncidenciaService incidenciaService;
 
     @Value("${app.repartidor.plazo-entrega-horas}")
     private int plazoEntregaHoras;
@@ -31,8 +32,9 @@ public class EnvioService {
     @Value("${app.repartidor.max-intentos-entrega}")
     private int maxIntentosEntrega;
 
-    public EnvioService(EnvioRepository envioRepository) {
+    public EnvioService(EnvioRepository envioRepository, IncidenciaService incidenciaService) {
         this.envioRepository = envioRepository;
+        this.incidenciaService = incidenciaService;
     }
 
     public List<Envio> listarTodos() {
@@ -81,8 +83,7 @@ public class EnvioService {
 
     public BigDecimal calcularGanadoHoy(Repartidor repartidor) {
         return listarAsignadosHoy(repartidor).stream()
-                .filter(envio -> envio.getEstado() != EstadoEnvio.CANCELADO
-                        && envio.getEstado() != EstadoEnvio.DEVUELTO)
+                .filter(envio -> envio.getEstado() != EstadoEnvio.CANCELADO)
                 .map(Envio::getCostoTotal)
                 .filter(costo -> costo != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -155,15 +156,29 @@ public class EnvioService {
     }
 
     @Transactional
-    public boolean eliminarEntregado(Long envioId, Repartidor repartidor) {
+    public Optional<Envio> eliminarEntregado(Long envioId, Repartidor repartidor) {
         Envio envio = envioRepository.findById(envioId).orElse(null);
         if (envio == null || envio.getRepartidor() == null
-                || !envio.getRepartidor().getId().equals(repartidor.getId())
-                || envio.getEstado() != EstadoEnvio.ENTREGADO) {
-            return false;
+                || !envio.getRepartidor().getId().equals(repartidor.getId())) {
+            return Optional.empty();
         }
-        envioRepository.delete(envio);
-        return true;
+
+        if (envio.getEstado() == EstadoEnvio.ENTREGADO) {
+            incidenciaService.eliminarPorEnvio(envio);
+            envioRepository.delete(envio);
+            return Optional.of(envio);
+        }
+
+        if (envio.getEstado() == EstadoEnvio.DEVUELTO) {
+            envio.setEstado(EstadoEnvio.PENDIENTE);
+            envio.setRepartidor(null);
+            envio.setFechaAsignacion(null);
+            envio.setFechaLimite(null);
+            envio.setIntentosEntrega(0);
+            return Optional.of(envioRepository.save(envio));
+        }
+
+        return Optional.empty();
     }
 
     public List<Envio> listarVencidosNoResueltos() {

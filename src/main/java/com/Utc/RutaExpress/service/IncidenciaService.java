@@ -33,4 +33,9 @@ public class IncidenciaService {
             incidenciaRepository.save(incidencia);
         }
     }
+
+    @Transactional
+    public void eliminarPorEnvio(Envio envio) {
+        incidenciaRepository.deleteByEnvio(envio);
+    }
 }
