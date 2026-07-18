@@ -57,6 +57,7 @@ public class RepartidorController {
 
         if (repartidorOpt.isPresent()) {
             Repartidor repartidor = repartidorOpt.get();
+            model.addAttribute("repartidor", repartidor);
             List<Envio> asignadosHoy = envioService.listarAsignadosHoy(repartidor);
             long completadasHoy = asignadosHoy.stream()
                     .filter(envio -> envio.getEstado() == EstadoEnvio.ENTREGADO)

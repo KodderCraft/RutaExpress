@@ -18,8 +18,12 @@
         <div class="nav-item" data-panel="mapa"><i data-icon="mapPin"></i>Mapa</div>
         <div class="nav-item" data-panel="ganancias"><i data-icon="wallet"></i>Ganancias</div>
         <div class="sidebar-foot">
-        <div class="avatar" style="background:var(--teal);color:#fff;">JT</div>
-        <div class="who"><b>Jorge Torres</b><span>Moto · Zona Centro</span></div>
+        <div class="avatar" style="background:var(--teal);color:#fff;"
+             th:text="${usuario != null and usuario.nombre != null and #strings.length(usuario.nombre) > 0 ? #strings.substring(usuario.nombre,0,1) : '?'}">JT</div>
+        <div class="who">
+            <b th:text="${usuario != null and usuario.nombre != null ? usuario.nombre : 'Repartidor'}">Usuario no encontrado</b>
+            <span th:text="${(repartidor != null and repartidor.vehiculoTipo != null ? repartidor.vehiculoTipo : 'Vehículo no registrado') + ' · ' + (repartidor != null and repartidor.zona != null ? repartidor.zona : 'Zona no asignada')}">Moto · Zona Centro</span>
+        </div>
         </div>
     </div>
 
