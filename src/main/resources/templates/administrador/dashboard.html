@@ -140,11 +140,22 @@
       <div class="topbar"><div><h1>Incidencias y reportes</h1><div class="sub">Casos que requieren revisión manual</div></div></div>
       <div class="card">
         <table>
-          <tr><th>Código</th><th>Tipo</th><th>Reportado por</th><th>Fecha</th><th>Estado</th><th></th></tr>
-          <tr><td class="code">SE-47960</td><td>Destinatario no localizado</td><td>Repartidor</td><td>10 jul</td><td><span class="badge incidencia">Abierta</span></td><td><button class="btn btn-primary btn-sm">Revisar</button></td></tr>
-          <tr><td class="code">SE-47820</td><td>Paquete dañado</td><td>Remitente</td><td>9 jul</td><td><span class="badge incidencia">Abierta</span></td><td><button class="btn btn-primary btn-sm">Revisar</button></td></tr>
-          <tr><td class="code">SE-47701</td><td>Retraso prolongado</td><td>Sistema</td><td>8 jul</td><td><span class="badge entregado">Resuelta</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+          <tr><th>Código</th><th>Tipo</th><th>Reportado por</th><th>Estado</th><th></th></tr>
+          <tr th:each="incidencia : ${incidencias}">
+            <td class="code" th:text="${incidencia.envio != null ? incidencia.envio.codigoGuia : '-'}"></td>
+            <td th:text="${incidencia.descripcion}"></td>
+            <td>Sistema</td>
+            <td th:switch="${incidencia.estado.name()}">
+              <span th:case="'RESUELTA'" class="badge entregado" th:text="${incidencia.estado}"></span>
+              <span th:case="*" class="badge incidencia" th:text="${incidencia.estado}"></span>
+            </td>
+            <td><button class="btn btn-primary btn-sm" type="button">Revisar</button></td>
+          </tr>
         </table>
+        <div class="empty" th:if="${#lists.isEmpty(incidencias)}">
+          <i data-icon="check"></i>
+          <p>No hay incidencias registradas.</p>
+        </div>
       </div>
     </div>
   </div>
