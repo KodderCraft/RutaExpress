@@ -28,6 +28,9 @@ public class EnvioService {
     @Value("${app.repartidor.plazo-entrega-horas}")
     private int plazoEntregaHoras;
 
+    @Value("${app.repartidor.max-intentos-entrega}")
+    private int maxIntentosEntrega;
+
     public EnvioService(EnvioRepository envioRepository) {
         this.envioRepository = envioRepository;
     }
@@ -78,7 +81,8 @@ public class EnvioService {
 
     public BigDecimal calcularGanadoHoy(Repartidor repartidor) {
         return listarAsignadosHoy(repartidor).stream()
-                .filter(envio -> envio.getEstado() != EstadoEnvio.CANCELADO)
+                .filter(envio -> envio.getEstado() != EstadoEnvio.CANCELADO
+                        && envio.getEstado() != EstadoEnvio.DEVUELTO)
                 .map(Envio::getCostoTotal)
                 .filter(costo -> costo != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -102,15 +106,25 @@ public class EnvioService {
     }
 
     @Transactional
-    public boolean marcarNoEntregado(Long envioId, Repartidor repartidor) {
+    public Optional<Envio> marcarNoEntregado(Long envioId, Repartidor repartidor) {
         Envio envio = envioRepository.findById(envioId).orElse(null);
         if (envio == null || envio.getRepartidor() == null
                 || !envio.getRepartidor().getId().equals(repartidor.getId())) {
-            return false;
+            return Optional.empty();
         }
-        envio.setEstado(EstadoEnvio.CANCELADO);
-        envioRepository.save(envio);
-        return true;
+
+        int intentos = (envio.getIntentosEntrega() == null ? 0 : envio.getIntentosEntrega()) + 1;
+        envio.setIntentosEntrega(intentos);
+
+        if (intentos >= maxIntentosEntrega) {
+            envio.setEstado(EstadoEnvio.DEVUELTO);
+        } else {
+            envio.setEstado(EstadoEnvio.PENDIENTE);
+            envio.setRepartidor(null);
+            envio.setFechaAsignacion(null);
+        }
+
+        return Optional.of(envioRepository.save(envio));
     }
 
     @Transactional
@@ -143,6 +157,7 @@ public class EnvioService {
 
     public List<Envio> listarVencidosNoResueltos() {
         return envioRepository.findByEstadoNotInAndFechaLimiteBefore(
-                List.of(EstadoEnvio.ENTREGADO, EstadoEnvio.CANCELADO), LocalDateTime.now());
+                List.of(EstadoEnvio.ENTREGADO, EstadoEnvio.CANCELADO, EstadoEnvio.DEVUELTO),
+                LocalDateTime.now());
     }
 }

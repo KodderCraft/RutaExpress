@@ -5,5 +5,6 @@ public enum EstadoEnvio {
     RECOGIDO,
     EN_CAMINO,
     ENTREGADO,
-    CANCELADO
+    CANCELADO,
+    DEVUELTO
 }

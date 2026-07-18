@@ -57,6 +57,8 @@ public class Envio {
 
     private LocalDateTime fechaLimite;
 
+    private Integer intentosEntrega = 0;
+
     public Envio() {}
 
     public Long getId() { return id; }
@@ -110,10 +112,14 @@ public class Envio {
     public LocalDateTime getFechaLimite() { return fechaLimite; }
     public void setFechaLimite(LocalDateTime fechaLimite) { this.fechaLimite = fechaLimite; }
 
+    public Integer getIntentosEntrega() { return intentosEntrega; }
+    public void setIntentosEntrega(Integer intentosEntrega) { this.intentosEntrega = intentosEntrega; }
+
     @Transient
     public boolean isVencido() {
         return fechaLimite != null
                 && estado != EstadoEnvio.ENTREGADO && estado != EstadoEnvio.CANCELADO
+                && estado != EstadoEnvio.DEVUELTO
                 && fechaLimite.isBefore(LocalDateTime.now());
     }
 }

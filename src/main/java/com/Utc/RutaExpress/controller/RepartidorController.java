@@ -33,6 +33,9 @@ public class RepartidorController {
     @Value("${app.repartidor.meta-diaria}")
     private int metaDiaria;
 
+    @Value("${app.repartidor.max-intentos-entrega}")
+    private int maxIntentosEntrega;
+
     public RepartidorController(EnvioService envioService, RepartidorService repartidorService,
             IncidenciaService incidenciaService) {
         this.envioService = envioService;
@@ -46,6 +49,7 @@ public class RepartidorController {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("usuario", usuario);
         model.addAttribute("metaDiaria", metaDiaria);
+        model.addAttribute("maxIntentosEntrega", maxIntentosEntrega);
 
         Optional<Repartidor> repartidorOpt = usuario == null
                 ? Optional.empty()
@@ -141,18 +145,25 @@ public class RepartidorController {
 
         Repartidor repartidor = repartidorOpt.get();
         Optional<Envio> envioOpt = envioService.buscarGestionable(id, repartidor);
-        boolean exito = envioOpt.isPresent() && envioService.marcarNoEntregado(id, repartidor);
-        if (exito) {
-            Envio envio = envioOpt.get();
+        Optional<Envio> resultado = envioOpt.isPresent()
+                ? envioService.marcarNoEntregado(id, repartidor)
+                : Optional.<Envio>empty();
+
+        if (resultado.isPresent()) {
+            Envio envio = resultado.get();
             incidenciaService.registrarSiNoExiste(envio,
                     "Entrega fallida: " + envio.getCodigoGuia() + " - Motivo: " + motivo);
-            redirectAttributes.addFlashAttribute("mensaje",
-                    "Entrega marcada como no realizada. Se generó una incidencia para revisión.");
+
+            String mensaje = envio.getEstado() == EstadoEnvio.DEVUELTO
+                    ? "Se agotaron los " + maxIntentosEntrega + " intentos. El paquete se marcará para devolución."
+                    : "Entrega marcada como no realizada (intento " + envio.getIntentosEntrega() + "/"
+                            + maxIntentosEntrega + "). Volverá a Disponibles para un nuevo intento.";
+            redirectAttributes.addFlashAttribute("mensaje", mensaje);
         } else {
             redirectAttributes.addFlashAttribute("error", "No se pudo actualizar este envío.");
         }
 
-        return "redirect:/repartidor/dashboard?gestionar=" + id;
+        return "redirect:/repartidor/dashboard";
     }
 
     @PostMapping("/repartidor/envios/{id}/eliminar")
