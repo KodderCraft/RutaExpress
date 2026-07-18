@@ -45,7 +45,7 @@
                 <p class="hint">Envíos que has elegido hoy</p>
                 <div class="table-wrap">
                 <table>
-                <tr><th>Código</th><th>Cliente</th><th>Dirección</th><th>Tipo</th><th>Estado</th></tr>
+                <tr><th>Código</th><th>Cliente</th><th>Dirección</th><th>Tipo</th><th>Estado</th><th></th></tr>
                 <tr th:each="envio : ${asignadosHoy}">
                     <td class="code" th:text="${envio.codigoGuia}"></td>
                     <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
@@ -57,6 +57,25 @@
                         <span th:case="'RECOGIDO'" class="badge transito" th:text="${envio.estado}"></span>
                         <span th:case="'CANCELADO'" class="badge incidencia" th:text="${envio.estado}"></span>
                         <span th:case="*" class="badge pendiente" th:text="${envio.estado}"></span>
+                        <span class="badge incidencia" th:if="${envio.vencido}">VENCIDO</span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-teal btn-sm" onclick="verDetalleEnvio(this)"
+                            th:attr="data-codigo=${envio.codigoGuia},
+                                      data-cliente=${envio.destinatario != null ? envio.destinatario.nombre : '-'},
+                                      data-remitente=${envio.remitente != null ? envio.remitente.nombre : '-'},
+                                      data-direccion=${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'},
+                                      data-recogida=${envio.direccionRecogida != null ? envio.direccionRecogida.direccionTexto : '-'},
+                                      data-tipo=${envio.tipoServicio},
+                                      data-estado=${envio.estado},
+                                      data-costo=${envio.costoTotal != null ? envio.costoTotal : '-'},
+                                      data-distancia=${envio.distanciaKm != null ? envio.distanciaKm + ' km' : '-'},
+                                      data-tiempo=${envio.tiempoEstimadoMin != null ? envio.tiempoEstimadoMin + ' min' : '-'},
+                                      data-fecha=${envio.fechaAsignacion != null ? #temporals.format(envio.fechaAsignacion, 'dd/MM/yyyy HH:mm') : '-'},
+                                      data-fecha-limite=${envio.fechaLimite != null ? #temporals.format(envio.fechaLimite, 'dd/MM/yyyy HH:mm') : '-'},
+                                      data-vencido=${envio.vencido}">
+                            Detalle
+                        </button>
                     </td>
                 </tr>
                 </table>
@@ -141,11 +160,19 @@
 
             <!-- ENTREGA ACTUAL -->
             <div class="panel" data-panel="entrega">
-            <div class="topbar"><div><h1>Entrega actual</h1><div class="sub">Parada 3 · SE-48213</div></div></div>
-            <div class="grid two-col">
+            <div class="topbar"><div><h1>Entrega actual</h1>
+                <div class="sub" th:if="${entregaActual != null}" th:text="${entregaActual.codigoGuia}"></div>
+                <div class="sub" th:if="${entregaActual == null}">No tienes entregas en curso</div>
+            </div></div>
+
+            <div class="card" th:if="${entregaActual != null and entregaActual.vencido}" style="border-left:4px solid var(--coral);background:var(--coral-tint);margin-bottom:16px;">
+                <p style="margin:0;color:var(--coral);font-weight:600;">Esta entrega superó su fecha límite. Se generó una incidencia para revisión del administrador.</p>
+            </div>
+
+            <div class="grid two-col" th:if="${entregaActual != null}">
                 <div class="card">
-                <h3>Carlos Peña</h3>
-                <p class="hint">Calle Larga 8-21, apartamento 3B · Cuenca</p>
+                <h3 th:text="${entregaActual.destinatario != null ? entregaActual.destinatario.nombre : '-'}"></h3>
+                <p class="hint" th:text="${entregaActual.direccionEntrega != null ? entregaActual.direccionEntrega.direccionTexto : '-'}"></p>
                 <div class="divider"></div>
                 <div class="field"><label>Escanear código del paquete</label>
                     <div style="border:1px dashed var(--line);border-radius:10px;padding:24px;text-align:center;color:var(--mute);">
@@ -154,23 +181,41 @@
                     </div>
                 </div>
                 <div class="field"><label>Código de verificación del cliente</label><input class="mono" placeholder="Ej. 7429"></div>
-                <div style="display:flex;gap:10px;">
-                    <button class="btn btn-teal btn-block"><i data-icon="check"></i>Marcar entregado</button>
-                    <button class="btn btn-coral btn-block"><i data-icon="alert"></i>No se pudo entregar</button>
+                <div style="display:flex;gap:10px;" th:switch="${entregaActual.estado.name()}">
+                    <form th:case="'PENDIENTE'" th:action="@{/repartidor/envios/{id}/avanzar-estado(id=${entregaActual.id})}" method="post" style="flex:1;">
+                        <button class="btn btn-dark btn-block" type="submit"><i data-icon="box"></i>Marcar como recogido</button>
+                    </form>
+                    <form th:case="'RECOGIDO'" th:action="@{/repartidor/envios/{id}/avanzar-estado(id=${entregaActual.id})}" method="post" style="flex:1;">
+                        <button class="btn btn-dark btn-block" type="submit"><i data-icon="truck"></i>Iniciar entrega</button>
+                    </form>
+                    <form th:case="'EN_CAMINO'" th:action="@{/repartidor/envios/{id}/entregado(id=${entregaActual.id})}" method="post" style="flex:1;">
+                        <button class="btn btn-teal btn-block" type="submit"><i data-icon="check"></i>Marcar entregado</button>
+                    </form>
+                    <button class="btn btn-coral btn-block" type="button" style="flex:1;"><i data-icon="alert"></i>No se pudo entregar</button>
                 </div>
                 </div>
                 <div class="card">
-                <h3>Detalle del paquete</h3>
+                <h3>Detalle del envío</h3>
                 <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:flex;justify-content:space-between;"><span>Tipo</span><b>Paquete pequeño</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span>Peso</span><b>1.8 kg</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span>Valor declarado</span><b>$25.00</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span>Pago</span><b>Ya pagado</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Tipo de servicio</span><b th:text="${entregaActual.tipoServicio}"></b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Costo total</span><b th:text="${entregaActual.costoTotal != null ? entregaActual.costoTotal : '-'}"></b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Distancia</span><b th:text="${entregaActual.distanciaKm != null ? entregaActual.distanciaKm + ' km' : '-'}"></b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Tiempo estimado</span><b th:text="${entregaActual.tiempoEstimadoMin != null ? entregaActual.tiempoEstimadoMin + ' min' : '-'}"></b></div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>Fecha límite</span>
+                        <b th:text="${entregaActual.fechaLimite != null ? #temporals.format(entregaActual.fechaLimite, 'dd/MM/yyyy HH:mm') : '-'}"
+                           th:style="${entregaActual.vencido} ? 'color:var(--coral);' : ''"></b>
+                    </div>
                 </div>
                 <div class="divider"></div>
-                <p class="hint" style="margin-bottom:6px;">Instrucciones del remitente</p>
-                <div class="note">Tocar el timbre del apartamento 3B. Si no responde, llamar antes de dejar con el conserje.</div>
+                <p class="hint" style="margin-bottom:6px;">Dirección de recogida</p>
+                <div class="note" th:text="${entregaActual.direccionRecogida != null ? entregaActual.direccionRecogida.direccionTexto : 'No registrada'}"></div>
                 </div>
+            </div>
+
+            <div class="card empty" th:if="${entregaActual == null}">
+                <i data-icon="box"></i>
+                <p>No tienes ninguna entrega en curso ahora mismo.</p>
             </div>
             </div>
 
@@ -201,6 +246,62 @@
                 </div>
                 </div>
             </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="envioDetalleOverlay" onclick="cerrarDetalleEnvio(event)">
+            <div class="modal-box">
+                <div class="modal-head">
+                    <div>
+                        <div class="modal-title-row">
+                            <span id="dCodigo" class="modal-codigo"></span>
+                            <span id="dEstadoBadge" class="badge pendiente"></span>
+                        </div>
+                        <span class="hint">Detalle del envío</span>
+                    </div>
+                    <button type="button" class="modal-close" onclick="cerrarDetalleEnvio()">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="modal-section">
+                        <div class="modal-section-title"><span class="icon-chip ink"><i data-icon="user"></i></span>Contacto</div>
+                        <div class="field-row">
+                            <div><span class="hint">Cliente</span><p id="dCliente"></p></div>
+                            <div><span class="hint">Remitente</span><p id="dRemitente"></p></div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title"><span class="icon-chip amber"><i data-icon="mapPin"></i></span>Ubicaciones</div>
+                        <div class="modal-field">
+                            <span class="hint">Dirección de entrega</span>
+                            <p id="dDireccion"></p>
+                        </div>
+                        <div class="modal-field">
+                            <span class="hint">Dirección de recogida</span>
+                            <p id="dRecogida"></p>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title"><span class="icon-chip teal"><i data-icon="truck"></i></span>Detalles del servicio</div>
+                        <div class="field-row stat-row">
+                            <div><span class="hint">Tipo</span><p id="dTipo"></p></div>
+                            <div><span class="hint">Costo</span><p id="dCosto"></p></div>
+                            <div><span class="hint">Distancia</span><p id="dDistancia"></p></div>
+                            <div><span class="hint">Tiempo</span><p id="dTiempo"></p></div>
+                            <div><span class="hint">F. límite</span><p id="dFechaLimite"></p></div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <p class="modal-footer-note"><i data-icon="clock" class="modal-field-icon"></i>Asignado · <span id="dFecha"></span></p>
+                </div>
             </div>
         </div>
 

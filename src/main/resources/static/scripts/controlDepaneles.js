@@ -16,7 +16,8 @@
     phone:'<path d="M6 3h4l1 5-2.5 2a12 12 0 0 0 5.5 5.5l2-2.5 5 1v4a2 2 0 0 1-2.2 2A17 17 0 0 1 4 6.2 2 2 0 0 1 6 3z"/>',
     clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
     qr:'<rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><path d="M15 15h3v3h-3zM19 19h1.5v1.5H19zM15 20h1v1h-1z"/>',
-    user:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>'
+    user:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+    eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>'
   };
   
   document.querySelectorAll('i[data-icon]').forEach(el=>{
@@ -144,3 +145,36 @@
   function showQuote(){
     document.getElementById('quoteCard').style.display = 'block';
   }
+
+  // ===== Modal: detalle de envío =====
+  const DETALLE_CAMPOS = ['codigo','cliente','remitente','direccion','recogida','tipo','costo','distancia','tiempo','fechaLimite','fecha'];
+  const ESTADO_BADGE_CLASS = {ENTREGADO:'entregado', EN_CAMINO:'reparto', RECOGIDO:'transito', CANCELADO:'incidencia'};
+
+  function verDetalleEnvio(btn){
+    const overlay = document.getElementById('envioDetalleOverlay');
+    if(!overlay) return;
+    DETALLE_CAMPOS.forEach(campo=>{
+      const el = document.getElementById('d'+campo.charAt(0).toUpperCase()+campo.slice(1));
+      if(el) el.textContent = btn.dataset[campo] || '-';
+    });
+    const estado = btn.dataset.estado || '-';
+    const badge = document.getElementById('dEstadoBadge');
+    if(badge){
+      badge.textContent = estado;
+      badge.className = 'badge ' + (ESTADO_BADGE_CLASS[estado] || 'pendiente');
+    }
+    const fechaLimiteEl = document.getElementById('dFechaLimite');
+    if(fechaLimiteEl){
+      fechaLimiteEl.style.color = btn.dataset.vencido === 'true' ? 'var(--coral)' : '';
+    }
+    overlay.classList.add('open');
+  }
+
+  function cerrarDetalleEnvio(e){
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('envioDetalleOverlay').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') cerrarDetalleEnvio();
+  });

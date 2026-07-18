@@ -1,18 +1,36 @@
 package com.Utc.RutaExpress.service;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.Utc.RutaExpress.entity.EstadoIncidencia;
+import com.Utc.RutaExpress.entity.Envio;
 import com.Utc.RutaExpress.entity.Incidencia;
+import com.Utc.RutaExpress.repository.IncidenciaRepository;
 
-public interface IncidenciaService {
+import java.util.List;
 
-    List<Incidencia> listarTodos();
+@Service
+public class IncidenciaService {
 
-    Incidencia buscarPorId(Long id);
+    private final IncidenciaRepository incidenciaRepository;
 
-    Incidencia guardar(Incidencia incidencia);
+    public IncidenciaService(IncidenciaRepository incidenciaRepository) {
+        this.incidenciaRepository = incidenciaRepository;
+    }
 
-    Incidencia actualizar(Long id, Incidencia incidencia);
+    public List<Incidencia> listarTodas() {
+        return incidenciaRepository.findAllByOrderByIdDesc();
+    }
 
-    void eliminar(Long id);
-
+    @Transactional
+    public void registrarSiNoExiste(Envio envio, String descripcion) {
+        if (!incidenciaRepository.existsByEnvio(envio)) {
+            Incidencia incidencia = new Incidencia();
+            incidencia.setEnvio(envio);
+            incidencia.setDescripcion(descripcion);
+            incidencia.setEstado(EstadoIncidencia.PENDIENTE);
+            incidenciaRepository.save(incidencia);
+        }
+    }
 }

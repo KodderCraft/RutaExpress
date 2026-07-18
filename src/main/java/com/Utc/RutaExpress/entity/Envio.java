@@ -55,6 +55,8 @@ public class Envio {
 
     private LocalDateTime fechaAsignacion;
 
+    private LocalDateTime fechaLimite;
+
     public Envio() {}
 
     public Long getId() { return id; }
@@ -104,4 +106,14 @@ public class Envio {
 
     public LocalDateTime getFechaAsignacion() { return fechaAsignacion; }
     public void setFechaAsignacion(LocalDateTime fechaAsignacion) { this.fechaAsignacion = fechaAsignacion; }
+
+    public LocalDateTime getFechaLimite() { return fechaLimite; }
+    public void setFechaLimite(LocalDateTime fechaLimite) { this.fechaLimite = fechaLimite; }
+
+    @Transient
+    public boolean isVencido() {
+        return fechaLimite != null
+                && estado != EstadoEnvio.ENTREGADO && estado != EstadoEnvio.CANCELADO
+                && fechaLimite.isBefore(LocalDateTime.now());
+    }
 }

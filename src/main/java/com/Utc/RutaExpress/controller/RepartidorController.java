@@ -56,11 +56,13 @@ public class RepartidorController {
             model.addAttribute("asignadosHoy", asignadosHoy);
             model.addAttribute("reclamadosHoy", envioService.contarReclamadosHoy(repartidor));
             model.addAttribute("completadasHoy", completadasHoy);
+            model.addAttribute("entregaActual", envioService.buscarEntregaActual(repartidor).orElse(null));
         } else {
             model.addAttribute("enviosDisponibles", Collections.<Envio>emptyList());
             model.addAttribute("asignadosHoy", Collections.<Envio>emptyList());
             model.addAttribute("reclamadosHoy", 0L);
             model.addAttribute("completadasHoy", 0L);
+            model.addAttribute("entregaActual", null);
         }
 
         return "repartidor/dashboard";
@@ -83,6 +85,50 @@ public class RepartidorController {
             redirectAttributes.addFlashAttribute("mensaje", "Reclamaste el envío correctamente.");
         } else {
             redirectAttributes.addFlashAttribute("error", "Este envío ya fue tomado por otro repartidor.");
+        }
+
+        return "redirect:/repartidor/dashboard";
+    }
+
+    @PostMapping("/repartidor/envios/{id}/entregado")
+    public String marcarEntregado(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Repartidor> repartidorOpt = usuario == null
+                ? Optional.empty()
+                : repartidorService.buscarPorUsuarioId(usuario.getId());
+
+        if (repartidorOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "No se encontró tu perfil de repartidor.");
+            return "redirect:/repartidor/dashboard";
+        }
+
+        boolean exito = envioService.marcarEntregado(id, repartidorOpt.get());
+        if (exito) {
+            redirectAttributes.addFlashAttribute("mensaje", "Entrega marcada como completada.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "No se pudo actualizar este envío.");
+        }
+
+        return "redirect:/repartidor/dashboard";
+    }
+
+    @PostMapping("/repartidor/envios/{id}/avanzar-estado")
+    public String avanzarEstado(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Repartidor> repartidorOpt = usuario == null
+                ? Optional.empty()
+                : repartidorService.buscarPorUsuarioId(usuario.getId());
+
+        if (repartidorOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "No se encontró tu perfil de repartidor.");
+            return "redirect:/repartidor/dashboard";
+        }
+
+        boolean exito = envioService.avanzarEstado(id, repartidorOpt.get());
+        if (exito) {
+            redirectAttributes.addFlashAttribute("mensaje", "Estado del envío actualizado.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "No se pudo actualizar el estado de este envío.");
         }
 
         return "redirect:/repartidor/dashboard";

@@ -12,18 +12,25 @@ import com.Utc.RutaExpress.entity.Repartidor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EnvioRepository extends JpaRepository<Envio, Long> {
 
     List<Envio> findByEstadoAndRepartidorIsNull(EstadoEnvio estado);
 
+    Optional<Envio> findFirstByRepartidorAndEstadoInOrderByFechaAsignacionAsc(
+            Repartidor repartidor, List<EstadoEnvio> estados);
+
     @Modifying
-    @Query("UPDATE Envio e SET e.repartidor = :repartidor, e.fechaAsignacion = :fecha " +
+    @Query("UPDATE Envio e SET e.repartidor = :repartidor, e.fechaAsignacion = :fecha, e.fechaLimite = :fechaLimite " +
            "WHERE e.id = :id AND e.repartidor IS NULL AND e.estado = com.Utc.RutaExpress.entity.EstadoEnvio.PENDIENTE")
-    int reclamar(@Param("id") Long id, @Param("repartidor") Repartidor repartidor, @Param("fecha") LocalDateTime fecha);
+    int reclamar(@Param("id") Long id, @Param("repartidor") Repartidor repartidor,
+            @Param("fecha") LocalDateTime fecha, @Param("fechaLimite") LocalDateTime fechaLimite);
 
     long countByRepartidorAndFechaAsignacionBetween(Repartidor repartidor, LocalDateTime inicio, LocalDateTime fin);
 
     List<Envio> findByRepartidorAndFechaAsignacionBetween(Repartidor repartidor, LocalDateTime inicio, LocalDateTime fin);
+
+    List<Envio> findByEstadoNotInAndFechaLimiteBefore(List<EstadoEnvio> estadosExcluidos, LocalDateTime ahora);
 }
