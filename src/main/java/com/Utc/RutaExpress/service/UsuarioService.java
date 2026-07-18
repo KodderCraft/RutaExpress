@@ -21,7 +21,7 @@ public class UsuarioService {
     return usuarioRepository.existsByEmail(email);
 }
     public Usuario login(loginValidar login){
-        Optional<Usuario> cliente = usuarioRepository.findByEmail(login.getCorreo());
+        Optional<Usuario> cliente = usuarioRepository.findBynombre(login.getnombre());
 
         
         if(cliente.isEmpty()){
