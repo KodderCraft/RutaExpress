@@ -244,6 +244,7 @@
   .route-dot.end{background:var(--coral);}
   .route-line{width:2px;flex:1;background:var(--line);min-height:22px;}
   .route-textcol{display:flex;flex-direction:column;gap:2px;}
+  .route-map{height:220px;border-radius:var(--radius);margin-top:12px;overflow:hidden;}
   .field-pair{display:flex;flex-direction:column;gap:4px;flex:1;}
   .field-pair .hint,.route-textcol .hint{text-transform:uppercase;font-size:.66rem;font-weight:700;color:var(--mute);letter-spacing:.3px;margin:0;}
   .field-pair .val,.route-textcol .val{font-size:.82rem;font-weight:600;color:var(--text);}
@@ -277,6 +278,7 @@
   .modal-body .field-row > div .hint{display:block;margin:0 0 4px;}
   .modal-body .field-row > div p{margin:0;font-weight:600;font-size:.9rem;color:var(--text);}
   .modal-body .field-row.stat-row{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));}
+  .stat-chip{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
   .modal-field{margin-bottom:14px;}
   .modal-field:last-child{margin-bottom:0;}
   .modal-field .hint{margin:0 0 4px;}

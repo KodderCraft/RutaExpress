@@ -3,6 +3,8 @@
 <head>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/stilos.css}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 </head>
 <body>
@@ -70,22 +72,6 @@
                              th:text="'Intento ' + ${envio.intentosEntrega} + '/' + ${maxIntentosEntrega}"></div>
                     </td>
                     <td style="display:flex;gap:8px;">
-                        <button type="button" class="btn btn-ghost btn-sm" onclick="verDetalleEnvio(this)"
-                            th:attr="data-codigo=${envio.codigoGuia},
-                                      data-cliente=${envio.destinatario != null ? envio.destinatario.nombre : '-'},
-                                      data-remitente=${envio.remitente != null ? envio.remitente.nombre : '-'},
-                                      data-direccion=${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'},
-                                      data-recogida=${envio.direccionRecogida != null ? envio.direccionRecogida.direccionTexto : '-'},
-                                      data-tipo=${envio.tipoServicio},
-                                      data-estado=${envio.estado},
-                                      data-costo=${envio.costoTotal != null ? envio.costoTotal : '-'},
-                                      data-distancia=${envio.distanciaKm != null ? envio.distanciaKm + ' km' : '-'},
-                                      data-tiempo=${envio.tiempoEstimadoMin != null ? envio.tiempoEstimadoMin + ' min' : '-'},
-                                      data-fecha=${envio.fechaAsignacion != null ? #temporals.format(envio.fechaAsignacion, 'dd/MM/yyyy HH:mm') : '-'},
-                                      data-fecha-limite=${envio.fechaLimite != null ? #temporals.format(envio.fechaLimite, 'dd/MM/yyyy HH:mm') : '-'},
-                                      data-vencido=${envio.vencido}">
-                            Detalle
-                        </button>
                         <a th:if="${envio.estado.name() != 'ENTREGADO' and envio.estado.name() != 'CANCELADO' and envio.estado.name() != 'DEVUELTO'}"
                            class="btn btn-teal btn-sm" th:href="@{/repartidor/dashboard(gestionar=${envio.id})}">Gestionar</a>
                         <form th:if="${envio.estado.name() == 'NO_ENTREGADO'}"
@@ -150,7 +136,23 @@
                     <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
                     <td th:text="${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'}"></td>
                     <td th:text="${envio.tipoServicio}"></td>
-                    <td>
+                    <td style="display:flex;gap:8px;">
+                        <button type="button" class="btn btn-ghost btn-sm" onclick="verDetalleEnvio(this)"
+                            th:attr="data-codigo=${envio.codigoGuia},
+                                      data-cliente=${envio.destinatario != null ? envio.destinatario.nombre : '-'},
+                                      data-remitente=${envio.remitente != null ? envio.remitente.nombre : '-'},
+                                      data-direccion=${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'},
+                                      data-recogida=${envio.direccionRecogida != null ? envio.direccionRecogida.direccionTexto : '-'},
+                                      data-tipo=${envio.tipoServicio},
+                                      data-estado=${envio.estado},
+                                      data-costo=${envio.costoTotal != null ? envio.costoTotal : '-'},
+                                      data-distancia=${envio.distanciaKm != null ? envio.distanciaKm + ' km' : '-'},
+                                      data-tiempo=${envio.tiempoEstimadoMin != null ? envio.tiempoEstimadoMin + ' min' : '-'},
+                                      data-fecha=${envio.fechaAsignacion != null ? #temporals.format(envio.fechaAsignacion, 'dd/MM/yyyy HH:mm') : 'Sin asignar'},
+                                      data-fecha-limite=${envio.fechaLimite != null ? #temporals.format(envio.fechaLimite, 'dd/MM/yyyy HH:mm') : 'Por definir'},
+                                      data-vencido=${envio.vencido}">
+                            Detalle
+                        </button>
                         <form th:action="@{/repartidor/envios/{id}/reclamar(id=${envio.id})}" method="post" style="display:inline;">
                             <button class="btn btn-primary btn-sm" type="submit">Elegir</button>
                         </form>
@@ -307,6 +309,12 @@
                             <div class="route-dotcol"><div class="route-dot end"></div></div>
                             <div class="route-textcol"><span class="hint">Entrega</span><span class="val" th:text="${entregaActual.direccionEntrega != null ? entregaActual.direccionEntrega.direccionTexto : '-'}"></span></div>
                         </div>
+                        <div id="mapaRutaGestion" class="route-map"
+                             th:if="${entregaActual.direccionRecogida != null and entregaActual.direccionEntrega != null}"
+                             th:attr="data-recogida=${entregaActual.direccionRecogida.direccionTexto},
+                                      data-entrega=${entregaActual.direccionEntrega.direccionTexto}">
+                        </div>
+                        <p class="hint" id="rutaInfo" style="margin-top:8px;"></p>
                     </div>
 
                     <div class="card">
@@ -382,7 +390,10 @@
                     <div class="modal-section">
                         <div class="modal-section-title"><span class="icon-chip ink"><i data-icon="user"></i></span>Contacto</div>
                         <div class="field-row">
-                            <div><span class="hint">Cliente</span><p id="dCliente"></p></div>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div class="avatar" id="dClienteAvatar">--</div>
+                                <div><span class="hint">Cliente</span><p id="dCliente"></p></div>
+                            </div>
                             <div><span class="hint">Remitente</span><p id="dRemitente"></p></div>
                         </div>
                     </div>
@@ -391,13 +402,13 @@
 
                     <div class="modal-section">
                         <div class="modal-section-title"><span class="icon-chip amber"><i data-icon="mapPin"></i></span>Ubicaciones</div>
-                        <div class="modal-field">
-                            <span class="hint">Dirección de entrega</span>
-                            <p id="dDireccion"></p>
+                        <div class="route-row">
+                            <div class="route-dotcol"><div class="route-dot" style="background:var(--teal);"></div><div class="route-line"></div></div>
+                            <div class="route-textcol"><span class="hint">Dirección de recogida</span><span class="val" id="dRecogida"></span></div>
                         </div>
-                        <div class="modal-field">
-                            <span class="hint">Dirección de recogida</span>
-                            <p id="dRecogida"></p>
+                        <div class="route-row" style="margin-top:10px;">
+                            <div class="route-dotcol"><div class="route-dot end"></div></div>
+                            <div class="route-textcol"><span class="hint">Dirección de entrega</span><span class="val" id="dDireccion"></span></div>
                         </div>
                     </div>
 
@@ -406,11 +417,11 @@
                     <div class="modal-section">
                         <div class="modal-section-title"><span class="icon-chip teal"><i data-icon="truck"></i></span>Detalles del servicio</div>
                         <div class="field-row stat-row">
-                            <div><span class="hint">Tipo</span><p id="dTipo"></p></div>
-                            <div><span class="hint">Costo</span><p id="dCosto"></p></div>
-                            <div><span class="hint">Distancia</span><p id="dDistancia"></p></div>
-                            <div><span class="hint">Tiempo</span><p id="dTiempo"></p></div>
-                            <div><span class="hint">F. límite</span><p id="dFechaLimite"></p></div>
+                            <div class="stat-chip"><span class="hint">Tipo</span><p id="dTipo"></p></div>
+                            <div class="stat-chip"><span class="hint">Costo</span><p id="dCosto"></p></div>
+                            <div class="stat-chip"><span class="hint">Distancia</span><p id="dDistancia"></p></div>
+                            <div class="stat-chip"><span class="hint">Tiempo</span><p id="dTiempo"></p></div>
+                            <div class="stat-chip"><span class="hint">F. límite</span><p id="dFechaLimite"></p></div>
                         </div>
                     </div>
 
