@@ -9,6 +9,7 @@ import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
 import com.Utc.RutaExpress.repository.EnvioRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -75,6 +76,14 @@ public class EnvioService {
         return envioRepository.findByRepartidorAndFechaAsignacionBetween(repartidor, inicio, fin);
     }
 
+    public BigDecimal calcularGanadoHoy(Repartidor repartidor) {
+        return listarAsignadosHoy(repartidor).stream()
+                .filter(envio -> envio.getEstado() != EstadoEnvio.CANCELADO)
+                .map(Envio::getCostoTotal)
+                .filter(costo -> costo != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     public Optional<Envio> buscarGestionable(Long envioId, Repartidor repartidor) {
         return envioRepository.findByIdAndRepartidor(envioId, repartidor);
     }
@@ -117,6 +126,18 @@ public class EnvioService {
         }
         envio.setEstado(siguiente);
         envioRepository.save(envio);
+        return true;
+    }
+
+    @Transactional
+    public boolean eliminarEntregado(Long envioId, Repartidor repartidor) {
+        Envio envio = envioRepository.findById(envioId).orElse(null);
+        if (envio == null || envio.getRepartidor() == null
+                || !envio.getRepartidor().getId().equals(repartidor.getId())
+                || envio.getEstado() != EstadoEnvio.ENTREGADO) {
+            return false;
+        }
+        envioRepository.delete(envio);
         return true;
     }
 

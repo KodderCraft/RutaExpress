@@ -62,6 +62,7 @@ public class RepartidorController {
             model.addAttribute("asignadosHoy", asignadosHoy);
             model.addAttribute("reclamadosHoy", envioService.contarReclamadosHoy(repartidor));
             model.addAttribute("completadasHoy", completadasHoy);
+            model.addAttribute("ganadoHoy", envioService.calcularGanadoHoy(repartidor));
 
             Optional<Envio> envioGestionado = gestionar != null
                     ? envioService.buscarGestionable(gestionar, repartidor)
@@ -73,6 +74,7 @@ public class RepartidorController {
             model.addAttribute("asignadosHoy", Collections.<Envio>emptyList());
             model.addAttribute("reclamadosHoy", 0L);
             model.addAttribute("completadasHoy", 0L);
+            model.addAttribute("ganadoHoy", java.math.BigDecimal.ZERO);
             model.addAttribute("entregaActual", null);
             model.addAttribute("mostrarGestion", false);
         }
@@ -151,6 +153,28 @@ public class RepartidorController {
         }
 
         return "redirect:/repartidor/dashboard?gestionar=" + id;
+    }
+
+    @PostMapping("/repartidor/envios/{id}/eliminar")
+    public String eliminarEnvio(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Repartidor> repartidorOpt = usuario == null
+                ? Optional.empty()
+                : repartidorService.buscarPorUsuarioId(usuario.getId());
+
+        if (repartidorOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "No se encontró tu perfil de repartidor.");
+            return "redirect:/repartidor/dashboard";
+        }
+
+        boolean exito = envioService.eliminarEntregado(id, repartidorOpt.get());
+        if (exito) {
+            redirectAttributes.addFlashAttribute("mensaje", "Envío eliminado del historial.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "No se pudo eliminar este envío.");
+        }
+
+        return "redirect:/repartidor/dashboard";
     }
 
     @PostMapping("/repartidor/envios/{id}/avanzar-estado")

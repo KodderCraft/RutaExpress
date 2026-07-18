@@ -32,10 +32,17 @@
                 </div>
             </div>
 
+            <div class="card" th:if="${mensaje}" style="border-left:4px solid var(--teal);background:var(--teal-tint);">
+                <p style="margin:0;color:var(--teal);font-weight:600;" th:text="${mensaje}"></p>
+            </div>
+            <div class="card" th:if="${error}" style="border-left:4px solid var(--coral);background:var(--coral-tint);">
+                <p style="margin:0;color:var(--coral);font-weight:600;" th:text="${error}"></p>
+            </div>
+
             <div class="grid stat-grid">
                 <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div></div><div class="value" th:text="${#lists.size(asignadosHoy)}">0</div><div class="label">Entregas hoy</div></div>
                 <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div></div><div class="value" th:text="${completadasHoy}">0</div><div class="label">Completadas</div></div>
-                <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value">$0.00</div><div class="label">Ganado hoy</div></div>
+                <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value" th:text="'$' + ${#numbers.formatDecimal(ganadoHoy, 1, 2)}">$0.00</div><div class="label">Ganado hoy</div></div>
                 <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="clock"></i></div></div><div class="value">—</div><div class="label">Tiempo estimado restante</div></div>
             </div>
 
@@ -77,6 +84,11 @@
                         </button>
                         <a th:if="${envio.estado.name() != 'ENTREGADO' and envio.estado.name() != 'CANCELADO'}"
                            class="btn btn-teal btn-sm" th:href="@{/repartidor/dashboard(gestionar=${envio.id})}">Gestionar</a>
+                        <form th:if="${envio.estado.name() == 'ENTREGADO'}"
+                              th:action="@{/repartidor/envios/{id}/eliminar(id=${envio.id})}" method="post"
+                              style="display:inline;" onsubmit="return confirm('¿Eliminar este envío entregado del historial?')">
+                            <button type="submit" class="btn btn-coral btn-sm">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
                 </table>
