@@ -216,6 +216,24 @@
   .empty .icon{width:34px;height:34px;color:var(--line);margin-bottom:10px;}
   .quote-card{background:var(--ink);color:#fff;border-radius:var(--radius);padding:20px;margin-top:16px;}
   .quote-card .price{font-family:'Space Grotesk';font-size:2rem;font-weight:700;color:var(--amber);}
+  .usuario-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:50;}
+  .usuario-modal.active{display:flex;}
+  .usuario-modal__backdrop{position:absolute;inset:0;background:rgba(20,33,61,.55);backdrop-filter:blur(4px);}
+  .usuario-modal__card{position:relative;z-index:1;width:min(560px,calc(100vw - 24px));background:var(--paper-2);border:1px solid var(--line);box-shadow:0 22px 60px rgba(20,33,61,.22);border-radius:16px;padding:24px;animation:modalFadeIn .22s ease;}
+  .usuario-modal__close{position:absolute;top:12px;right:12px;border:none;border-radius:50%;width:32px;height:32px;background:var(--paper);color:var(--mute);cursor:pointer;font-size:1.15rem;}
+  .usuario-modal__header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .usuario-modal__avatar{width:52px;height:52px;font-size:1rem;background:var(--ink-3);}
+  .usuario-modal__header h3{margin:0 0 4px;font-size:1.15rem;}
+  .usuario-modal__header p{margin:0;color:var(--mute);font-size:.82rem;}
+  .usuario-modal__grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .usuario-modal__item{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;}
+  .usuario-modal__item strong{font-size:.73rem;color:var(--mute);text-transform:uppercase;letter-spacing:.4px;}
+  .usuario-modal__item span{font-size:.86rem;color:var(--text);font-weight:600;}
+  .usuario-modal__item--full{grid-column:1 / -1;}
+  .repartidor-form{display:flex;flex-direction:column;gap:4px;}
+  .pedido-lista{display:grid;gap:8px;margin-top:8px;}
+  .pedido-lista__item{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.78rem;font-weight:600;color:var(--text);}
+  @keyframes modalFadeIn{from{opacity:0;transform:translateY(8px) scale(.98);}to{opacity:1;transform:none;}}
   .bars{display:flex;align-items:flex-end;gap:10px;height:140px;padding-top:10px;}
   .bars .bar{flex:1;background:linear-gradient(180deg,var(--amber),var(--amber-dark));border-radius:6px 6px 2px 2px;position:relative;}
   .bars .bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:.68rem;color:var(--mute);}

@@ -31,6 +31,9 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDate fechaRegistro = LocalDate.now();
 
+    @Column(name = "direccion")
+    private String direccion;
+
     public Usuario() {
     }
 
@@ -88,5 +91,13 @@ public class Usuario {
 
     public LocalDate getFechaRegistro() {
         return fechaRegistro;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 }
