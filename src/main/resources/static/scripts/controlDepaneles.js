@@ -16,7 +16,9 @@
     phone:'<path d="M6 3h4l1 5-2.5 2a12 12 0 0 0 5.5 5.5l2-2.5 5 1v4a2 2 0 0 1-2.2 2A17 17 0 0 1 4 6.2 2 2 0 0 1 6 3z"/>',
     clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
     qr:'<rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><path d="M15 15h3v3h-3zM19 19h1.5v1.5H19zM15 20h1v1h-1z"/>',
-    user:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>'
+    user:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+    eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+    arrowLeft:'<path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/>'
   };
   
   document.querySelectorAll('i[data-icon]').forEach(el=>{
@@ -405,3 +407,200 @@
       }
     }
   });
+  // ===== Modal: detalle de envío =====
+  const DETALLE_CAMPOS = ['codigo','cliente','remitente','direccion','recogida','tipo','costo','distancia','tiempo','fechaLimite','fecha'];
+  const ESTADO_BADGE_CLASS = {ENTREGADO:'entregado', EN_CAMINO:'reparto', RECOGIDO:'transito', CANCELADO:'incidencia', NO_ENTREGADO:'incidencia', DEVUELTO:'incidencia'};
+
+  function iniciales(nombre){
+    if(!nombre || nombre === '-') return '--';
+    const partes = nombre.trim().split(/\s+/).filter(Boolean);
+    const letras = partes.slice(0, 2).map(p => p.charAt(0).toUpperCase());
+    return letras.join('') || '--';
+  }
+
+  function verDetalleEnvio(btn){
+    const overlay = document.getElementById('envioDetalleOverlay');
+    if(!overlay) return;
+    DETALLE_CAMPOS.forEach(campo=>{
+      const el = document.getElementById('d'+campo.charAt(0).toUpperCase()+campo.slice(1));
+      if(el) el.textContent = btn.dataset[campo] || '-';
+    });
+    const avatarEl = document.getElementById('dClienteAvatar');
+    if(avatarEl) avatarEl.textContent = iniciales(btn.dataset.cliente);
+    const estado = btn.dataset.estado || '-';
+    const badge = document.getElementById('dEstadoBadge');
+    if(badge){
+      badge.textContent = estado;
+      badge.className = 'badge ' + (ESTADO_BADGE_CLASS[estado] || 'pendiente');
+    }
+    const fechaLimiteEl = document.getElementById('dFechaLimite');
+    if(fechaLimiteEl){
+      fechaLimiteEl.style.color = btn.dataset.vencido === 'true' ? 'var(--coral)' : '';
+    }
+    // dibujarMapaRuta se define más abajo, pero al ser una "function" (no una const
+    // arrow function) queda "hoisted" y se puede llamar acá sin problema.
+    dibujarMapaRuta('mapaRutaDetalle', 'rutaInfoDetalle', btn.dataset.recogida, btn.dataset.direccion);
+    overlay.classList.add('open');
+  }
+
+  function cerrarDetalleEnvio(e){
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('envioDetalleOverlay').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') cerrarDetalleEnvio();
+  });
+
+  // ===== Navegación entre paneles / selección de motivo de fallo =====
+  function irAPanel(panel){
+    const app = document.querySelector('.app.active');
+    if(!app) return;
+    const navItem = app.querySelector('.nav-item[data-panel="'+panel+'"]');
+    if(navItem) navItem.click();
+  }
+
+  function seleccionarMotivo(chip){
+    chip.parentElement.querySelectorAll('.reason-chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected');
+    const input = chip.closest('form').querySelector('#motivoInput');
+    if(input) input.value = chip.textContent.trim();
+  }
+
+  // ===== Modal de confirmación (reemplaza confirm()/alert() nativos) =====
+  let formPendiente = null;
+
+  function confirmarAccion(form, mensaje){
+    formPendiente = form;
+    document.getElementById('confirmMensaje').textContent = mensaje;
+    document.getElementById('confirmCancelBtn').style.display = '';
+    document.getElementById('confirmAceptarBtn').textContent = 'Confirmar';
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function mostrarAlertaModal(mensaje){
+    formPendiente = null;
+    document.getElementById('confirmMensaje').textContent = mensaje;
+    document.getElementById('confirmCancelBtn').style.display = 'none';
+    document.getElementById('confirmAceptarBtn').textContent = 'Entendido';
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function confirmarAceptar(){
+    const form = formPendiente;
+    formPendiente = null;
+    cerrarConfirmModal();
+    if(form) form.submit();
+  }
+
+  function cerrarConfirmModal(e){
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('confirmModal').classList.remove('open');
+    formPendiente = null;
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') cerrarConfirmModal();
+  });
+
+  function confirmarNoEntregado(form){
+    const input = form.querySelector('#motivoInput');
+    if(!input || !input.value){
+      mostrarAlertaModal('Selecciona un motivo antes de confirmar.');
+      return;
+    }
+    confirmarAccion(form, '¿Confirmas que no se pudo entregar este envío? Se generará una incidencia.');
+  }
+
+  // ===== Mapa de ruta (Gestión de envío y modal de Detalle en Disponibles) =====
+  // El proyecto nunca guarda latitud/longitud de ninguna dirección (ni el selector de
+  // mapa del cliente al crear un envío las persiste), así que acá se geocodifica el
+  // TEXTO de la dirección en vivo, cada vez que se abre la pantalla. countrycodes=ec
+  // evita que direcciones como "Cuenca" se resuelvan a la ciudad homónima en España.
+  function geocodificar(direccionTexto){
+    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(direccionTexto) + '&format=json&limit=1&countrycodes=ec';
+    return fetch(url).then(res => res.json()).then(resultados => {
+      if(!resultados || !resultados.length) return null;
+      return { lat: parseFloat(resultados[0].lat), lng: parseFloat(resultados[0].lon) };
+    });
+  }
+
+  // Guarda la instancia de Leaflet por contenedor. El mapa del modal de Detalle se
+  // reutiliza para envíos distintos sin recargar la página, y Leaflet no permite
+  // reinicializar un contenedor sin antes hacer remove() del mapa anterior.
+  const mapasRuta = {};
+
+  // Función genérica: geocodifica recogida/entrega, dibuja el mapa (Leaflet), los
+  // marcadores (verde/rojo) y la ruta entre ambos (OSRM), y escribe distancia/tiempo en
+  // infoElId. La usan tanto initMapaRutaGestion() como verDetalleEnvio().
+  function dibujarMapaRuta(contenedorId, infoElId, recogidaTexto, entregaTexto){
+    const contenedor = document.getElementById(contenedorId);
+    if(!contenedor || typeof L === 'undefined') return;
+    const infoEl = infoElId ? document.getElementById(infoElId) : null;
+
+    if(mapasRuta[contenedorId]){
+      mapasRuta[contenedorId].remove();
+      delete mapasRuta[contenedorId];
+    }
+    contenedor.innerHTML = '';
+
+    if(!recogidaTexto || !entregaTexto){
+      if(infoEl) infoEl.textContent = '';
+      return;
+    }
+
+    if(infoEl) infoEl.textContent = 'Cargando ruta…';
+
+    Promise.all([geocodificar(recogidaTexto), geocodificar(entregaTexto)])
+      .then(([recogida, entrega]) => {
+        if(!recogida || !entrega){
+          if(infoEl) infoEl.textContent = 'No se pudo ubicar la ruta en el mapa.';
+          return;
+        }
+
+        const mapa = L.map(contenedor).setView([recogida.lat, recogida.lng], 13);
+        mapasRuta[contenedorId] = mapa;
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: 'OpenStreetMap'
+        }).addTo(mapa);
+
+        L.circleMarker([recogida.lat, recogida.lng], { radius: 7, color: '#0E8C7F', fillColor: '#0E8C7F', fillOpacity: 1 }).addTo(mapa);
+        L.circleMarker([entrega.lat, entrega.lng], { radius: 7, color: '#E7495A', fillColor: '#E7495A', fillOpacity: 1 }).addTo(mapa);
+
+        const rutaUrl = 'https://router.project-osrm.org/route/v1/driving/'
+          + recogida.lng + ',' + recogida.lat + ';' + entrega.lng + ',' + entrega.lat
+          + '?overview=full&geometries=geojson';
+
+        fetch(rutaUrl).then(res => res.json()).then(data => {
+          if(!data.routes || !data.routes.length){
+            mapa.fitBounds(L.latLngBounds([[recogida.lat, recogida.lng], [entrega.lat, entrega.lng]]));
+            return;
+          }
+          const ruta = data.routes[0];
+          const puntos = ruta.geometry.coordinates.map(p => [p[1], p[0]]);
+          const linea = L.polyline(puntos, { color: '#3457C7', weight: 4 }).addTo(mapa);
+          mapa.fitBounds(linea.getBounds());
+          if(infoEl){
+            const distancia = (ruta.distance / 1000).toFixed(1);
+            const tiempo = Math.ceil(ruta.duration / 60);
+            infoEl.textContent = distancia + ' km · ' + tiempo + ' min';
+          }
+        }).catch(() => {
+          mapa.fitBounds(L.latLngBounds([[recogida.lat, recogida.lng], [entrega.lat, entrega.lng]]));
+        });
+      })
+      .catch(() => {
+        if(infoEl) infoEl.textContent = 'No se pudo cargar el mapa de la ruta.';
+      });
+  }
+
+  // Se llama una vez al cargar la página: si el panel de Gestión está activo
+  // (mostrarGestion=true) el contenedor #mapaRutaGestion ya existe con los data-* del
+  // envío que se está gestionando (ver dashboard.html). Si no existe, no hace nada.
+  function initMapaRutaGestion(){
+    const contenedor = document.getElementById('mapaRutaGestion');
+    if(!contenedor) return;
+    dibujarMapaRuta('mapaRutaGestion', 'rutaInfo', contenedor.dataset.recogida, contenedor.dataset.entrega);
+  }
+
+  initMapaRutaGestion();

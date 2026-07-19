@@ -20,6 +20,8 @@ import com.Utc.RutaExpress.repository.PagoRepository;
 import com.Utc.RutaExpress.repository.UsuarioRepository;
 import com.Utc.RutaExpress.service.EnvioServiceImpl;
 import com.Utc.RutaExpress.DTO.RegistroEnvioDTO;
+import com.Utc.RutaExpress.service.IncidenciaService;
+
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -44,6 +46,10 @@ public class controllerPrincipal {
 
     public controllerPrincipal(EnvioServiceImpl envioServiceImpl) {
         this.envioServiceImpl = envioServiceImpl;
+    private final IncidenciaService incidenciaService;
+
+    public controllerPrincipal(IncidenciaService incidenciaService) {
+        this.incidenciaService = incidenciaService;
     }
 
     @GetMapping()
@@ -94,10 +100,16 @@ public String mostrarDashboardCliente(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("usuario", usuario);
         return "repartidor/dashboard";
+    @GetMapping("/cliente/dashboard")
+    public String mostrarDashboardCliente( HttpSession session , Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("usuario", usuario);
+
+        return "cliente/dashboard";
     }
 
     @GetMapping("/administrador/dashboard")
-    public String mostrarDashboardAdmin( HttpSession session,  Model model ) {  
+    public String mostrarDashboardAdmin( HttpSession session,  Model model ) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         List<Usuario> usuarios = usuarioRepository.findAll();
         List<Usuario> destinatarios = usuarios.stream()
@@ -155,6 +167,7 @@ public String mostrarDashboardCliente(HttpSession session, Model model) {
         model.addAttribute("historialDestinatario", historialDestinatario);
         model.addAttribute("pagos", pagoRepository.count());
         model.addAttribute("incidencias", incidenciaRepository.count());
+        model.addAttribute("incidencias", incidenciaService.listarTodas());
         return "administrador/dashboard";
     }
 

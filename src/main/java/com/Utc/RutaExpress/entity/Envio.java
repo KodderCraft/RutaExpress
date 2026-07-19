@@ -53,6 +53,14 @@ public class Envio {
 
     private LocalDateTime fechaEntrega;
 
+    private LocalDateTime fechaAsignacion;
+
+    private LocalDateTime fechaLimite;
+
+    // Cuenta los intentos de entrega fallidos. Al llegar a app.repartidor.max-intentos-entrega
+    // el envio pasa a DEVUELTO en vez de volver a NO_ENTREGADO (ver EnvioService.marcarNoEntregado).
+    private Integer intentosEntrega = 0;
+
     public Envio() {}
 
     public Long getId() { return id; }
@@ -99,4 +107,21 @@ public class Envio {
 
     public LocalDateTime getFechaEntrega() { return fechaEntrega; }
     public void setFechaEntrega(LocalDateTime fechaEntrega) { this.fechaEntrega = fechaEntrega; }
+
+    public LocalDateTime getFechaAsignacion() { return fechaAsignacion; }
+    public void setFechaAsignacion(LocalDateTime fechaAsignacion) { this.fechaAsignacion = fechaAsignacion; }
+
+    public LocalDateTime getFechaLimite() { return fechaLimite; }
+    public void setFechaLimite(LocalDateTime fechaLimite) { this.fechaLimite = fechaLimite; }
+
+    public Integer getIntentosEntrega() { return intentosEntrega; }
+    public void setIntentosEntrega(Integer intentosEntrega) { this.intentosEntrega = intentosEntrega; }
+
+    @Transient
+    public boolean isVencido() {
+        return fechaLimite != null
+                && estado != EstadoEnvio.ENTREGADO && estado != EstadoEnvio.CANCELADO
+                && estado != EstadoEnvio.DEVUELTO
+                && fechaLimite.isBefore(LocalDateTime.now());
+    }
 }
