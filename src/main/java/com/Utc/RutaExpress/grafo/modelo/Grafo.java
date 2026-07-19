@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Grafo {
 
-    private ListaAdyacencia listaAdyacencia;
+    private final ListaAdyacencia listaAdyacencia;
 
     public Grafo() {
         this.listaAdyacencia = new ListaAdyacencia();
