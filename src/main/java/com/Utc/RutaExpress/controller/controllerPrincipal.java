@@ -106,7 +106,7 @@ public String mostrarDashboardCliente(HttpSession session, Model model) {
     //     Usuario usuario = (Usuario) session.getAttribute("usuario");
     //     model.addAttribute("usuario", usuario);
     //     return "repartidor/dashboard";
-    // }
+    // }|x
 
 
     // @GetMapping("/cliente/dashboard")
