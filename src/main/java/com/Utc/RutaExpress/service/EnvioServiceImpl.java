@@ -558,6 +558,14 @@ Envio envio = envioRepository.findById(id)
 
         if (envio.getEstado() == EstadoEnvio.ENTREGADO) {
             incidenciaService.eliminarPorEnvio(envio);
+            // El paquete tiene una FK hacia el envío (paquetes.envio_id); si no se borra
+            // primero, el delete del envío revienta con DataIntegrityViolationException.
+            paqueteRepository.findByEnvioId(envio.getId()).ifPresent(paquete -> {
+                paquete.setEnvio(null);
+                paqueteRepository.saveAndFlush(paquete);
+                paqueteRepository.delete(paquete);
+            });
+            envioRepository.flush();
             envioRepository.delete(envio);
             return Optional.of(envio);
         }
