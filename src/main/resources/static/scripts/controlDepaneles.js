@@ -78,24 +78,17 @@
     document.getElementById('authScreen').style.display = 'flex';
   }
 
-  // Role switcher
-  document.querySelectorAll('.role-tab').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.role-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      // document.querySelectorAll('.app').forEach(a=>a.classList.remove('active'));
-      // document.getElementById('app-'+btn.dataset.role).classList.add('active');
-    });
-  });
-  // function goPanel(role, panel){
-  //   document.querySelectorAll('.role-tab').forEach(b=>b.classList.toggle('active', b.dataset.role===role));
-  //   document.querySelectorAll('.app').forEach(a=>a.classList.toggle('active', a.id==='app-'+role));
-  //   const scope = document.getElementById('app-'+role);
-  //   scope.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.panel===panel));
-  //   scope.querySelectorAll(':scope > .main > .panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===panel));
-  // }
+
+  function goPanel(role, panel){
+    document.querySelectorAll('.role-tab').forEach(b=>b.classList.toggle('active', b.dataset.role===role));
+    document.querySelectorAll('.app').forEach(a=>a.classList.toggle('active', a.id==='app-'+role));
+    const scope = document.getElementById('app-'+role);
+    scope.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.panel===panel));
+    scope.querySelectorAll(':scope > .main > .panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===panel));
+  }
 
   // Sidebar nav within each role
+  
   document.querySelectorAll('.app').forEach(app=>{
     const navItems = app.querySelectorAll('.nav-item');
     const panels = app.querySelectorAll(':scope > .main > .panel');
@@ -104,9 +97,18 @@
         navItems.forEach(n=>n.classList.remove('active'));
         item.classList.add('active');
         panels.forEach(p=>p.classList.toggle('active', p.dataset.panel===item.dataset.panel));
+        ;
       });
     });
+    const panelActivo = app.querySelector(':scope > .main > .panel.active');
+  if (panelActivo) {
+    const nombrePanel = panelActivo.dataset.panel;
+    navItems.forEach(item => {
+      item.classList.toggle('active', item.dataset.panel === nombrePanel);
+    });
+  }
   });
+
 
   // Subtabs (Usuarios: remitentes/destinatarios)
   document.querySelectorAll('.subtabs').forEach(group=>{

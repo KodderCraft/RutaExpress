@@ -148,9 +148,10 @@
                 <p class="hint">Envíos sin repartidor asignado</p>
                 <div class="table-wrap">
                 <table>
-                <tr><th>Código</th><th>Destinatario</th><th>Dirección de entrega</th><th>Tipo</th><th></th></tr>
+                <tr><th>Código</th><th>Remitente</th><th>Destinatario</th><th>Dirección de entrega</th><th>Tipo</th><th></th></tr>
                 <tr th:each="envio : ${enviosDisponibles}">
                     <td class="code" th:text="${envio.codigoGuia}"></td>
+                    <td th:text="${envio.remitente != null ? envio.remitente.nombre : '-'}"></td>
                     <td th:text="${envio.destinatario != null ? envio.destinatario.nombre : '-'}"></td>
                     <td th:text="${envio.direccionEntrega != null ? envio.direccionEntrega.direccionTexto : '-'}"></td>
                     <td th:text="${envio.tipoServicio}"></td>

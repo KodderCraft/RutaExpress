@@ -101,12 +101,14 @@ public class RepartidorController {
             model.addAttribute("completadasHoy", completadasHoy);
             model.addAttribute("ganadoHoy", envioService.calcularGanadoHoy(repartidor));
 
-            // Panel "Ganancias": ganado hoy ya viene calculado arriba; el resto usa entregas
-            // reales de la semana (fechaEntrega), no lo asignado/en curso.
+            // Panel "Ganancias": ganado hoy ya viene calculado arriba. "entregasSemana" sigue
+            // contando solo ENTREGADO (entregas completadas de verdad), pero "ganadoSemana" y
+            // las barras usan listarGananciasSemana(), que combina lo pagado por remitente
+            // (cuenta al recoger) con lo pagado por destinatario (cuenta al entregar).
             List<Envio> entregadosSemana = envioService.listarEntregadosSemana(repartidor);
             model.addAttribute("ganadoSemana", envioService.calcularGanadoSemana(repartidor));
             model.addAttribute("entregasSemana", (long) entregadosSemana.size());
-            model.addAttribute("barrasSemana", construirBarrasSemana(entregadosSemana));
+            model.addAttribute("barrasSemana", construirBarrasSemana(envioService.listarGananciasSemana(repartidor)));
             model.addAttribute("entregasRecientes", envioService.listarEntregasRecientes(repartidor));
 
             Optional<Envio> envioGestionado = gestionar != null
@@ -134,14 +136,19 @@ public class RepartidorController {
     // Agrupa las entregas de la semana por dia (Lun-Dom) y calcula el porcentaje de
     // altura de cada barra en base al dia con mas ganado (si todos los dias estan en
     // cero, todas las barras quedan en 0% en vez de dividir por cero).
-    private List<BarraDia> construirBarrasSemana(List<Envio> entregadosSemana) {
+    private List<BarraDia> construirBarrasSemana(List<Envio> gananciasSemana) {
         Map<DayOfWeek, BigDecimal> porDia = new EnumMap<>(DayOfWeek.class);
         for (DayOfWeek dia : ORDEN_SEMANA) {
             porDia.put(dia, BigDecimal.ZERO);
         }
-        for (Envio envio : entregadosSemana) {
-            if (envio.getFechaEntrega() != null && envio.getCostoTotal() != null) {
-                DayOfWeek dia = envio.getFechaEntrega().getDayOfWeek();
+        for (Envio envio : gananciasSemana) {
+            // Misma regla que EnvioServiceImpl.seGano(): si paga el destinatario, la ganancia
+            // se cuenta en la fecha de entrega; si paga el remitente, en la fecha de recogida.
+            java.time.LocalDateTime fecha = "DESTINATARIO".equalsIgnoreCase(envio.getPagador())
+                    ? envio.getFechaEntrega()
+                    : envio.getFechaRecogido();
+            if (fecha != null && envio.getCostoTotal() != null) {
+                DayOfWeek dia = fecha.getDayOfWeek();
                 porDia.merge(dia, envio.getCostoTotal(), BigDecimal::add);
             }
         }

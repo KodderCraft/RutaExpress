@@ -1,435 +1,561 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <link rel="stylesheet" th:href="@{/css/stilos.css}">
-<link rel="stylesheet" 
-href="https://unpkg.com/leaflet/dist/leaflet.css">
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-
+  <link rel="stylesheet" th:href="@{/css/stilos.css}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
+
 <body>
-    <div th:replace="~{componentes/header :: header}" ></div>
-    
-    <!-- para el cliente  -->
-    <!-- <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}" ></div> -->
-<div class="app active" id="app-remitente" >
-<div th:replace="~{componentes/sidebarCliente :: sidebarCliente}"></div>
-  <div class="main">
-    <!-- INICIO -->
-    <div class="panel " data-panel="inicio">
-      <div class="topbar">
-        <div><h1>Hola, <span th:text="${session.usuario.nombre}"></span> </h1><div class="sub">Esto es lo que pasa con tus envíos hoy</div></div>
-        <div class="topbar-actions">
-          <div class="bell"><i data-icon="bell"></i></div>
-          <button class="btn btn-primary" onclick="goPanel('remitente','nuevo')"><i data-icon="plus"></i>Nuevo envío</button>
+  <div th:replace="~{componentes/header :: header}"></div>
+  <!-- para el cliente  -->
+  <div class="app active" id="app-remitente">
+    <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}"></div>
+
+    <div class="main">
+      <!-- INICIO -->
+      <div  data-panel="inicio" th:classappend="${errorCss} ?  'panel' : 'panel active'">
+
+        <div th:if="${successMessage}" class="card"
+          style="margin: 16px 0; border-left: 4px solid #0E8C7F; background: #effcf8;">
+          <p style="margin: 0; color: #0b5f54;" th:text="${successMessage}"></p>
         </div>
-      </div>
 
-      <div class="grid stat-grid">
-        <div class="card stat-card"><div class="top"><div class="icon-wrap amber"><i data-icon="box"></i></div><span class="delta up">+2 hoy</span></div><div class="value">4</div><div class="label">Envíos activos</div></div>
-        <div class="card stat-card"><div class="top"><div class="icon-wrap teal"><i data-icon="check"></i></div><span class="delta up">+18%</span></div><div class="value">27</div><div class="label">Entregados este mes</div></div>
-        <div class="card stat-card"><div class="top"><div class="icon-wrap ink"><i data-icon="wallet"></i></div></div><div class="value">$186.40</div><div class="label">Gastado este mes</div></div>
-        <div class="card stat-card"><div class="top"><div class="icon-wrap coral"><i data-icon="alert"></i></div></div><div class="value">1</div><div class="label">Requiere tu atención</div></div>
-      </div>
+        <!-- errorMessage moved to the 'nuevo' panel so users see it above the form -->
 
-      <div class="grid two-col">
-        <div class="card">
-          <h3>Envíos recientes</h3>
-          <p class="hint">Seguimiento rápido de tus últimos paquetes</p>
-          <div class="table-wrap">
-            <table>
-              <tr><th>Código</th><th>Destinatario</th><th>Estado</th><th>Repartidor</th><th></th></tr>
-              <tr>
-                <td class="code">SE-48213</td>
-                <td>Carlos Peña</td>
-                <td><span class="badge reparto">En reparto</span></td>
-                <td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge T.</div></td>
-                <td><button class="btn btn-ghost btn-sm" onclick="goPanel('remitente','rastrear')">Rastrear</button></td>
-              </tr>
-              <tr>
-                <td class="code">SE-48190</td>
-                <td>Ana Ruiz</td>
-                <td><span class="badge transito">En tránsito</span></td>
-                <td><div class="row-flex"><div class="mini-avatar">LP</div>Luis P.</div></td>
-                <td><button class="btn btn-ghost btn-sm" onclick="goPanel('remitente','rastrear')">Rastrear</button></td>
-              </tr>
-              <tr>
-                <td class="code">SE-48072</td>
-                <td>Kiosco Central</td>
-                <td><span class="badge entregado">Entregado</span></td>
-                <td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge T.</div></td>
-                <td><button class="btn btn-ghost btn-sm">Calificar</button></td>
-              </tr>
-              <tr>
-                <td class="code">SE-47960</td>
-                <td>Diego Salas</td>
-                <td><span class="badge incidencia">Incidencia</span></td>
-                <td><div class="row-flex"><div class="mini-avatar">--</div>Sin asignar</div></td>
-                <td><button class="btn btn-coral btn-sm">Ver detalle</button></td>
-              </tr>
-            </table>
+        <div class="topbar">
+          <div>
+            <h1>Hola, <span th:text="${session.usuario.nombre}"></span> </h1>
+            <div class="sub">Esto es lo que pasa con tus envíos hoy</div>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary" onclick="goPanel('remitente','nuevo')"><i data-icon="plus"></i>Nuevo
+              envío</button>
           </div>
         </div>
-        <div class="card">
-          <h3>Envío SE-48213</h3>
-          <p class="hint">Camino a Carlos Peña · Cuenca</p>
-          <div class="route-tracker" style="margin-top:18px;">
-            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">Recogido</div><div class="time">9:10 a.m.</div></div>
-            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">En bodega</div><div class="time">10:40 a.m.</div></div>
-            <div class="step current"><div class="dot"><i data-icon="truck"></i></div><div class="label">En reparto</div><div class="time">Ahora</div></div>
-            <div class="step"><div class="dot"><i data-icon="mapPin"></i></div><div class="label">Entregado</div><div class="time">Est. 3:30 p.m.</div></div>
-          </div>
-          <div class="mapbox" style="min-height:150px;">
-            <div class="map-pill"><span class="dotlive"></span>En vivo</div>
-            <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 160 C 100 40, 180 190, 260 60 S 380 40, 385 30" stroke="#B9C3DE" stroke-width="3" fill="none" stroke-dasharray="6 8"/>
-              <circle cx="20" cy="160" r="6" fill="#0E8C7F"/>
-              <circle cx="385" cy="30" r="6" fill="#E7495A"/>
-              <circle cx="230" cy="95" r="9" fill="#FF9F1C"/>
-              <path d="M223 92h11v7h-11zM234 94h5l3 3v2h-8z" fill="#14213D"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- NUEVO ENVÍO -->
-    <div class="panel active" data-panel="nuevo">
-      <div class="topbar"><div><h1>Crear un nuevo envío</h1><div class="sub">Completa los datos de recogida y entrega</div></div></div>
-      <div class="grid two-col">
+        <div class="grid stat-grid">
+          <div class="card stat-card">
+            <div class="top">
+             <span></span> <div class="icon-wrap amber"><i data-icon="box"></i></div>
+            </div>
+            <div class="value" th:text="${totalGenerados}">0</div>
+            <div class="label">Envíos Generados</div>
+          </div>
+          <div class="card stat-card">
+            <div class="top">
+             <span></span> <div class="icon-wrap teal"><i data-icon="check"></i></div>
+            </div>
+            <div class="value" th:text="${totalEntregados}" >0</div>
+            <div class="label">Entregados recibidos</div>
+          </div>
+          <div class="card stat-card">
+            <div class="top">
+              <span></span> <div class="icon-wrap ink"><i data-icon="wallet"></i></div> 
+            </div>
+            <div class="value">$186.40</div>
+            <div class="label">Gastado este mes</div>
+          </div>
         
-        <!-- <div class="card">
-          <h3>Detalles del envío</h3>
-          <div class="field-row">
-              <div class="field">
-                  <label>Dirección de recogida
-                    
-                  </label>
-                  
-                  <input id="direccionRecogida" readonly placeholder="Ej. calle 642">
+        </div>
 
-                  <button class="btn btn-dark" type="button" onclick="abrirMapa('recogida')">
-                      Agregar dirección
+        <div class="grid">
+          
+
+          <div class="card">
+            <h3>Envíos recientes</h3>
+            <p class="hint">Historial detallado y seguimiento de tus paquetes</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Destinatario</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Repartidor</th>
+                    <th>Total</th>
+                    <th>Pago</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="e : ${envios}">
+
+                    <!-- Código Guía -->
+                    <td class="code" th:text="${e.codigoGuia}">SE-00000</td>
+
+                    <!-- Destinatario -->
+                    <td th:text="${e.destinatario != null ? e.destinatario.nombre : 'Sin destinatario'}">Destinatario
+                    </td>
+
+                    <!-- Fecha -->
+                    <td th:text="${e.fechaRegistro != null ? #temporals.format(e.fechaRegistro, 'dd MMM') : '—'}">13 jul
+                    </td>
+
+                    <!-- Estado Enum con clase Badge dinámica -->
+                    <td>
+                      <span th:class="'badge ' + ${e.estado != null ? #strings.toLowerCase(e.estado) : ''}"
+                        th:text="${e.estado}">
+                        EN_REPARTO
+                      </span>
+                    </td>
+
+                    <!-- Repartidor con Avatar -->
+                    <td>
+                      <div class="row-flex">
+                        <div class="mini-avatar"
+                          th:text="${e.repartidor != null && e.repartidor.usuario != null ? #strings.substring(e.repartidor.usuario.nombre, 0, 1) : '--'}">
+                          JT
+                        </div>
+                        <span
+                          th:text="${e.repartidor != null && e.repartidor.usuario != null ? e.repartidor.usuario.nombre : 'Sin repartidor'}">
+                          Sin repartidor
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Costo Total -->
+                    <td th:text="${e.costoTotal != null ? '$' + #numbers.formatDecimal(e.costoTotal, 1, 2) : '$0.00'}">
+                      $0.00</td>
+
+                    <!-- Quién paga (desde la perspectiva del remitente, que es quien ve esta tabla) -->
+                    <td th:text="${e.pagador == 'DESTINATARIO'} ? 'Paga el destinatario' : 'Tú pagas'">Tú pagas</td>
+
+                    <!-- Acciones -->
+                    <td >
+                      <div class="row-flex" style="display: flex; align-items: center; justify-content: center">
+                        <button class="btn btn-ghost btn-sm" onclick="verRuta()">Ver Ruta</button>
+                        <!-- El botón "Editar" SOLO se muestra si el repartidor es nulo -->
+                        <a th:if="${e.repartidor == null}" style="margin-left: 8px;text-decoration:none;"
+                          th:href="@{/cliente/envio/editar/{id}(id=${e.id})}" 
+                          class="btn btn-ghost btn-sm">
+                          Editar
+                        </a>  
+                        <!-- Enlace Eliminar con etiqueta <a> -->
+                        <a  th:if="${e.repartidor == null}" 
+                          th:href="@{/cliente/envio/eliminar/{id}(id=${e.id})}" 
+                          class="btn btn-coral" style="text-decoration: none;"
+                          onclick="return confirm('¿Estás seguro de que deseas eliminar este envío?');">
+                          Eliminar
+                        </a>
+                      </div>
+
+
+                    </td>
+
+                  </tr>
+                </tbody> <!-- 👈 Se cerró la etiqueta correctamente -->
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- NUEVO ENVÍO -->
+      <div class="panel" data-panel="nuevo" th:classappend="${errorCss} ? 'panel active' : 'panel'">
+
+        <div class="topbar">
+          <div >
+            <h1>Crear un nuevo envío</h1>
+            <div class="sub">Completa los datos de recogida y entrega</div>
+          </div>
+          <div th:if="${errorMessage}" class="card" style="background: #ffeaea;">
+          <p style="margin: 0; color: #a11;" th:text="${errorMessage}"></p>
+        </div>
+        </div>
+
+        <div class="grid two-col">
+          <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+          <div class="card">
+            <form th:action="@{/cliente/envio/registrar}" th:object="${envioDTO}" method="post" id="registroEnvioForm">
+
+              <h3>Detalles del envío</h3>
+
+              <!-- SECCIÓN 1: DIRECCIONES -->
+              <div class="field-row">
+                <div class="field">
+                  <label for="direccionRecogida">Dirección de recogida</label>
+                  <input type="text" th:field="*{direccionRecogida}" readonly placeholder="Ej. calle 642" required>
+                  <button  class="btn btn-ghost btn-sm" type="button" onclick="abrirMapa('recogida')">Agregar dirección</button>
+                </div>
+
+                <div class="field">
+                  <label for="direccionEntrega">Dirección de entrega</label>
+                  <input type="text" th:field="*{direccionEntrega}" readonly placeholder="Ej. calle 32" required>
+                  <button class="btn btn-ghost btn-sm" type="button" onclick="abrirMapa('entrega')">Agregar dirección</button>
+                </div>
+              </div>
+
+              <!-- SECCIÓN 2: DESTINATARIO -->
+              <div class="field-row">
+                <div class="field">
+                  <label for="nombreDestinatario">Nombre del destinatario</label>
+                  <input type="text" th:field="*{nombreDestinatario}" placeholder="Ej. Carlos Peña">
+                </div>
+                <div class="field">
+                  <label for="telefonoDestinatario">Teléfono del destinatario</label>
+                  <input type="text" th:field="*{telefonoDestinatario}" placeholder="09XXXXXXXX">
+                </div>
+              </div>
+
+              <!-- SECCIÓN 3: SERVICIO Y PAQUETE -->
+              <div class="field-row">
+                <div class="field">
+                  <label for="tipoServicio">Tipo de servicio</label>
+                  <select th:field="*{tipoServicio}" required>
+                    <option value="estandar">Estándar</option>
+                    <option value="express">Express (Mismo día)</option>
+                    <option value="prioritario">Prioritario</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Detalles del paquete</label>
+                  <button type="button" class="btn btn-teal"
+                    onclick="{document.getElementById('modal-paquete').showModal()}">
+  
+                    Agregar Paquete
                   </button>
+                </div>
+              </div>
 
+              <!-- SECCIÓN 4: ¿QUIÉN PAGA EL ENVÍO? -->
+              <div class="field-row">
+                <div class="field">
+                  <label>¿Quién paga el envío?</label>
+                  <div style="display:flex;gap:18px;align-items:center;">
+                    <label style="display:flex;gap:6px;align-items:center;font-weight:normal;">
+                      <input type="radio" th:field="*{pagador}" value="REMITENTE" checked style="width:auto;">
+                      Yo (remitente)
+                    </label>
+                    <label style="display:flex;gap:6px;align-items:center;font-weight:normal;">
+                      <input type="radio" th:field="*{pagador}" value="DESTINATARIO" style="width:auto;">
+                      El destinatario (contra entrega)
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="valorDeclarado">Valor declarado del paquete</label>
+                  <input type="text" th:field="*{valorDeclarado}" placeholder="$ 0.00" readonly>
+                </div>
+                <div class="field">
+                  <label>Costo del envío</label>
+                  <input type="text" id="costoTotalVisible" placeholder="$ 0.00" readonly>
+                </div>
               </div>
 
               <div class="field">
-        <label>Dirección de entrega</label>
+              </div>
 
-        <input id="direccionEntrega" readonly placeholder="Ej. calle 32">
+              <!-- ========================================================= -->
+              <!-- CAMPOS OCULTOS QUE RECIBIRÁN LOS DATOS DEL MAPA Y DEL MODAL -->
+              <!-- ========================================================= -->
+              <input type="hidden" th:field="*{latitudRecogida}">
+              <input type="hidden" th:field="*{longitudRecogida}">
+              <input type="hidden" th:field="*{latitudEntrega}">
+              <input type="hidden" th:field="*{longitudEntrega}">
 
-        <button class="btn btn-dark"  type="button" onclick="abrirMapa('entrega')">
-            Agregar dirección
-        </button>
+              <!-- Datos del modal -->
+              <input type="hidden" th:field="*{alto}">
+              <input type="hidden" th:field="*{ancho}">
+              <input type="hidden" th:field="*{largo}">
+              <input type="hidden" th:field="*{peso}">
+              <input type="hidden" th:field="*{tipo}">
+              <input type="hidden" th:field="*{descripcion}">
+              <input type="hidden" th:field="*{fragil}">
 
-    </div>
+              <!-- Datos calculados por JS (distancia, tiempo, costo) -->
+              <input type="hidden" th:field="*{distanciaKm}">
+              <input type="hidden" th:field="*{tiempoEstimadoMin}">
+              <input type="hidden" th:field="*{costoTotal}">
+
+              <!-- ACCIONES -->
+              <div class="field-row" style="margin-top:15px;">
+                <button type="submit" class="btn btn-dark">
+                  <i data-icon="send"></i>Generar Envío
+                </button>
+             
+
+              </div>
+
+              <!-- COTIZACIÓN VISUAL -->
+              <div class="field-row">
+                <div class="quote-card" id="quoteCard" style="display:none; width: 40%; margin-left: auto;">
+                  <!-- Contenido dinámico -->
+                </div>
+              </div>
+            </form>
+
           </div>
-          <div class="field-row">
-            <div class="field"><label>Nombre del destinatario</label><input type="text" placeholder="Ej. Carlos Peña"></div>
-            <div class="field"><label>Teléfono del destinatario</label><input type="text" placeholder="09XXXXXXXX"></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label>Tipo de paquete</label>
-              <button class="btn btn-teal" onclick="document.getElementById('modal-paquete').showModal()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Agregar Paquete
+
+          <!-- COLUMNA DERECHA: RESUMEN -->
+          <div class="card">
+            <h3>Resumen</h3>
+            <p class="hint">Zona: Centro histórico → El Vergel</p>
+            <button  class="btn btn-primary" onclick="verRuta()" >
+              <i data-icon="mapPin"></i>Ver ruta
             </button>
+            <div class="divider"></div>
+            <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;"><span>Distancia estimada</span><b
+                  id="distanciaRuta"> ---</b></div>
+              <div style="display:flex;justify-content:space-between;"><span>Carro, Tiempo estimado </span><b
+                  id="tiempoRuta">---</b></div>
+              <div style="display:flex;justify-content:space-between;"><span>Costo del envío</span><b
+                  id="costoRuta">---</b></div>
+              <div style="display:flex;justify-content:space-between;"><span>Repartidores disponibles</span><b>---</b>
+              </div>
             </div>
-            <div class="field"><label>Valor declarado (opcional, para seguro)</label><input type="text" placeholder="$ 0.00"></div>
+            <div class="divider"></div>
           </div>
-          <div class="field"><label>Instrucciones para el repartidor</label><textarea rows="2" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea></div>
-          <button class="btn btn-dark" ><i data-icon="send"></i>Generar Envio</button>
-          <button class="btn  btn-primary" onclick="verRuta()" style=" color: rgb(252, 251, 251);"><i data-icon="mapPin"></i>Ver ruta</button>
 
-          <div class="field-row">
-     
-            <div class="quote-card" id="quoteCard" style="display:none; width: 40%;  margin-left: auto;">
+        </div>
+
+        <!-- Mapa con la ruta calculada (lo llena verRuta() en mapa.js). Antes vivía fuera de
+             todos los paneles (hijo directo de .main), así que se veía SIEMPRE sin importar
+             la pestaña activa; ahora queda dentro de "nuevo", que es donde tiene sentido. -->
+        <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div>
+      </div>
+
+
+      <!-- RECIBIDOS -->
+      <div class="panel" data-panel="recibidos">
+        <div class="topbar">
+          <div>
+            <h1>Paquetes recibidos</h1>
+            <div class="sub">Envíos donde apareces como destinatario</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Envíos por recibir</h3>
+            <p class="hint">Seguimiento de los paquetes que te están enviando</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Remitente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Repartidor</th>
+                    <th>Total</th>
+                    <th>Pago</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="e : ${enviosRecibidos}">
+                    <td class="code" th:text="${e.codigoGuia}">SE-00000</td>
+                    <td th:text="${e.remitente != null ? e.remitente.nombre : 'Sin remitente'}">Remitente</td>
+                    <td th:text="${e.fechaRegistro != null ? #temporals.format(e.fechaRegistro, 'dd MMM') : '—'}">13 jul</td>
+                    <td>
+                      <span th:class="'badge ' + ${e.estado != null ? #strings.toLowerCase(e.estado) : ''}"
+                        th:text="${e.estado}">
+                        EN_REPARTO
+                      </span>
+                    </td>
+                    <td>
+                      <div class="row-flex">
+                        <div class="mini-avatar"
+                          th:text="${e.repartidor != null && e.repartidor.usuario != null ? #strings.substring(e.repartidor.usuario.nombre, 0, 1) : '--'}">
+                          JT
+                        </div>
+                        <span
+                          th:text="${e.repartidor != null && e.repartidor.usuario != null ? e.repartidor.usuario.nombre : 'Sin repartidor'}">
+                          Sin repartidor
+                        </span>
+                      </div>
+                    </td>
+                    <td th:text="${e.costoTotal != null ? '$' + #numbers.formatDecimal(e.costoTotal, 1, 2) : '$0.00'}">
+                      $0.00</td>
+                    <!-- Quién paga (desde la perspectiva del destinatario, que es quien ve esta tabla) -->
+                    <td th:text="${e.pagador == 'DESTINATARIO'} ? 'Tú pagas (contra entrega)' : 'Ya pagado por el remitente'">Ya pagado por el remitente</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="empty" th:if="${#lists.isEmpty(enviosRecibidos)}">
+                <p>No tienes paquetes por recibir todavía.</p>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
+      <!-- RASTREAR -->
+      <div class="panel" data-panel="rastrear">
+        <div class="topbar">
+          <div>
+            <h1>Rastrear un paquete</h1>
+            <div class="sub">Ingresa el código de guía para ver el estado en vivo</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;gap:10px;">
+            <input class="mono" value="SE-48213" style="max-width:220px;">
+            <button class="btn btn-primary">Rastrear</button>
+          </div>
+        </div>
+        <div class="grid two-col">
+          <div class="card">
+            <h3>Estado del envío</h3>
+            <div class="route-tracker">
+              <div class="step done">
+                <div class="dot"><i data-icon="check"></i></div>
+                <div class="label">Recogido</div>
+                <div class="time">9:10 a.m.</div>
+              </div>
+              <div class="step done">
+                <div class="dot"><i data-icon="check"></i></div>
+                <div class="label">En bodega</div>
+                <div class="time">10:40 a.m.</div>
+              </div>
+              <div class="step current">
+                <div class="dot"><i data-icon="truck"></i></div>
+                <div class="label">En reparto</div>
+                <div class="time">Ahora</div>
+              </div>
+              <div class="step">
+                <div class="dot"><i data-icon="mapPin"></i></div>
+                <div class="label">Entregado</div>
+                <div class="time">Est. 3:30 p.m.</div>
+              </div>
+            </div>
+            <div class="mapbox">
+              <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 160 C 100 40, 180 190, 260 60 S 380 40, 385 30" stroke="#B9C3DE" stroke-width="3"
+                  fill="none" stroke-dasharray="6 8" />
+                <circle cx="20" cy="160" r="6" fill="#0E8C7F" />
+                <circle cx="385" cy="30" r="6" fill="#E7495A" />
+                <circle cx="230" cy="95" r="9" fill="#FF9F1C" />
+              </svg>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Tu repartidor</h3>
+            <div class="row-flex" style="margin-bottom:14px;">
+              <div class="avatar" style="background:var(--ink-3);color:#fff;">JT</div>
+              <div><b>Jorge Torres</b>
+                <div style="color:var(--mute);font-size:.8rem;">⭐ 4.9 · Moto · 812 entregas</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-block" style="margin-bottom:8px;"><i data-icon="phone"></i>Llamar</button>
+            <button class="btn btn-ghost btn-block"><i data-icon="bell"></i>Enviar mensaje</button>
+            <div class="divider"></div>
+            <p class="hint" style="margin-bottom:8px;">Cuando se entregue, podrás calificar el servicio:</p>
+            <div class="stars"><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i><i
+                data-icon="star"></i><i data-icon="star"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGOS -->
+      <div class="panel" data-panel="pagos">
+        <div class="topbar">
+          <div>
+            <h1>Saldo</h1>
+            <div class="sub">Métodos de pago y facturación</div>
+          </div>
+        </div>
+        <div class="grid two-col">
+          <div class="card">
+  <h3>Recargar saldo de la cuenta</h3>
+  <p class="hint">Añade fondos para pagar tus próximos envíos.</p>
+  
+  <!-- Formulario básico conectado a tu controlador -->
+  <form th:action="@{/cliente/pagos/recargar}" method="post" style="margin-top: 12px;">
+    
+    <div class="field" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+      <label for="montoRecarga">Monto a recargar ($)</label>
+      <input type="number" id="montoRecarga" name="monto" min="1" step="0.01" placeholder="Ej. 20.00" required >
+    </div>
+    <button type="submit" class="btn btn-block" style="background-color: #080227; color: #fff;cursor: pointer; width: 50%;">
+      <i data-icon="plus"></i> Confirmar Recarga
+    </button>
+  </form>
+          </div>
           
-        </div> -->
-        
-        <div class="card">
-  <h3>Detalles del envío</h3>
-
-  <!-- SECCIÓN 1: DIRECCIONES -->
-  <div class="field-row">
-    <div class="field">
-      <label for="direccionRecogida">Dirección de recogida</label>
-      <input id="direccionRecogida" name="direccion_recogida" readonly placeholder="Ej. calle 642">
-      <!-- Input oculto para guardar el ID de la dirección una vez se guarde en la BD -->
-      <input type="hidden" id="direccionRecogidaId" name="direccion_recogida_id">
-      <button class="btn btn-dark" type="button" onclick="abrirMapa('recogida')">
-        Agregar dirección
-      </button>
-    </div>
-
-    <div class="field">
-      <label for="direccionEntrega">Dirección de entrega</label>
-      <input id="direccionEntrega" name="direccion_entrega" readonly placeholder="Ej. calle 32">
-      <!-- Input oculto para guardar el ID de la dirección una vez se guarde en la BD -->
-      <input type="hidden" id="direccionEntregaId" name="direccion_entrega_id">
-      <button class="btn btn-dark" type="button" onclick="abrirMapa('entrega')">
-        Agregar dirección
-      </button>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 2: REMITENTE (Quién envía) -->
-  <div class="field-row">
-    <div class="field">
-      <label for="nombreRemitente">Nombre del remitente</label>
-      <input type="text" id="nombreRemitente" name="nombre_remitente" placeholder="Ej. María López">
-    </div>
-    <div class="field">
-      <label for="telefonoRemitente">Teléfono del remitente</label>
-      <input type="text" id="telefonoRemitente" name="telefono_remitente" placeholder="09XXXXXXXX">
-    </div>
-  </div>
-
-  <!-- SECCIÓN 3: DESTINATARIO (Quién recibe) -->
-  <div class="field-row">
-    <div class="field">
-      <label for="nombreDestinatario">Nombre del destinatario</label>
-      <input type="text" id="nombreDestinatario" name="nombre_destinatario" placeholder="Ej. Carlos Peña">
-    </div>
-    <div class="field">
-      <label for="telefonoDestinatario">Teléfono del destinatario</label>
-      <input type="text" id="telefonoDestinatario" name="telefono_destinatario" placeholder="09XXXXXXXX">
-    </div>
-  </div>
-
-  <!-- SECCIÓN 4: DETALLES DEL SERVICIO Y PAQUETE -->
-  <div class="field-row">
-    <div class="field">
-      <label for="tipoServicio">Tipo de servicio</label>
-      <select id="tipoServicio" name="tipo_servicio">
-        <option value="estandar">Estándar</option>
-        <option value="express">Express (Mismo día)</option>
-        <option value="prioritario">Prioritario</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Tipo de paquete</label>
-      <button type="button" class="btn btn-teal" onclick="document.getElementById('modal-paquete').showModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Agregar Paquete
-      </button>
-    </div>
-  </div>
-
-  <div class="field-row">
-    <div class="field">
-      <label for="valorDeclarado">Valor declarado (opcional, para seguro)</label>
-      <input type="text" id="valorDeclarado" name="valor_declarado" placeholder="$ 0.00">
-    </div>
-  </div>
-
-  <div class="field">
-    <label for="instrucciones">Instrucciones para el repartidor</label>
-    <textarea id="instrucciones" name="instrucciones" rows="2" placeholder="Ej. Tocar el timbre del apartamento 3B"></textarea>
-  </div>
-
-  <!-- CAMPOS OCULTOS PARA LOGÍSTICA (Se llenan automáticamente con JS tras calcular la ruta) -->
-  <input type="hidden" id="distanciaKm" name="distancia_km">
-  <input type="hidden" id="tiempoEstimadoMin" name="tiempo_estimado_min">
-  <input type="hidden" id="costoTotal" name="costo_total">
-
-  <!-- ACCIONES -->
-  <div class="field-row">
-    <button type="button" class="btn btn-primary" onclick="verRuta()" style="color: rgb(252, 251, 251);">
-      <i data-icon="mapPin"></i>Ver ruta
-    </button>
-    <button type="submit" class="btn btn-dark">
-      <i data-icon="send"></i>Generar Envío
-    </button>
-  </div>
-
-  <!-- COTIZACIÓN VISUAL -->
-  <div class="field-row">
-    <div class="quote-card" id="quoteCard" style="display:none; width: 40%; margin-left: auto;">
-      <!-- Aquí pintarás el costo, distancia y tiempo calculados antes de enviar -->
-    </div>
-  </div>
-</div>
-
-        <div class="card">
-          <h3>Resumen</h3>
-          <p class="hint">Zona: Centro histórico → El Vergel</p>
-          <div class="divider"></div>
-          <div style="font-size:.85rem;display:flex;flex-direction:column;gap:10px;">
-            <div style="display:flex;justify-content:space-between;"><span>Distancia estimada</span><b id="distanciaRuta"> ---</b></div>
-            <div style="display:flex;justify-content:space-between;"><span>Carro, Tiempo estimado </span><b id="tiempoRuta">---</b></div>
-            <div style="display:flex;justify-content:space-between;"><span>Repartidores disponibles</span><b>---</b></div>
-          </div>
-          <div class="divider"></div>
-        </div>
-
-
-      </div>
-
-    </div>
-
-    <!-- MIS ENVÍOS -->
-    <div class="panel" data-panel="misenvios">
-      <div class="topbar"><div><h1>Mis envíos</h1><div class="sub">Historial completo y estado actual</div></div>
-        <div class="searchbox"><i data-icon="search"></i><input placeholder="Buscar por código o destinatario"></div>
-      </div>
-      <div class="card">
-        <div class="pill-list" style="margin-bottom:16px;">
-          <div class="pill active">Todos</div><div class="pill">En tránsito</div><div class="pill">En reparto</div><div class="pill">Entregados</div><div class="pill">Con incidencia</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <tr><th>Código</th><th>Destinatario</th><th>Fecha</th><th>Estado</th><th>Repartidor</th><th>Total</th><th></th></tr>
-            <tr><td class="code">SE-48213</td><td>Carlos Peña</td><td>13 jul</td><td><span class="badge reparto">En reparto</span></td><td>Jorge T.</td><td>$4.80</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-            <tr><td class="code">SE-48190</td><td>Ana Ruiz</td><td>13 jul</td><td><span class="badge transito">En tránsito</span></td><td>Luis P.</td><td>$6.20</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-            <tr><td class="code">SE-48072</td><td>Kiosco Central</td><td>11 jul</td><td><span class="badge entregado">Entregado</span></td><td>Jorge T.</td><td>$3.50</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-            <tr><td class="code">SE-47960</td><td>Diego Salas</td><td>10 jul</td><td><span class="badge incidencia">Incidencia</span></td><td>—</td><td>$5.00</td><td><button class="btn btn-coral btn-sm">Resolver</button></td></tr>
-            <tr><td class="code">SE-47811</td><td>Farmacia Norte</td><td>8 jul</td><td><span class="badge entregado">Entregado</span></td><td>Rosa M.</td><td>$4.10</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- RASTREAR -->
-    <div class="panel" data-panel="rastrear">
-      <div class="topbar"><div><h1>Rastrear un paquete</h1><div class="sub">Ingresa el código de guía para ver el estado en vivo</div></div></div>
-      <div class="card" style="margin-bottom:16px;">
-        <div style="display:flex;gap:10px;">
-          <input class="mono" value="SE-48213" style="max-width:220px;">
-          <button class="btn btn-primary">Rastrear</button>
-        </div>
-      </div>
-      <div class="grid two-col">
-        <div class="card">
-          <h3>Estado del envío</h3>
-          <div class="route-tracker">
-            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">Recogido</div><div class="time">9:10 a.m.</div></div>
-            <div class="step done"><div class="dot"><i data-icon="check"></i></div><div class="label">En bodega</div><div class="time">10:40 a.m.</div></div>
-            <div class="step current"><div class="dot"><i data-icon="truck"></i></div><div class="label">En reparto</div><div class="time">Ahora</div></div>
-            <div class="step"><div class="dot"><i data-icon="mapPin"></i></div><div class="label">Entregado</div><div class="time">Est. 3:30 p.m.</div></div>
-          </div>
-          <div class="mapbox">
-            <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 160 C 100 40, 180 190, 260 60 S 380 40, 385 30" stroke="#B9C3DE" stroke-width="3" fill="none" stroke-dasharray="6 8"/>
-              <circle cx="20" cy="160" r="6" fill="#0E8C7F"/><circle cx="385" cy="30" r="6" fill="#E7495A"/>
-              <circle cx="230" cy="95" r="9" fill="#FF9F1C"/>
-            </svg>
+          <div class="card">
+            <h3>Ultimo Gasto julio</h3>
+            <div style="font-family:'Space Grotesk';font-size:1.8rem;font-weight:700;">$41.60</div>
+            <p class="hint">Gasto</p>
+            <!-- <button class="btn btn-ghost btn-block">Descargar recibo</button> -->
           </div>
         </div>
-        <div class="card">
-          <h3>Tu repartidor</h3>
-          <div class="row-flex" style="margin-bottom:14px;"><div class="avatar" style="background:var(--ink-3);color:#fff;">JT</div><div><b>Jorge Torres</b><div style="color:var(--mute);font-size:.8rem;">⭐ 4.9 · Moto · 812 entregas</div></div></div>
-          <button class="btn btn-ghost btn-block" style="margin-bottom:8px;"><i data-icon="phone"></i>Llamar</button>
-          <button class="btn btn-ghost btn-block"><i data-icon="bell"></i>Enviar mensaje</button>
-          <div class="divider"></div>
-          <p class="hint" style="margin-bottom:8px;">Cuando se entregue, podrás calificar el servicio:</p>
-          <div class="stars"><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i></div>
-        </div>
+
       </div>
     </div>
-
-    <!-- PAGOS -->
-    <div class="panel" data-panel="pagos">
-      <div class="topbar"><div><h1>Pagos</h1><div class="sub">Métodos de pago y facturación</div></div></div>
-      <div class="grid two-col">
-        <div class="card">
-          <h3>Métodos guardados</h3>
-          <table>
-            <tr><th>Método</th><th>Detalle</th><th></th></tr>
-            <tr><td><div class="row-flex"><i data-icon="wallet"></i>Tarjeta</div></td><td>Visa •••• 4482</td><td><span class="badge activo">Predeterminada</span></td></tr>
-            <tr><td><div class="row-flex"><i data-icon="wallet"></i>Efectivo</div></td><td>Pago contra entrega</td><td><button class="btn btn-ghost btn-sm">Usar</button></td></tr>
-          </table>
-          <button class="btn btn-ghost" style="margin-top:14px;"><i data-icon="plus"></i>Añadir método de pago</button>
-        </div>
-        <div class="card">
-          <h3>Facturación de julio</h3>
-          <div style="font-family:'Space Grotesk';font-size:1.8rem;font-weight:700;">$41.60</div>
-          <p class="hint">7 envíos facturados</p>
-          <button class="btn btn-ghost btn-block">Descargar recibo</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div>
-  </div>
   </div>
 
 
 
-<!-- Modal mapa -->
-<div id="modalMapa" class="modal">
+  <!-- Modal mapa -->
+  <div id="modalMapa" class="modal">
 
     <div class="modal-content">
 
-        <h3 id="tituloMapa">Seleccionar dirección</h3>
+      <h3 id="tituloMapa">Seleccionar dirección</h3>
 
-        <div id="mapSeleccion" style="height:400px;"></div>
+      <div id="mapSeleccion" style="height:400px;"></div>
 
-        <button class="btn btn-dark"  onclick="guardarDireccion()">
-            Guardar Ubicacion
-        </button>
+      <button class="btn btn-dark" onclick="guardarDireccion()">
+        Guardar Ubicacion
+      </button>
 
-        <button class="btn btn-dark"  onclick="cerrarMapa()">
-            Cancelar
-        </button>
+      <button class="btn btn-dark" onclick="cerrarMapa()">
+        Cancelar
+      </button>
 
     </div>
 
-</div>
+  </div>
 
-
-
-
-<dialog id="modal-paquete">
-  <header>
-    <h2>Registro de Paquete / Envío</h2>
-  </header>
-
-  <main>
-    <form >
+  <dialog id="modal-paquete">
+    <header>
+      <h2>Registro de Paquete / Envío</h2>
+    </header>
+    <div>
       <input type="hidden" id="envio_id" name="envio_id" />
 
       <h3 class="label">Dimensisones y Peso</h3>
 
-      <section class="field-row" >
-        <div >  
-          <label  for="alto">Alto (m/cm):</label>
-          <input  type="number" id="alto" name="alto" step="0.01" placeholder="0.00" />
+      <section class="field-row">
+        <div>
+          <label for="alto">Alto (m/cm):</label>
+          <input type="number" id="alto_modal" name="alto_modal" step="0.01" placeholder="0.00" />
         </div>
 
         <div>
           <label for="ancho">Ancho (m/cm):</label>
-          <input type="number" id="ancho" name="ancho" step="0.01" placeholder="0.00" />      
+          <input type="number" id="ancho_modal" name="ancho_modal" step="0.01" placeholder="0.00" />
         </div>
 
         <div>
 
           <label for="largo">Largo (m/cm):</label>
-          <input type="number" id="largo" name="largo" step="0.01" placeholder="0.00" />
+          <input type="number" id="largo_modal" name="largo_modal" step="0.01" placeholder="0.00" />
         </div>
-          <div>
-            
-            <label for="peso">Peso (kg):</label>
-            <input type="number" id="peso" name="peso" step="0.01" placeholder="0.00" />
-          </div>  
+        <div>
+
+          <label for="peso">Peso (kg):</label>
+          <input type="number" id="peso_modal" name="peso_modal" step="0.01" placeholder="0.00" />
+        </div>
       </section>
 
-   
+
 
       <section>
         <h3>Detalles del Contenido</h3>
 
-       <label for="tipo">Tipo de Paquete:</label>
-        <select id="tipo" name="tipo" required>
+        <label for="tipo">Tipo de Paquete:</label>
+        <select id="tipo_modal" name="tipo_modal" required>
           <option value="" disabled selected>Seleccione una opción...</option>
           <option value="caja">Caja</option>
           <option value="sobre">Sobre / Documento</option>
@@ -440,397 +566,60 @@ href="https://unpkg.com/leaflet/dist/leaflet.css">
         </select>
 
         <label for="valor_declarado">Valor Declarado ($):</label>
-        <input type="number" id="valor_declarado" name="valor_declarado" step="0.01" placeholder="0.00" />
+        <input type="number" id="valor_declarado_modal" name="valor_declarado_modal" step="0.01" placeholder="0.00" />
 
         <label for="descripcion">Descripción:</label>
-        <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalles adicionales del contenido..."></textarea>
+        <textarea id="descripcion_modal" name="descripcion_modal" rows="3"
+          placeholder="Detalles adicionales del contenido..."></textarea>
 
         <br />
 
-        <label for="fragil">
-          <input style="width:20px;" type="checkbox" id="fragil" name="fragil" value="true" />
+        <label for="fragil_modal">
+          <input style="width:20px;" type="checkbox" id="fragil_modal" name="fragil_modal" value="true" />
           ¿Es material frágil?
         </label>
       </section>
 
-     
+
 
       <div>
         <button class="btn" type="button" onclick="this.closest('dialog').close()">Cancelar</button>
-        <button class="btn btn-primary" type="submit">Guardar Datos</button>
+        <button class="btn btn-primary" type="button" onclick="guardarDatosPaquete()">Guardar Datos</button>
       </div>
-    </form>
-  </main>
-</dialog>
 
-    <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
-  </body>
-  
-<script th:src="@{/scripts/controlDepaneles.js}"></script>
-  
-<!-- <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&libraries=places"></script> -->
+    </div>
+  </dialog>
+
+
+
+
+  <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
+</body>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script th:inline="javascript">
-
-let mapaSeleccion = null;
-
-let mapaRuta = null;
-
-let marcador = null;
-
-let tipoDireccion = "";
-
-let direccionSeleccionada = "";
-
-
-let puntoRecogida = null;
-
-let puntoEntrega = null;
-
-
-let lineaRuta = null;
-
-  function toggleModal(modalId, show) {
-  const modal = document.getElementById(modalId);
-  if (show) {
-    modal.style.display="block";
-  } else {
-    modal.style.display="none";
-
-    document.getElementById('form-paquete').reset(); // Limpia campos al cerrar
-  }
-}
-
-function abrirMapa(tipo){
-
-    tipoDireccion = tipo;
-
-
-    document.getElementById("modalMapa")
-    .style.display="flex";
-
-
-    setTimeout(()=>{
-
-        crearMapaSeleccion();
-
-    },300);
-
-}
-
-function crearMapaSeleccion(){
-
-
-    if(mapaSeleccion){
-
-        mapaSeleccion.invalidateSize();
-
-        return;
-
-    }
-
-
-    mapaSeleccion = L.map('mapSeleccion')
-    .setView(
-        [-2.90055,-79.00453],
-        14
-    );
-
-
-    L.tileLayer(
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-            attribution:'OpenStreetMap'
-        }
-    ).addTo(mapaSeleccion);
-
-
-
-    mapaSeleccion.on('click',function(e){
-
-
-        if(marcador){
-
-            mapaSeleccion.removeLayer(marcador);
-
-        }
-
-
-        marcador =
-        L.marker([
-            e.latlng.lat,
-            e.latlng.lng
-        ])
-        .addTo(mapaSeleccion);
-
-
-
-        obtenerDireccion(
-            e.latlng.lat,
-            e.latlng.lng
-        );
-
-
-    });
-
-
-}
-
-function obtenerDireccion(lat,lng){
-
-
-fetch(
-`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`
-)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-
-    direccionSeleccionada =
-    data.display_name;
-
-
-    console.log(direccionSeleccionada);
-
-
-});
-
-
-}
-
-
-function guardarDireccion(){
-
-
-    if(!marcador){
-
-        alert("Seleccione una ubicación");
-
-        return;
-
-    }
-
-
-
-    let pos = marcador.getLatLng();
-
-
-
-    if(tipoDireccion==="recogida"){
-
-
-        puntoRecogida={
-
-            lat:pos.lat,
-
-            lng:pos.lng
-
-        };
-
-
-        direccionRecogida.value =
-        direccionSeleccionada;
-
-
-
-    }else{
-
-
-        puntoEntrega={
-
-            lat:pos.lat,
-
-            lng:pos.lng
-
-        };
-
-
-        direccionEntrega.value =
-        direccionSeleccionada;
-
-    }
-
-
-
-    cerrarMapa();
-
-}
-
-function cerrarMapa(){
-
-
-    document.getElementById("modalMapa")
-    .style.display="none";
-
-
-    if(marcador){
-
-        mapaSeleccion.removeLayer(marcador);
-
-        marcador=null;
-
-    }
-
-}
-
-function crearMapaRuta(){
-    if(mapaRuta){
-
-        mapaRuta.invalidateSize();
-
-        return;
-
-    }
-
-
-
-    mapaRuta = L.map('mapRuta')
-    .setView(
-        [-2.90055,-79.00453],
-        14
-    );
-
-
-    L.tileLayer(
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-            attribution:'OpenStreetMap'
-        }
-    )
-    .addTo(mapaRuta);
-
-}
-
-// function verRuta(){
-
+  // Tarifas reales (precio por km según tipo de servicio), traídas desde la BD, para que
+  // el precio que se muestra en pantalla (mapa.js) coincida con el que cobra el backend.
+  window.TARIFAS_POR_KM = /*[[${tarifasPorKm}]]*/ { estandar: 0.10, express: 0.25, prioritario: 0.50 };
+</script>
+<script th:src="@{/scripts/controlDepaneles.js}"></script>
+<script th:src="@{/scripts/mapa.js}"></script>
+<script th:inline="javascript" >
+
+// function clearForm(){
   
-//   if(!puntoRecogida || !puntoEntrega){
-    
-//     alert(
-//       "Seleccione origen y destino"
-//     );
-    
-//     return;
-    
+//   alert("Limpiar");
+
+//   var input = document.querySelectorAll("input");
+
+//   input.forEach( i => {
+//     i.value="";
 //   }
-  
 
-      
-//     crearMapaRuta();
-
-
-
-//     let url =
-//     `https://router.project-osrm.org/route/v1/driving/${puntoRecogida.lng},${puntoRecogida.lat};${puntoEntrega.lng},${puntoEntrega.lat}?overview=full&geometries=geojson`;
-
-
-
-//     fetch(url)
-
-//     .then(res=>res.json())
-
-//     .then(data=>{
-
-
-//         let coordenadas =
-//         data.routes[0]
-//         .geometry
-//         .coordinates;
-
-
-
-//         let puntos =
-//         coordenadas.map(p=>[
-//             p[1],
-//             p[0]
-//         ]);
-
-
-
-//         if(lineaRuta){
-
-//             mapaRuta.removeLayer(lineaRuta);
-
-//         }
-
-
-
-//         lineaRuta =
-//         L.polyline(
-//             puntos,
-//             {
-//                 color:"blue",
-//                 weight:5
-//             }
-//         )
-//         .addTo(mapaRuta);
-
-
-
-//         mapaRuta.fitBounds(
-//             lineaRuta.getBounds()
-//         );
-
-
-//     });
-
-//       let distancia = (mapaRuta.distance / 1000).toFixed(2);
-
-//       let tiempo = Math.ceil(mapaRuta.duration / 60);
-
-//       document.getElementById("distanciaRuta")
-//       .innerText = distancia + " km";
-
-//       document.getElementById("tiempoRuta")
-//       .innerText = tiempo + " min";
-
-
+//   )
 
 // }
-function verRuta() {
-  if (!puntoRecogida || !puntoEntrega) {
-    alert("Seleccione origen y destino");
-    return;
-  }
-
-  crearMapaRuta();
-
-  let url = `https://router.project-osrm.org/route/v1/driving/${puntoRecogida.lng},${puntoRecogida.lat};${puntoEntrega.lng},${puntoEntrega.lat}?overview=full&geometries=geojson`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      // 1. Dibujar la ruta en el mapa
-      let coordenadas = data.routes[0].geometry.coordinates;
-      let puntos = coordenadas.map(p => [p[1], p[0]]);
-
-      if (lineaRuta) {
-        mapaRuta.removeLayer(lineaRuta);
-      }
-
-      lineaRuta = L.polyline(puntos, {
-        color: "blue",
-        weight: 5
-      }).addTo(mapaRuta);
-
-      mapaRuta.fitBounds(lineaRuta.getBounds());
-
-      
-      let rutaData = data.routes[0]; 
-
-      let distancia = (rutaData.distance / 1000).toFixed(2);
-
-      let tiempo = Math.ceil(rutaData.duration / 60);
-
-      document.getElementById("distanciaRuta").innerText = distancia + " km";
-      document.getElementById("tiempoRuta").innerText = tiempo + " min";
-
-    })
-    .catch(error => {
-      console.error("Error al obtener la ruta:", error);
-    });
-}
 </script>
+
+<!-- <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&libraries=places"></script> -->
 
 </html>

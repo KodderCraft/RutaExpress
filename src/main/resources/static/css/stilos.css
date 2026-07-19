@@ -115,12 +115,13 @@
   .panel{display:none;}
   .panel.active{display:block;animation:fadeIn .25s ease;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
-
+  
   /* ===== CARDS / GRID ===== */
   .grid{display:grid;gap:16px;}
   .stat-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:22px;}
   .two-col{grid-template-columns:1.5fr 1fr;align-items:start;}
   .card{background:var(--paper-2);border:1px solid var(--line);  border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+  
   .card h3{margin:0 0 4px;font-size:1rem;font-weight:600;}
   .card .hint{color:var(--mute);font-size:.82rem;margin:0 0 14px;}
   .stat-card{display:flex;flex-direction:column;gap:8px;}
@@ -148,7 +149,7 @@
   .btn-coral{background:var(--coral-tint);color:var(--coral);}
   .btn-sm{padding:7px 13px;font-size:.78rem;}
   .btn-block{width:100%;justify-content:center;}
-
+  
   /* ===== BADGES ===== */
   .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700;letter-spacing:.2px;}
   .badge + .badge{margin-left:6px;}
