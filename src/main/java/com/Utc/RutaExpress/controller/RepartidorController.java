@@ -133,6 +133,9 @@ public class RepartidorController {
         return "repartidor/dashboard";
     }
 
+
+
+
     // Agrupa las entregas de la semana por dia (Lun-Dom) y calcula el porcentaje de
     // altura de cada barra en base al dia con mas ganado (si todos los dias estan en
     // cero, todas las barras quedan en 0% en vez de dividir por cero).

@@ -604,6 +604,7 @@ Envio envio = envioRepository.findById(id)
 
         List<Envio> pagadosPorRemitente = envioRepository
                 .findByRepartidorAndPagadorAndFechaRecogidoBetween(repartidor, "REMITENTE", inicio, fin);
+        
         List<Envio> pagadosPorDestinatario = envioRepository
                 .findByRepartidorAndPagadorAndEstadoAndFechaEntregaBetween(
                         repartidor, "DESTINATARIO", EstadoEnvio.ENTREGADO, inicio, fin);

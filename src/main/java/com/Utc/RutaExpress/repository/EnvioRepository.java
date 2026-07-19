@@ -7,13 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.List;
 import com.Utc.RutaExpress.entity.Envio;
 import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,17 +19,28 @@ public interface EnvioRepository extends JpaRepository<Envio, Long> {
     List<Envio> findByDestinatarioId(Long destinatarioId);
     List<Envio> findByRemitenteId(Long remitenteId);
 
-        List<Envio> findByEstadoAndRepartidorIsNull(EstadoEnvio estado);
-
-    Optional<Envio> findByIdAndRepartidor(Long id, Repartidor repartidor);
-
+    
     @Modifying
     @Query("UPDATE Envio e SET e.repartidor = :repartidor, e.fechaAsignacion = :fecha, e.fechaLimite = :fechaLimite " +
            "WHERE e.id = :id AND e.repartidor IS NULL AND e.estado = com.Utc.RutaExpress.entity.EstadoEnvio.PENDIENTE")
     int reclamar(@Param("id") Long id, @Param("repartidor") Repartidor repartidor,
             @Param("fecha") LocalDateTime fecha, @Param("fechaLimite") LocalDateTime fechaLimite);
+    List<Envio> findByEstadoAndRepartidorIsNull(EstadoEnvio estado);
+
+    Optional<Envio> findByIdAndRepartidor(Long id, Repartidor repartidor);
 
     long countByRepartidorAndFechaAsignacionBetween(Repartidor repartidor, LocalDateTime inicio, LocalDateTime fin);
+
+    List<Envio> findByRepartidorAndPagadorAndFechaRecogidoBetween(
+        Repartidor repartidor, String pagador, LocalDateTime inicio, LocalDateTime fin
+    );
+
+    // 2. Y DE PASO, AGREGA TAMBIÉN LA DEL DESTINATARIO (que la vas a necesitar abajo):
+    List<Envio> findByRepartidorAndPagadorAndEstadoAndFechaEntregaBetween(
+        Repartidor repartidor, String pagador, EstadoEnvio estado, LocalDateTime inicio, LocalDateTime fin
+    );
+
+    // findByRepartidorAndPagadorAndFechaRecogidoBetween
 
     List<Envio> findByRepartidorAndFechaAsignacionBetween(Repartidor repartidor, LocalDateTime inicio, LocalDateTime fin);
 

@@ -321,23 +321,23 @@ function guardarDatosPaquete() {
 }
 // Validación antes de enviar el formulario
 document.getElementById('registroEnvioForm').addEventListener('submit', function(e){
-  if(!document.getElementById('latitudRecogida').value || !document.getElementById('latitudEntrega').value){
-    alert('Selecciona ambas direcciones (recogida y entrega) en el mapa.');
-    e.preventDefault(); return;
-  }
-
-  if(!document.getElementById('tipo').value || !document.getElementById('peso').value || !document.getElementById('alto').value){
-    alert('Completa los datos del paquete: tipo, peso y alto.');
-    e.preventDefault(); return;
-  }
+    // if(!document.getElementById('latitudRecogida').value || !document.getElementById('latitudEntrega').value){
+    //   alert('Selecciona ambas direcciones (recogida y entrega) en el mapa.');
+    //   e.preventDefault(); return;
+    // }
+  
+  // if(!document.getElementById('tipo').value || !document.getElementById('peso').value || !document.getElementById('alto').value){
+  //   alert('Completa los datos del paquete: tipo, peso y alto.');
+  //   e.preventDefault(); return;
+  // }
 
   // El costo real se calcula en verRuta() a partir de la distancia (OSRM). Si el usuario
   // no presiona "Ver ruta" antes de enviar, este campo queda vacío y el backend cobraría
   // el precio plano de la tarifa en vez del costo real del trayecto.
-  if(!document.getElementById('costoTotal').value){
-    alert('Presiona "Ver ruta" para calcular la distancia y el costo antes de generar el envío.');
-    e.preventDefault(); return;
-  }
+  // if(!document.getElementById('costoTotal').value){
+  //   alert('Presiona "Ver ruta" para calcular la distancia y el costo antes de generar el envío.');
+  //   e.preventDefault(); return;
+  // }
 
 });
 
