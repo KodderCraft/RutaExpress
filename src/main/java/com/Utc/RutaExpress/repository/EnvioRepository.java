@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.List;
 import com.Utc.RutaExpress.entity.Envio;
 import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
@@ -19,6 +18,11 @@ import java.util.Optional;
 @Repository
 public interface EnvioRepository extends JpaRepository<Envio, Long> {
     List<Envio> findByDestinatarioId(Long destinatarioId);
+<<<<<<< HEAD
+    List<Envio> findByRemitenteId(Long remitenteId);
+
+}
+=======
 
 List<Envio> findByRemitenteId(Long remitenteId);
 List<Envio> findByDestinatarioId(Long destinatarioId);
@@ -50,3 +54,4 @@ List<Envio> findByDestinatarioId(Long destinatarioId);
     List<Envio> findTop10ByRepartidorAndEstadoOrderByFechaEntregaDesc(Repartidor repartidor, EstadoEnvio estado);
 }
 
+>>>>>>> 7fa4c74d0b6aae3ba22f2b2c07f645b47da383c8

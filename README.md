@@ -23,7 +23,7 @@ El proyecto simula el funcionamiento de una empresa de entregas, permitiendo adm
 
 # 🛠 Tecnologías
 
-- Java 25
+- Java 21
 - Spring Boot
 - Spring Web
 - Spring Data JPA
