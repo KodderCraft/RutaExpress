@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Grafo de Rutas</title>
+    <link rel="stylesheet" th:href="@{/css/grafo.css}">
+</head>
+<body>
+
+<div class="panel">
+    <h2>Calcular Ruta</h2>
+
+    <label>Ciudad origen</label>
+    <select id="origenSelect">
+        <option value="">Seleccione...</option>
+    </select>
+    <br><br>
+
+    <h3>Ciudades intermedias</h3>
+    <div id="contenedorParadas"></div>
+    <button type="button" onclick="agregarParada()">
+        + Agregar ciudad
+    </button>
+    <br><br>
+
+    <label>Ciudad destino</label>
+    <select id="destinoSelect">
+        <option value="">Seleccione...</option>
+    </select>
+    <br><br>
+
+    <button onclick="calcularRuta()">
+        Calcular Ruta
+    </button>
+
+    <!-- ============================================================= -->
+    <!-- PANEL DE DETALLES: AQUÍ SE MOSTRARÁN LOS KILÓMETROS Y TIEMPO -->
+    <!-- ============================================================= -->
+    <div id="panelDetalles" style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-left: 5px solid #FF0000; border-radius: 4px; display: none; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <!-- Los datos se inyectarán dinámicamente desde grafo.js -->
+    </div>
+</div>
+
+<div id="map"></div>
+
+<script th:src="@{/scripts/grafo/grafo.js}"></script>
+<script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCT1LFbTIGvaD6gzNPuIl_zzMraNpi-RLg&callback=cargarCiudades">
+</script>
+</body>
+</html>

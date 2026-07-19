@@ -2,9 +2,9 @@ package com.Utc.RutaExpress.grafo.modelo;
 
 public class Arista {
 
-    private Nodo origen;
-    private Nodo destino;
-    private int distancia;
+    private final Nodo origen;
+    private final Nodo destino;
+    private final int distancia;
 
     public Arista(Nodo origen, Nodo destino, int distancia) {
         this.origen = origen;
