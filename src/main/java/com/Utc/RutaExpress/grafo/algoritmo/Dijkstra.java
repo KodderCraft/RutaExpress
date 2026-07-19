@@ -1,7 +1,10 @@
 package com.Utc.RutaExpress.grafo.algoritmo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -9,10 +12,11 @@ import com.Utc.RutaExpress.grafo.modelo.Arista;
 import com.Utc.RutaExpress.grafo.modelo.Grafo;
 import com.Utc.RutaExpress.grafo.modelo.Nodo;
 
+
 public class Dijkstra {
 
-    private Map<Nodo, Integer> distancias;
-    private Map<Nodo, Nodo> anteriores;
+    private final Map<Nodo, Integer> distancias;
+    private final Map<Nodo, Nodo> anteriores;
 
     public Dijkstra() {
         distancias = new HashMap<>();
@@ -63,15 +67,35 @@ public class Dijkstra {
 
     }
 
-    public int obtenerDistancia(Nodo nodo) {
+        public int obtenerDistancia(Nodo nodo) {
 
-        return distancias.get(nodo);
+            return distancias.get(nodo);
 
-    }
+        }
 
-    public Map<Nodo, Nodo> getAnteriores() {
+        public Map<Nodo, Nodo> getAnteriores() {
 
-        return anteriores;
+            return anteriores;
+
+        }
+
+        public List<Nodo> obtenerCamino(Nodo destino) {
+
+        List<Nodo> camino = new ArrayList<>();
+
+        Nodo actual = destino;
+
+        while (actual != null) {
+
+            camino.add(actual);
+
+            actual = anteriores.get(actual);
+
+        }
+
+        Collections.reverse(camino);
+
+        return camino;
 
     }
 

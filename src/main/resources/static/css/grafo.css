@@ -1,0 +1,113 @@
+/* Estilos para el contenedor del mapa */
+#map {
+    width: 50%;
+    height: 650px;               /* Ajusta la altura a tu gusto */
+    border-radius: 24px;         /* Ajusta este número: más alto = más redondeado, más bajo = más cuadrado */
+    overflow: hidden;            /* ¡CRUCIAL! Esto obliga a Google Maps a respetar las esquinas redondeadas */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Una sombra suave para que resalte como en la foto */
+    border: 1px solid #e0e0e0;   /* Un borde sutil que define el mapa */
+}
+
+.panel{
+    padding:15px;
+}
+
+button{
+    padding:10px;
+    margin-top:10px;
+}
+
+/* src/main/resources/static/css/stilos.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Estilo para donde vayas a pintar tu Grafo o Mapa */
+#mapa-grafo {
+    width: 100%;
+    height: 500px;
+    background-color: #e5e3df;
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+.btn-calcular {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-calcular:hover {
+    background-color: #27ae60;
+}
+body {
+    /* Un degradado suave que va de azul oscuro a un tono morado/grisáceo */
+    background-color: #F6F5F0;   /* Fondo gris claro muy limpio */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 40px;
+    box-sizing: border-box;
+
+    /* --- ESTO CENTRA LOS ELEMENTOS VERTICAL Y HORIZONTALMENTE --- */
+    display: flex;               /* Alinea el panel y el mapa de lado a lado */
+    align-items: center;         /* ¡AQUÍ ESTÁ LA MAGIA! Centra verticalmente ambos elementos */
+    justify-content: center;     /* Centra todo horizontalmente en la pantalla */
+    min-height: 100vh;           /* Fuerza a que la página mida al menos el 100% del alto de la pantalla */
+    gap: 40px;                   /* Separación elegante entre el panel y el mapa */
+}
+
+/* Tu panel de control */
+.panel {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;         /* Panel también ligeramente redondeado */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    width: 320px;                /* Ancho fijo para el panel */
+    flex-shrink: 0;              /* Evita que el panel se encoja */
+}
+
+/* Asegurar que los botones y selects se vean modernos */
+select, button {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background-color: #27ae60;
+}
