@@ -2,7 +2,6 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
         <link rel="stylesheet" th:href="@{/css/stilos.css}">
-
 </head>
 <body>
     <div th:replace="~{componentes/header :: header}" ></div>
@@ -87,18 +86,203 @@
         </div>
         <div class="subpanel active" data-sub="remitentes">
           <table>
-            <tr><th>Usuario</th><th>Envíos totales</th><th>Registrado</th><th>Estado</th><th></th></tr>
-            <tr><td><div class="row-flex"><div class="mini-avatar">MJ</div>María Jiménez</div></td><td>142</td><td>Ene 2025</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-            <tr><td><div class="row-flex"><div class="mini-avatar">KC</div>Kiosco Central</td><td>310</td><td>Ago 2024</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-            <tr><td><div class="row-flex"><div class="mini-avatar">DS</div>Diego Salas</td><td>18</td><td>Mar 2026</td><td><span class="badge suspendido">Suspendido</span></td><td><button class="btn btn-ghost btn-sm">Revisar</button></td></tr>
+            <thead>
+              <tr><th>Usuario</th><th>Envíos totales</th><th>Registrado</th><th>Estado</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="usuario : ${usuarios}">
+                <td>
+                  <div class="row-flex">
+                    <div class="mini-avatar" th:text="${#strings.substring(usuario.nombre,0,2).toUpperCase()}">US</div>
+                    <span th:text="${usuario.nombre}">Nombre</span>
+                  </div>
+                </td>
+                <td th:text="${usuario.id}">142</td>
+                <td th:text="${#temporals.format(usuario.fechaRegistro, 'MMM yyyy')}">Ene 2025</td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${usuario.rol.name() == 'REPARTIDOR'} ? ' reparto' : (${usuario.rol.name() == 'ADMINISTRADOR'} ? ' activo' : ' pendiente')"
+                        th:text="${usuario.rol.name() == 'REPARTIDOR'} ? 'En ruta' : (${usuario.rol.name() == 'ADMINISTRADOR'} ? 'Activo' : 'Registrado')">Activo</span>
+                </td>
+                <td>
+                  <button class="btn btn-ghost btn-sm btn-ver-usuario"
+                          type="button"
+                          th:attr="data-id=${usuario.id},
+                                   data-nombre=${usuario.nombre},
+                                   data-email=${usuario.email},
+                                   data-rol=${usuario.rol},
+                                   data-telefono=${usuario.telefono != null ? usuario.telefono : 'Sin teléfono'},
+                                   data-direccion=${usuario.direccion != null && !#strings.isEmpty(usuario.direccion) ? usuario.direccion : 'Sin dirección registrada'},
+                                   data-fecha=${#temporals.format(usuario.fechaRegistro, 'dd MMM yyyy')}">Ver</button>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="subpanel" data-sub="destinatarios">
           <table>
-            <tr><th>Usuario</th><th>Recibidos</th><th>Dirección frecuente</th><th>Estado</th><th></th></tr>
-            <tr><td><div class="row-flex"><div class="mini-avatar">CP</div>Carlos Peña</div></td><td>27</td><td>Calle Larga 8-21</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
-            <tr><td><div class="row-flex"><div class="mini-avatar">AR</div>Ana Ruiz</div></td><td>9</td><td>Av. Remigio Crespo 3-40</td><td><span class="badge activo">Activo</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <thead>
+              <tr><th>Usuario</th><th>Envíos totales</th><th>Dirección frecuente</th><th>Estado</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="destinatario : ${destinatarios}">
+                <td>
+                  <div class="row-flex">
+                    <div class="mini-avatar" th:text="${#strings.substring(destinatario.nombre,0,2).toUpperCase()}">US</div>
+                    <span th:text="${destinatario.nombre}">Nombre</span>
+                  </div>
+                </td>
+                <td th:text="${totalEnviosPorDestinatario[destinatario.id] != null ? totalEnviosPorDestinatario[destinatario.id] : 0}">27</td>
+                <td th:text="${direccionDestinatario[destinatario.id] != null ? direccionDestinatario[destinatario.id] : 'Sin dirección registrada'}">Calle principal</td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${estadoDestinatario[destinatario.id] == 'EN_RUTA'} ? ' reparto' : ' activo'"
+                        th:text="${estadoDestinatario[destinatario.id] == 'EN_RUTA'} ? 'En ruta' : 'Activo'">Activo</span>
+                </td>
+                <td>
+                  <button class="btn btn-ghost btn-sm btn-ver-destinatario"
+                          type="button"
+                          th:attr="data-id=${destinatario.id},
+                                   data-nombre=${destinatario.nombre},
+                                   data-email=${destinatario.email},
+                                   data-telefono=${destinatario.telefono != null ? destinatario.telefono : 'Sin teléfono'},
+                                   data-direccion=${direccionDestinatario[destinatario.id] != null ? direccionDestinatario[destinatario.id] : 'Sin dirección registrada'},
+                                   data-fecha=${#temporals.format(destinatario.fechaRegistro, 'dd MMM yyyy')},
+                                   data-historial=${historialDestinatario[destinatario.id]}">Ver</button>
+                </td>
+              </tr>
+            </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalUsuario" class="usuario-modal" aria-hidden="true">
+      <div class="usuario-modal__backdrop" data-close="modalUsuario"></div>
+      <div class="usuario-modal__card" role="dialog" aria-modal="true" aria-labelledby="modalUsuarioNombre">
+        <button class="usuario-modal__close" type="button" data-close="modalUsuario" aria-label="Cerrar modal">×</button>
+        <div class="usuario-modal__header">
+          <div class="mini-avatar usuario-modal__avatar" id="modalUsuarioAvatar">US</div>
+          <div>
+            <h3 id="modalUsuarioNombre">Nombre</h3>
+            <p id="modalUsuarioRol" class="sub">Rol</p>
+          </div>
+        </div>
+        <div class="usuario-modal__grid">
+          <div class="usuario-modal__item"><strong>ID</strong><span id="modalUsuarioId">-</span></div>
+          <div class="usuario-modal__item"><strong>Email</strong><span id="modalUsuarioEmail">-</span></div>
+          <div class="usuario-modal__item"><strong>Teléfono</strong><span id="modalUsuarioTelefono">-</span></div>
+          <div class="usuario-modal__item"><strong>Dirección</strong><span id="modalUsuarioDireccion">-</span></div>
+          <div class="usuario-modal__item usuario-modal__item--full"><strong>Fecha de registro</strong><span id="modalUsuarioFecha">-</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalDestinatario" class="usuario-modal" aria-hidden="true">
+      <div class="usuario-modal__backdrop" data-close="modalDestinatario"></div>
+      <div class="usuario-modal__card" role="dialog" aria-modal="true" aria-labelledby="modalDestinatarioNombre">
+        <button class="usuario-modal__close" type="button" data-close="modalDestinatario" aria-label="Cerrar modal">×</button>
+        <div class="usuario-modal__header">
+          <div class="mini-avatar usuario-modal__avatar" id="modalDestinatarioAvatar">DR</div>
+          <div>
+            <h3 id="modalDestinatarioNombre">Nombre</h3>
+            <p id="modalDestinatarioMeta" class="sub">Destinatario</p>
+          </div>
+        </div>
+        <div class="usuario-modal__grid">
+          <div class="usuario-modal__item usuario-modal__item--full"><strong>Dirección de entrega principal</strong><span id="modalDestinatarioDireccion">-</span></div>
+          <div class="usuario-modal__item usuario-modal__item--full"><strong>Teléfono de contacto alternativo</strong><span id="modalDestinatarioTelefono">-</span></div>
+        </div>
+        <div class="usuario-modal__grid" style="margin-top: 14px;">
+          <div class="usuario-modal__item usuario-modal__item--full">
+            <strong>Historial de Paquetes Recibidos</strong>
+            <div id="modalDestinatarioHistorial" style="display:grid;gap:8px;margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalRegistroRepartidor" class="usuario-modal" aria-hidden="true">
+      <div class="usuario-modal__backdrop" data-close="modalRegistroRepartidor"></div>
+      <div class="usuario-modal__card" role="dialog" aria-modal="true" aria-labelledby="modalRegistroRepartidorTitulo">
+        <button class="usuario-modal__close" type="button" data-close="modalRegistroRepartidor" aria-label="Cerrar modal">×</button>
+        <div class="usuario-modal__header">
+          <div class="mini-avatar usuario-modal__avatar">RP</div>
+          <div>
+            <h3 id="modalRegistroRepartidorTitulo">Registrar repartidor</h3>
+            <p class="sub">Alta rápida del conductor en la plataforma</p>
+          </div>
+        </div>
+
+        <form id="formRegistroRepartidor" class="repartidor-form">
+          <div class="field">
+            <label for="registroNombre">Nombre completo</label>
+            <input id="registroNombre" name="nombre" type="text" placeholder="Ej. Ana López" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="registroEmail">Correo</label>
+              <input id="registroEmail" name="email" type="email" placeholder="correo@rutaexpress.com" required>
+            </div>
+            <div class="field">
+              <label for="registroTelefono">Teléfono</label>
+              <input id="registroTelefono" name="telefono" type="tel" placeholder="(55) 1234-5678">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="registroPassword">Contraseña</label>
+              <input id="registroPassword" name="password" type="password" placeholder="••••••••" required>
+            </div>
+            <div class="field">
+              <label for="registroZona">Zona asignada</label>
+              <select id="registroZona" name="zona">
+                <option value="Centro">Centro</option>
+                <option value="Norte">Norte</option>
+                <option value="Sur">Sur</option>
+                <option value="El Vergel">El Vergel</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="registroVehiculo">Tipo de vehículo</label>
+            <select id="registroVehiculo" name="tipoVehiculo">
+              <option value="Moto">Moto</option>
+              <option value="Auto">Auto</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <button class="btn btn-primary btn-block" type="submit">Guardar repartidor</button>
+          </div>
+
+          <div id="registroRepartidorFeedback" class="note" style="display:none;"></div>
+        </form>
+      </div>
+    </div>
+
+    <div id="modalPerfilRepartidor" class="usuario-modal" aria-hidden="true">
+      <div class="usuario-modal__backdrop" data-close="modalPerfilRepartidor"></div>
+      <div class="usuario-modal__card" role="dialog" aria-modal="true" aria-labelledby="modalPerfilRepartidorTitulo">
+        <button class="usuario-modal__close" type="button" data-close="modalPerfilRepartidor" aria-label="Cerrar modal">×</button>
+        <div class="usuario-modal__header">
+          <div class="mini-avatar usuario-modal__avatar" id="modalPerfilAvatar">RP</div>
+          <div>
+            <h3 id="modalPerfilRepartidorTitulo">Perfil del repartidor</h3>
+            <p id="modalPerfilZona" class="sub">Zona asignada</p>
+          </div>
+        </div>
+
+        <div class="usuario-modal__grid">
+          <div class="usuario-modal__item"><strong>Estado</strong><span id="modalPerfilEstado">-</span></div>
+          <div class="usuario-modal__item"><strong>Entregas totales</strong><span id="modalPerfilEntregas">-</span></div>
+          <div class="usuario-modal__item usuario-modal__item--full"><strong>Calificación</strong><div id="modalPerfilEstrellas" class="stars"></div></div>
+          <div class="usuario-modal__item"><strong>Vehículo registrado</strong><span id="modalPerfilVehiculo">-</span></div>
+          <div class="usuario-modal__item"><strong>Placa</strong><span id="modalPerfilPlaca">-</span></div>
+          <div class="usuario-modal__item usuario-modal__item--full"><strong>Pedidos asignados hoy</strong><div id="modalPerfilPedidos" class="pedido-lista"></div></div>
         </div>
       </div>
     </div>
@@ -106,15 +290,43 @@
     <!-- REPARTIDORES -->
     <div class="panel" data-panel="repartidores">
       <div class="topbar"><div><h1>Repartidores</h1><div class="sub">Estado, desempeño y zonas asignadas</div></div>
-        <button class="btn btn-primary"><i data-icon="plus"></i>Registrar repartidor</button>
+        <button class="btn btn-primary" id="btnAbrirModalRegistroRepartidor" type="button"><i data-icon="plus"></i>Registrar repartidor</button>
       </div>
       <div class="card">
         <table>
           <tr><th>Repartidor</th><th>Zona</th><th>Estado</th><th>Entregas</th><th>Calificación</th><th></th></tr>
-          <tr><td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge Torres</div></td><td>Centro</td><td><span class="badge reparto">En ruta</span></td><td>812</td><td>4.9 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
-          <tr><td><div class="row-flex"><div class="mini-avatar">LP</div>Luis Paredes</div></td><td>El Vergel</td><td><span class="badge reparto">En ruta</span></td><td>530</td><td>4.7 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
-          <tr><td><div class="row-flex"><div class="mini-avatar">RM</div>Rosa Medina</div></td><td>Norte</td><td><span class="badge activo">Disponible</span></td><td>274</td><td>4.8 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
-          <tr><td><div class="row-flex"><div class="mini-avatar">PS</div>Pablo Serrano</div></td><td>Sur</td><td><span class="badge pendiente">Desconectado</span></td><td>96</td><td>4.5 ⭐</td><td><button class="btn btn-ghost btn-sm">Ver perfil</button></td></tr>
+          <tr>
+            <td><div class="row-flex"><div class="mini-avatar">JT</div>Jorge Torres</div></td>
+            <td>Centro</td>
+            <td><span class="badge reparto">En ruta</span></td>
+            <td>812</td>
+            <td>4.9 ⭐</td>
+            <td><button class="btn btn-ghost btn-sm btn-ver-perfil-repartidor" type="button" data-id="1" data-nombre="Jorge Torres" data-zona="Centro" data-estado="En ruta" data-entregas="812" data-calificacion="4.9" data-vehiculo="Moto" data-placa="QW-4821" data-pedidos="SE-48213, SE-48072, SE-48261">Ver perfil</button></td>
+          </tr>
+          <tr>
+            <td><div class="row-flex"><div class="mini-avatar">LP</div>Luis Paredes</div></td>
+            <td>El Vergel</td>
+            <td><span class="badge reparto">En ruta</span></td>
+            <td>530</td>
+            <td>4.7 ⭐</td>
+            <td><button class="btn btn-ghost btn-sm btn-ver-perfil-repartidor" type="button" data-id="2" data-nombre="Luis Paredes" data-zona="El Vergel" data-estado="En ruta" data-entregas="530" data-calificacion="4.7" data-vehiculo="Auto" data-placa="TR-3118" data-pedidos="SE-47960, SE-47820">Ver perfil</button></td>
+          </tr>
+          <tr>
+            <td><div class="row-flex"><div class="mini-avatar">RM</div>Rosa Medina</div></td>
+            <td>Norte</td>
+            <td><span class="badge activo">Disponible</span></td>
+            <td>274</td>
+            <td>4.8 ⭐</td>
+            <td><button class="btn btn-ghost btn-sm btn-ver-perfil-repartidor" type="button" data-id="3" data-nombre="Rosa Medina" data-zona="Norte" data-estado="Disponible" data-entregas="274" data-calificacion="4.8" data-vehiculo="Moto" data-placa="NV-1924" data-pedidos="SE-48250, SE-48261">Ver perfil</button></td>
+          </tr>
+          <tr>
+            <td><div class="row-flex"><div class="mini-avatar">PS</div>Pablo Serrano</div></td>
+            <td>Sur</td>
+            <td><span class="badge pendiente">Desconectado</span></td>
+            <td>96</td>
+            <td>4.5 ⭐</td>
+            <td><button class="btn btn-ghost btn-sm btn-ver-perfil-repartidor" type="button" data-id="4" data-nombre="Pablo Serrano" data-zona="Sur" data-estado="Desconectado" data-entregas="96" data-calificacion="4.5" data-vehiculo="Auto" data-placa="SR-4190" data-pedidos="SE-47960">Ver perfil</button></td>
+          </tr>
         </table>
       </div>
     </div>
@@ -140,11 +352,22 @@
       <div class="topbar"><div><h1>Incidencias y reportes</h1><div class="sub">Casos que requieren revisión manual</div></div></div>
       <div class="card">
         <table>
-          <tr><th>Código</th><th>Tipo</th><th>Reportado por</th><th>Fecha</th><th>Estado</th><th></th></tr>
-          <tr><td class="code">SE-47960</td><td>Destinatario no localizado</td><td>Repartidor</td><td>10 jul</td><td><span class="badge incidencia">Abierta</span></td><td><button class="btn btn-primary btn-sm">Revisar</button></td></tr>
-          <tr><td class="code">SE-47820</td><td>Paquete dañado</td><td>Remitente</td><td>9 jul</td><td><span class="badge incidencia">Abierta</span></td><td><button class="btn btn-primary btn-sm">Revisar</button></td></tr>
-          <tr><td class="code">SE-47701</td><td>Retraso prolongado</td><td>Sistema</td><td>8 jul</td><td><span class="badge entregado">Resuelta</span></td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+          <tr><th>Código</th><th>Tipo</th><th>Reportado por</th><th>Estado</th><th></th></tr>
+          <tr th:each="incidencia : ${incidencias}">
+            <td class="code" th:text="${incidencia.envio != null ? incidencia.envio.codigoGuia : '-'}"></td>
+            <td th:text="${incidencia.descripcion}"></td>
+            <td>Sistema</td>
+            <td th:switch="${incidencia.estado.name()}">
+              <span th:case="'RESUELTA'" class="badge entregado" th:text="${incidencia.estado}"></span>
+              <span th:case="*" class="badge incidencia" th:text="${incidencia.estado}"></span>
+            </td>
+            <td><button class="btn btn-primary btn-sm" type="button">Revisar</button></td>
+          </tr>
         </table>
+        <div class="empty" th:if="${#lists.isEmpty(incidencias)}">
+          <i data-icon="check"></i>
+          <p>No hay incidencias registradas.</p>
+        </div>
       </div>
     </div>
   </div>
