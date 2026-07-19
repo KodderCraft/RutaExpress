@@ -45,11 +45,19 @@ public class Envio {
 
     private BigDecimal costoTotal;
 
+    // Quién paga el envío: "REMITENTE" (prepagado por quien envía) o "DESTINATARIO"
+    // (pago contra entrega, lo cobra el repartidor al entregar).
+    private String pagador = "REMITENTE";
+
     private Double distanciaKm;
 
     private Integer tiempoEstimadoMin;
 
     private LocalDateTime fechaRegistro;
+
+    // Cuándo el repartidor marcó el envío como RECOGIDO. Se usa para las ganancias cuando
+    // paga el remitente (prepagado): la ganancia se cuenta en este momento, no en la entrega.
+    private LocalDateTime fechaRecogido;
 
     private LocalDateTime fechaEntrega;
 
@@ -96,6 +104,9 @@ public class Envio {
     public BigDecimal getCostoTotal() { return costoTotal; }
     public void setCostoTotal(BigDecimal costoTotal) { this.costoTotal = costoTotal; }
 
+    public String getPagador() { return pagador; }
+    public void setPagador(String pagador) { this.pagador = pagador; }
+
     public Double getDistanciaKm() { return distanciaKm; }
     public void setDistanciaKm(Double distanciaKm) { this.distanciaKm = distanciaKm; }
 
@@ -104,6 +115,9 @@ public class Envio {
 
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+
+    public LocalDateTime getFechaRecogido() { return fechaRecogido; }
+    public void setFechaRecogido(LocalDateTime fechaRecogido) { this.fechaRecogido = fechaRecogido; }
 
     public LocalDateTime getFechaEntrega() { return fechaEntrega; }
     public void setFechaEntrega(LocalDateTime fechaEntrega) { this.fechaEntrega = fechaEntrega; }

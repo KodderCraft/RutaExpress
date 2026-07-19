@@ -30,6 +30,11 @@ public String registrarEnvio(@ModelAttribute("envioDTO") RegistroEnvioDTO regist
                              HttpSession session, 
                              RedirectAttributes flash) {
     try {
+        Usuario usuarioSesion = (Usuario) session.getAttribute("usuario");
+        if (usuarioSesion == null) {
+            return "redirect:/login";
+        }
+
         // Validaciones de tus campos reales
         boolean dirRecogidaVacia = (registroEnvioDTO.getDireccionRecogida() == null || registroEnvioDTO.getDireccionRecogida().trim().isEmpty());
         boolean dirEntregaVacia = (registroEnvioDTO.getDireccionEntrega() == null || registroEnvioDTO.getDireccionEntrega().trim().isEmpty());
@@ -46,8 +51,9 @@ public String registrarEnvio(@ModelAttribute("envioDTO") RegistroEnvioDTO regist
         if (dirRecogidaVacia) throw new IllegalArgumentException("La dirección de recogida es obligatoria.");
         if (dirEntregaVacia)  throw new IllegalArgumentException("La dirección de entrega es obligatoria.");
         if(altoVacio || anchoVacio || largoVacio) throw new IllegalArgumentException("Las dimensiones del paquete no pueden ser cero.");
-        // Si todo está correcto, guardas en la base de datos:
-        // envioServiceImpl.registrar(registroEnvioDTO);
+
+        // Si todo está correcto, guardamos en la base de datos:
+        envioServiceImpl.registrarEnvio(usuarioSesion, registroEnvioDTO);
 
         //  ¡ÉXITO! Aquí sí destruimos los datos de la sesión porque ya se guardaron
         session.removeAttribute("formularioGuardado");

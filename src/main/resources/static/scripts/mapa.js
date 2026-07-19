@@ -13,27 +13,6 @@ let puntoRecogida = null;
 let puntoEntrega = null;  
 let lineaRuta = null;
 
-if(tipoDireccion==="recogida"){
-      puntoRecogida={
-        lat:pos.lat,
-        lng:pos.lng
-      };
-      // guardar coordenadas en campos ocultos
-      document.getElementById('latitudRecogida').value = pos.lat;
-      document.getElementById('longitudRecogida').value = pos.lng;
-      document.getElementById('direccionRecogida').value = direccionSeleccionada;
-    }else{
-      puntoEntrega={
-        lat:pos.lat,
-        lng:pos.lng
-      };
-      // guardar coordenadas en campos ocultos
-      document.getElementById('latitudEntrega').value = pos.lat;
-      document.getElementById('longitudEntrega').value = pos.lng;
-      document.getElementById('direccionEntrega').value = direccionSeleccionada;
-    }
-  
-
 function abrirMapa(tipo){
 
     tipoDireccion = tipo;
@@ -173,9 +152,15 @@ function guardarDireccion(){
       document.getElementById('longitudEntrega').value = pos.lng;
       document.getElementById('direccionEntrega').value = direccionSeleccionada;
     }
-  
+
 
     cerrarMapa();
+
+    // En cuanto el usuario ya eligió recogida Y entrega, se calcula la ruta (distancia,
+    // tiempo y costo) automáticamente — no hace falta que presione "Ver ruta" a mano.
+    if (puntoRecogida && puntoEntrega) {
+        verRuta();
+    }
 
 }
 
@@ -221,8 +206,29 @@ function crearMapaRuta(){
 
 }
 
+let ultimaDistanciaCalculada = null;
+
+// Calcula y muestra en pantalla el costo real del envío = precio por km del tipo de
+// servicio elegido × distancia recorrida. Usa las mismas tarifas (TARIFAS_POR_KM,
+// inyectadas desde la BD) que aplica el backend, para que lo que se ve en pantalla
+// coincida con lo que realmente se va a cobrar.
+function calcularCostoEnvio(distanciaKm) {
+  const selectTipo = document.getElementById('tipoServicio');
+  const tipo = selectTipo ? selectTipo.value : 'estandar';
+  const tarifas = window.TARIFAS_POR_KM || { estandar: 0.10, express: 0.25, prioritario: 0.50 };
+  const precioPorKm = tarifas[tipo] !== undefined ? tarifas[tipo] : 5.00;
+  const costo = (parseFloat(distanciaKm) * precioPorKm).toFixed(2);
+
+  document.getElementById("costoTotal").value = costo;
+  const costoRutaEl = document.getElementById("costoRuta");
+  if (costoRutaEl) costoRutaEl.innerText = "$" + costo;
+  const costoVisibleEl = document.getElementById("costoTotalVisible");
+  if (costoVisibleEl) costoVisibleEl.value = "$" + costo;
+
+  return costo;
+}
+
 function verRuta() {
-  alert(`Distancia:`);
   if (!puntoRecogida || !puntoEntrega) {
     alert("Seleccione origen y destino");
     return;
@@ -250,8 +256,8 @@ function verRuta() {
 
       mapaRuta.fitBounds(lineaRuta.getBounds());
 
-      
-      let rutaData = data.routes[0]; 
+
+      let rutaData = data.routes[0];
 
       let distancia = (rutaData.distance / 1000).toFixed(2);
 
@@ -261,7 +267,8 @@ function verRuta() {
       document.getElementById("tiempoRuta").innerText = tiempo + " min";
       document.getElementById("distanciaKm").value = distancia;
       document.getElementById("tiempoEstimadoMin").value = tiempo;
-      document.getElementById("costoTotal").value = (parseFloat(distancia) * 1.2 + 2.5).toFixed(2);
+      ultimaDistanciaCalculada = distancia;
+      calcularCostoEnvio(distancia);
     })
     .catch(error => {
       console.error("Error al obtener la ruta:", error);
@@ -324,4 +331,23 @@ document.getElementById('registroEnvioForm').addEventListener('submit', function
     e.preventDefault(); return;
   }
 
+  // El costo real se calcula en verRuta() a partir de la distancia (OSRM). Si el usuario
+  // no presiona "Ver ruta" antes de enviar, este campo queda vacío y el backend cobraría
+  // el precio plano de la tarifa en vez del costo real del trayecto.
+  if(!document.getElementById('costoTotal').value){
+    alert('Presiona "Ver ruta" para calcular la distancia y el costo antes de generar el envío.');
+    e.preventDefault(); return;
+  }
+
 });
+
+// Si el usuario cambia el tipo de servicio después de haber calculado la ruta,
+// recalcula el precio mostrado sin necesidad de volver a presionar "Ver ruta".
+const selectTipoServicio = document.getElementById('tipoServicio');
+if (selectTipoServicio) {
+  selectTipoServicio.addEventListener('change', function () {
+    if (ultimaDistanciaCalculada !== null) {
+      calcularCostoEnvio(ultimaDistanciaCalculada);
+    }
+  });
+}

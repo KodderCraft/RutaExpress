@@ -11,6 +11,7 @@ public class RegistroEnvioDTO {
     private String nombreDestinatario;
     private String telefonoDestinatario;
     private String tipoServicio;
+    private String pagador;
     private String instrucciones;
     private BigDecimal valorDeclarado;
     private Double distanciaKm;
@@ -49,6 +50,9 @@ public class RegistroEnvioDTO {
 
     public String getTipoServicio() { return tipoServicio; }
     public void setTipoServicio(String tipoServicio) { this.tipoServicio = tipoServicio; }
+
+    public String getPagador() { return pagador; }
+    public void setPagador(String pagador) { this.pagador = pagador; }
 
     public String getInstrucciones() { return instrucciones; }
     public void setInstrucciones(String instrucciones) { this.instrucciones = instrucciones; }

@@ -115,6 +115,22 @@
       </label>
     </div>
   </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>¿Quién paga el envío?</label>
+      <div style="display:flex;gap:18px;align-items:center;">
+        <label style="display:flex;gap:6px;align-items:center;font-weight:normal;">
+          <input type="radio" th:field="*{pagador}" value="REMITENTE" style="width:auto;">
+          Yo (remitente)
+        </label>
+        <label style="display:flex;gap:6px;align-items:center;font-weight:normal;">
+          <input type="radio" th:field="*{pagador}" value="DESTINATARIO" style="width:auto;">
+          El destinatario (contra entrega)
+        </label>
+      </div>
+    </div>
+  </div>
 </div>
 
  <div >

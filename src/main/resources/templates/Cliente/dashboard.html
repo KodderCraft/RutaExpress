@@ -76,6 +76,7 @@
                     <th>Estado</th>
                     <th>Repartidor</th>
                     <th>Total</th>
+                    <th>Pago</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -118,6 +119,9 @@
                     <!-- Costo Total -->
                     <td th:text="${e.costoTotal != null ? '$' + #numbers.formatDecimal(e.costoTotal, 1, 2) : '$0.00'}">
                       $0.00</td>
+
+                    <!-- Quién paga (desde la perspectiva del remitente, que es quien ve esta tabla) -->
+                    <td th:text="${e.pagador == 'DESTINATARIO'} ? 'Paga el destinatario' : 'Tú pagas'">Tú pagas</td>
 
                     <!-- Acciones -->
                     <td >
@@ -218,10 +222,31 @@
                 </div>
               </div>
 
+              <!-- SECCIÓN 4: ¿QUIÉN PAGA EL ENVÍO? -->
               <div class="field-row">
                 <div class="field">
-                  <label for="valorDeclarado">Valor Total</label>
+                  <label>¿Quién paga el envío?</label>
+                  <div style="display:flex;gap:18px;align-items:center;">
+                    <label style="display:flex;gap:6px;align-items:center;font-weight:normal;">
+                      <input type="radio" th:field="*{pagador}" value="REMITENTE" checked style="width:auto;">
+                      Yo (remitente)
+                    </label>
+                    <label style="display:flex;gap:6px;align-items:center;font-weight:normal;">
+                      <input type="radio" th:field="*{pagador}" value="DESTINATARIO" style="width:auto;">
+                      El destinatario (contra entrega)
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="valorDeclarado">Valor declarado del paquete</label>
                   <input type="text" th:field="*{valorDeclarado}" placeholder="$ 0.00" readonly>
+                </div>
+                <div class="field">
+                  <label>Costo del envío</label>
+                  <input type="text" id="costoTotalVisible" placeholder="$ 0.00" readonly>
                 </div>
               </div>
 
@@ -282,6 +307,8 @@
                   id="distanciaRuta"> ---</b></div>
               <div style="display:flex;justify-content:space-between;"><span>Carro, Tiempo estimado </span><b
                   id="tiempoRuta">---</b></div>
+              <div style="display:flex;justify-content:space-between;"><span>Costo del envío</span><b
+                  id="costoRuta">---</b></div>
               <div style="display:flex;justify-content:space-between;"><span>Repartidores disponibles</span><b>---</b>
               </div>
             </div>
@@ -289,9 +316,79 @@
           </div>
 
         </div>
+
+        <!-- Mapa con la ruta calculada (lo llena verRuta() en mapa.js). Antes vivía fuera de
+             todos los paneles (hijo directo de .main), así que se veía SIEMPRE sin importar
+             la pestaña activa; ahora queda dentro de "nuevo", que es donde tiene sentido. -->
+        <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div>
       </div>
 
-    
+
+      <!-- RECIBIDOS -->
+      <div class="panel" data-panel="recibidos">
+        <div class="topbar">
+          <div>
+            <h1>Paquetes recibidos</h1>
+            <div class="sub">Envíos donde apareces como destinatario</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Envíos por recibir</h3>
+            <p class="hint">Seguimiento de los paquetes que te están enviando</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Remitente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Repartidor</th>
+                    <th>Total</th>
+                    <th>Pago</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="e : ${enviosRecibidos}">
+                    <td class="code" th:text="${e.codigoGuia}">SE-00000</td>
+                    <td th:text="${e.remitente != null ? e.remitente.nombre : 'Sin remitente'}">Remitente</td>
+                    <td th:text="${e.fechaRegistro != null ? #temporals.format(e.fechaRegistro, 'dd MMM') : '—'}">13 jul</td>
+                    <td>
+                      <span th:class="'badge ' + ${e.estado != null ? #strings.toLowerCase(e.estado) : ''}"
+                        th:text="${e.estado}">
+                        EN_REPARTO
+                      </span>
+                    </td>
+                    <td>
+                      <div class="row-flex">
+                        <div class="mini-avatar"
+                          th:text="${e.repartidor != null && e.repartidor.usuario != null ? #strings.substring(e.repartidor.usuario.nombre, 0, 1) : '--'}">
+                          JT
+                        </div>
+                        <span
+                          th:text="${e.repartidor != null && e.repartidor.usuario != null ? e.repartidor.usuario.nombre : 'Sin repartidor'}">
+                          Sin repartidor
+                        </span>
+                      </div>
+                    </td>
+                    <td th:text="${e.costoTotal != null ? '$' + #numbers.formatDecimal(e.costoTotal, 1, 2) : '$0.00'}">
+                      $0.00</td>
+                    <!-- Quién paga (desde la perspectiva del destinatario, que es quien ve esta tabla) -->
+                    <td th:text="${e.pagador == 'DESTINATARIO'} ? 'Tú pagas (contra entrega)' : 'Ya pagado por el remitente'">Ya pagado por el remitente</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="empty" th:if="${#lists.isEmpty(enviosRecibidos)}">
+                <p>No tienes paquetes por recibir todavía.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- RASTREAR -->
       <div class="panel" data-panel="rastrear">
         <div class="topbar">
@@ -392,10 +489,8 @@
             <!-- <button class="btn btn-ghost btn-block">Descargar recibo</button> -->
           </div>
         </div>
-      
-      </div>
 
-      <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div>
+      </div>
     </div>
   </div>
 
@@ -501,6 +596,11 @@
   <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
 </body>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script th:inline="javascript">
+  // Tarifas reales (precio por km según tipo de servicio), traídas desde la BD, para que
+  // el precio que se muestra en pantalla (mapa.js) coincida con el que cobra el backend.
+  window.TARIFAS_POR_KM = /*[[${tarifasPorKm}]]*/ { estandar: 0.10, express: 0.25, prioritario: 0.50 };
+</script>
 <script th:src="@{/scripts/controlDepaneles.js}"></script>
 <script th:src="@{/scripts/mapa.js}"></script>
 <script th:inline="javascript" >
