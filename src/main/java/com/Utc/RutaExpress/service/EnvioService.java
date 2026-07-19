@@ -64,7 +64,6 @@ public interface EnvioService {
     List<Envio> listarEntregadosSemana(Repartidor repartidor);
 
     List<Envio> listarGananciasSemana(Repartidor repartidor);
-
     BigDecimal calcularGanadoSemana(Repartidor repartidor);
 
     List<Envio> listarEntregasRecientes(Repartidor repartidor);
