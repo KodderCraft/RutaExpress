@@ -78,24 +78,17 @@
     document.getElementById('authScreen').style.display = 'flex';
   }
 
-  // Role switcher
-  document.querySelectorAll('.role-tab').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.role-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      // document.querySelectorAll('.app').forEach(a=>a.classList.remove('active'));
-      // document.getElementById('app-'+btn.dataset.role).classList.add('active');
-    });
-  });
-  // function goPanel(role, panel){
-  //   document.querySelectorAll('.role-tab').forEach(b=>b.classList.toggle('active', b.dataset.role===role));
-  //   document.querySelectorAll('.app').forEach(a=>a.classList.toggle('active', a.id==='app-'+role));
-  //   const scope = document.getElementById('app-'+role);
-  //   scope.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.panel===panel));
-  //   scope.querySelectorAll(':scope > .main > .panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===panel));
-  // }
+
+  function goPanel(role, panel){
+    document.querySelectorAll('.role-tab').forEach(b=>b.classList.toggle('active', b.dataset.role===role));
+    document.querySelectorAll('.app').forEach(a=>a.classList.toggle('active', a.id==='app-'+role));
+    const scope = document.getElementById('app-'+role);
+    scope.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.panel===panel));
+    scope.querySelectorAll(':scope > .main > .panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===panel));
+  }
 
   // Sidebar nav within each role
+  
   document.querySelectorAll('.app').forEach(app=>{
     const navItems = app.querySelectorAll('.nav-item');
     const panels = app.querySelectorAll(':scope > .main > .panel');
@@ -104,9 +97,18 @@
         navItems.forEach(n=>n.classList.remove('active'));
         item.classList.add('active');
         panels.forEach(p=>p.classList.toggle('active', p.dataset.panel===item.dataset.panel));
+        ;
       });
     });
+    const panelActivo = app.querySelector(':scope > .main > .panel.active');
+  if (panelActivo) {
+    const nombrePanel = panelActivo.dataset.panel;
+    navItems.forEach(item => {
+      item.classList.toggle('active', item.dataset.panel === nombrePanel);
+    });
+  }
   });
+
 
   // Subtabs (Usuarios: remitentes/destinatarios)
   document.querySelectorAll('.subtabs').forEach(group=>{
@@ -147,6 +149,264 @@
     document.getElementById('quoteCard').style.display = 'block';
   }
 
+  const modalUsuario = document.getElementById('modalUsuario');
+  const modalUsuarioAvatar = document.getElementById('modalUsuarioAvatar');
+  const modalUsuarioNombre = document.getElementById('modalUsuarioNombre');
+  const modalUsuarioRol = document.getElementById('modalUsuarioRol');
+  const modalUsuarioId = document.getElementById('modalUsuarioId');
+  const modalUsuarioEmail = document.getElementById('modalUsuarioEmail');
+  const modalUsuarioTelefono = document.getElementById('modalUsuarioTelefono');
+  const modalUsuarioDireccion = document.getElementById('modalUsuarioDireccion');
+  const modalUsuarioFecha = document.getElementById('modalUsuarioFecha');
+
+  const modalDestinatario = document.getElementById('modalDestinatario');
+  const modalDestinatarioAvatar = document.getElementById('modalDestinatarioAvatar');
+  const modalDestinatarioNombre = document.getElementById('modalDestinatarioNombre');
+  const modalDestinatarioMeta = document.getElementById('modalDestinatarioMeta');
+  const modalDestinatarioDireccion = document.getElementById('modalDestinatarioDireccion');
+  const modalDestinatarioTelefono = document.getElementById('modalDestinatarioTelefono');
+  const modalDestinatarioHistorial = document.getElementById('modalDestinatarioHistorial');
+
+  const modalRegistroRepartidor = document.getElementById('modalRegistroRepartidor');
+  const modalPerfilRepartidor = document.getElementById('modalPerfilRepartidor');
+  const modalPerfilAvatar = document.getElementById('modalPerfilAvatar');
+  const modalPerfilZona = document.getElementById('modalPerfilZona');
+  const modalPerfilEstado = document.getElementById('modalPerfilEstado');
+  const modalPerfilEntregas = document.getElementById('modalPerfilEntregas');
+  const modalPerfilEstrellas = document.getElementById('modalPerfilEstrellas');
+  const modalPerfilVehiculo = document.getElementById('modalPerfilVehiculo');
+  const modalPerfilPlaca = document.getElementById('modalPerfilPlaca');
+  const modalPerfilPedidos = document.getElementById('modalPerfilPedidos');
+
+  function abrirModalUsuario(button){
+    if (!modalUsuario) return;
+
+    const nombre = button.dataset.nombre || 'Usuario';
+    const iniciales = nombre
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join('');
+
+    modalUsuarioAvatar.textContent = iniciales || 'US';
+    modalUsuarioNombre.textContent = nombre;
+    modalUsuarioRol.textContent = button.dataset.rol || 'Sin rol';
+    modalUsuarioId.textContent = button.dataset.id || '-';
+    modalUsuarioEmail.textContent = button.dataset.email || '-';
+    modalUsuarioTelefono.textContent = button.dataset.telefono || '-';
+    modalUsuarioDireccion.textContent = button.dataset.direccion || '-';
+    modalUsuarioFecha.textContent = button.dataset.fecha || '-';
+
+    modalUsuario.classList.add('active');
+    modalUsuario.setAttribute('aria-hidden', 'false');
+  }
+
+  function cerrarModalUsuario(){
+    if (!modalUsuario) return;
+    modalUsuario.classList.remove('active');
+    modalUsuario.setAttribute('aria-hidden', 'true');
+  }
+
+  function mostrarDetallesDestinatario(button){
+    if (!modalDestinatario) return;
+
+    const nombre = button.dataset.nombre || 'Destinatario';
+    const direccion = button.dataset.direccion || 'Sin dirección registrada';
+    const telefono = button.dataset.telefono || 'Sin teléfono';
+    const historialRaw = button.dataset.historial || '';
+    const historial = historialRaw
+      .split(';')
+      .map(entry => entry.trim())
+      .filter(Boolean)
+      .map(entry => {
+        const [remitente, fecha, estado] = entry.split('|');
+        return { remitente: remitente || 'Sin remitente', fecha: fecha || 'Sin fecha', estado: estado || 'Sin estado' };
+      });
+
+    const iniciales = nombre
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join('');
+
+    modalDestinatarioAvatar.textContent = iniciales || 'DR';
+    modalDestinatarioNombre.textContent = nombre;
+    modalDestinatarioMeta.textContent = 'Destinatario';
+    modalDestinatarioDireccion.textContent = direccion;
+    modalDestinatarioTelefono.textContent = telefono;
+
+    if (modalDestinatarioHistorial) {
+      modalDestinatarioHistorial.innerHTML = '';
+
+      if (!historial.length) {
+        modalDestinatarioHistorial.innerHTML = '<div class="usuario-modal__item"><span>No hay paquetes recibidos registrados.</span></div>';
+      } else {
+        historial.forEach(item => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'usuario-modal__item';
+          wrapper.innerHTML = '<strong>' + item.remitente + '</strong><span>' + item.fecha + ' · ' + item.estado + '</span>';
+          modalDestinatarioHistorial.appendChild(wrapper);
+        });
+      }
+    }
+
+    modalDestinatario.classList.add('active');
+    modalDestinatario.setAttribute('aria-hidden', 'false');
+  }
+
+  function cerrarModalDestinatario(){
+    if (!modalDestinatario) return;
+    modalDestinatario.classList.remove('active');
+    modalDestinatario.setAttribute('aria-hidden', 'true');
+  }
+
+  function abrirModalRegistroRepartidor() {
+    if (!modalRegistroRepartidor) return;
+    modalRegistroRepartidor.classList.add('active');
+    modalRegistroRepartidor.setAttribute('aria-hidden', 'false');
+  }
+
+  function cerrarModalRegistroRepartidor() {
+    if (!modalRegistroRepartidor) return;
+    modalRegistroRepartidor.classList.remove('active');
+    modalRegistroRepartidor.setAttribute('aria-hidden', 'true');
+  }
+
+  function renderEstrellas(valor) {
+    if (!modalPerfilEstrellas) return;
+    modalPerfilEstrellas.innerHTML = '';
+    const rating = Number(valor) || 0;
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('i');
+      star.setAttribute('data-icon', 'star');
+      star.classList.add(rating >= i ? 'filled' : '');
+      modalPerfilEstrellas.appendChild(star);
+    }
+    document.querySelectorAll('#modalPerfilEstrellas i[data-icon="star"]').forEach(el => {
+      el.classList.add('icon');
+      el.innerHTML = '<path d="M12 3l2.7 5.9 6.3.7-4.7 4.3 1.3 6.2L12 17l-5.6 3.1 1.3-6.2-4.7-4.3 6.3-.7z"/>';
+    });
+  }
+
+  function verPerfilRepartidor(id) {
+    const button = document.querySelector(`.btn-ver-perfil-repartidor[data-id="${id}"]`);
+    if (!button || !modalPerfilRepartidor) return;
+
+    const nombre = button.dataset.nombre || 'Repartidor';
+    const zona = button.dataset.zona || 'Sin zona';
+    const estado = button.dataset.estado || 'Disponible';
+    const entregas = button.dataset.entregas || '0';
+    const calificacion = button.dataset.calificacion || '4.5';
+    const vehiculo = button.dataset.vehiculo || 'Moto';
+    const placa = button.dataset.placa || 'Sin placa';
+    const pedidos = (button.dataset.pedidos || '').split(',').map(item => item.trim()).filter(Boolean);
+
+    const iniciales = nombre.split(' ').filter(Boolean).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('');
+    modalPerfilAvatar.textContent = iniciales || 'RP';
+    modalPerfilZona.textContent = 'Zona asignada · ' + zona;
+    modalPerfilEstado.textContent = estado;
+    modalPerfilEntregas.textContent = entregas;
+    modalPerfilVehiculo.textContent = vehiculo;
+    modalPerfilPlaca.textContent = placa;
+    modalPerfilPedidos.innerHTML = pedidos.length ? pedidos.map(pedido => '<div class="pedido-lista__item">' + pedido + '</div>').join('') : '<div class="pedido-lista__item">Sin pedidos asignados hoy.</div>';
+    renderEstrellas(calificacion);
+
+    modalPerfilRepartidor.classList.add('active');
+    modalPerfilRepartidor.setAttribute('aria-hidden', 'false');
+  }
+
+  function cerrarModalPerfilRepartidor() {
+    if (!modalPerfilRepartidor) return;
+    modalPerfilRepartidor.classList.remove('active');
+    modalPerfilRepartidor.setAttribute('aria-hidden', 'true');
+  }
+
+  document.querySelectorAll('.btn-ver-usuario').forEach(button => {
+    button.addEventListener('click', () => abrirModalUsuario(button));
+  });
+
+  document.querySelectorAll('.btn-ver-destinatario').forEach(button => {
+    button.addEventListener('click', () => mostrarDetallesDestinatario(button));
+  });
+
+  document.querySelectorAll('.btn-ver-perfil-repartidor').forEach(button => {
+    button.addEventListener('click', () => verPerfilRepartidor(button.dataset.id));
+  });
+
+  const btnAbrirModalRegistroRepartidor = document.getElementById('btnAbrirModalRegistroRepartidor');
+  if (btnAbrirModalRegistroRepartidor) {
+    btnAbrirModalRegistroRepartidor.addEventListener('click', abrirModalRegistroRepartidor);
+  }
+
+  const formRegistroRepartidor = document.getElementById('formRegistroRepartidor');
+  if (formRegistroRepartidor) {
+    formRegistroRepartidor.addEventListener('submit', async event => {
+      event.preventDefault();
+      const feedback = document.getElementById('registroRepartidorFeedback');
+      const payload = Object.fromEntries(new FormData(formRegistroRepartidor).entries());
+
+      try {
+        const response = await fetch('/api/admin/repartidores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.textContent = result.message || 'Registro completado.';
+          feedback.style.color = result.success ? 'var(--teal)' : 'var(--coral)';
+        }
+
+        if (result.success) {
+          formRegistroRepartidor.reset();
+          setTimeout(cerrarModalRegistroRepartidor, 700);
+        }
+      } catch (error) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.textContent = 'No se pudo registrar el repartidor.';
+          feedback.style.color = 'var(--coral)';
+        }
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-close="modalUsuario"]').forEach(element => {
+    element.addEventListener('click', cerrarModalUsuario);
+  });
+
+  document.querySelectorAll('[data-close="modalDestinatario"]').forEach(element => {
+    element.addEventListener('click', cerrarModalDestinatario);
+  });
+
+  document.querySelectorAll('[data-close="modalRegistroRepartidor"]').forEach(element => {
+    element.addEventListener('click', cerrarModalRegistroRepartidor);
+  });
+
+  document.querySelectorAll('[data-close="modalPerfilRepartidor"]').forEach(element => {
+    element.addEventListener('click', cerrarModalPerfilRepartidor);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      if (modalUsuario && modalUsuario.classList.contains('active')) {
+        cerrarModalUsuario();
+      }
+      if (modalDestinatario && modalDestinatario.classList.contains('active')) {
+        cerrarModalDestinatario();
+      }
+      if (modalRegistroRepartidor && modalRegistroRepartidor.classList.contains('active')) {
+        cerrarModalRegistroRepartidor();
+      }
+      if (modalPerfilRepartidor && modalPerfilRepartidor.classList.contains('active')) {
+        cerrarModalPerfilRepartidor();
+      }
+    }
+  });
   // ===== Modal: detalle de envío =====
   const DETALLE_CAMPOS = ['codigo','cliente','remitente','direccion','recogida','tipo','costo','distancia','tiempo','fechaLimite','fecha'];
   const ESTADO_BADGE_CLASS = {ENTREGADO:'entregado', EN_CAMINO:'reparto', RECOGIDO:'transito', CANCELADO:'incidencia', NO_ENTREGADO:'incidencia', DEVUELTO:'incidencia'};

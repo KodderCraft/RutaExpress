@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Envío</title>
+  <link rel="stylesheet" th:href="@{/css/stilos.css}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+
+<body>
+  <div th:replace="~{componentes/header :: header}"></div>
+  <div class="app active" id="app-remitente">
+    <!-- <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}"></div> -->
+     <div class="sidebar" >
+        
+    <div class="sidebar-title">Cliente</div>
+    <div class="nav-item " style="pointer-events: none;" onclick="none" ><i data-icon="star"></i>Edicion</div>
+    <div class="sidebar-foot" >
+      <div class="avatar" th:text="${#strings.substring(session.usuario.nombre,0,1)}" >
+      
+      </div>
+
+      <div class="who"><b th:text="${session.usuario.nombre}" ></b><span th:text="${session.usuario.rol}"></span></div>
+    </div>
+    </div>     
+    <div class="main">
+      <div class="panel active" data-panel="editar-envio">
+        <div class="topbar">
+          <div>
+            <h1>Editar envío</h1>
+            <div class="sub">Actualiza los datos del envío, dirección y paquete</div>
+          </div>
+          <div class="topbar-actions">
+            <a class="btn btn-ghost" style="text-decoration: none;" th:href="@{/cliente/dashboard}">Volver al dashboard</a>
+          </div>
+        </div>
+
+        <div th:if="${successMessage}" class="card" style="margin: 16px 0; border-left: 4px solid #0E8C7F; background: #effcf8;">
+          <p style="margin: 0; color: #0b5f54;" th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="card" style="margin: 16px 0; border-left: 4px solid #E7495A; background: #ffeaea;">
+          <p style="margin: 0; color: #a11;" th:text="${errorMessage}"></p>
+        </div>
+
+    
+  <div class="card" style="width: 60%; margin:auto;" >
+  <h2 style="margin-top: 0; color: #1e293b;">Actualizar Datos del Envío</h2>
+  <p class="hint" style="margin-bottom: 25px; color: #64748b;">Modifica los detalles del envío y del paquete antes de que sea asignado a un repartidor.</p>
+
+  <form class="grid" th:action="@{/cliente/envio/actualizar/{id}(id=${registroEnvioDTO.id})}" th:object="${registroEnvioDTO}" method="post" id="registroEnvioForm">
+
+
+  <!-- ID Oculto -->
+  <input type="hidden" th:field="*{id}" />
+
+
+  <div > 
+  <!-- SECCIÓN 3: DETALLES DEL PAQUETE (AQUÍ MISMO EN LA PÁGINA) -->
+  <h4 style="margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Detalles del Paquete</h4>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="tipo">Tipo de paquete</label>
+      <select th:field="*{tipo}" id="tipo" required>
+        <option value="" disabled selected>Seleccione una opción...</option>
+        <option value="caja">Caja</option>
+        <option value="sobre">Sobre / Documento</option>
+        <option value="pallet">Pallet</option>
+        <option value="paquete_irregular">Paquete Irregular</option>
+        <option value="bolsa_seguridad">Bolsa de Seguridad</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    
+    <div class="field">
+      <label for="tipoServicio">Tipo de servicio</label>
+      <select th:field="*{tipoServicio}" required>
+        <option value="estandar">Estándar</option>
+        <option value="express">Express (Mismo día)</option>
+        <option value="prioritario">Prioritario</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Dimensiones y Peso -->
+  <div class="field-row">
+    <div class="field">
+      <label for="alto">Alto (cm/m)</label>
+      <input type="number" step="0.01" th:field="*{alto}" id="alto" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label for="ancho">Ancho (cm/m)</label>
+      <input type="number" step="0.01" th:field="*{ancho}" id="ancho" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label for="largo">Largo (cm/m)</label>
+      <input type="number" step="0.01" th:field="*{largo}" id="largo" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label for="peso">Peso (kg)</label>
+      <input type="number" step="0.01" th:field="*{peso}" id="peso" placeholder="0.00">
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="valorDeclarado">Valor declarado ($)</label>
+      <input type="number" step="0.01" th:field="*{valorDeclarado}" id="valorDeclarado" placeholder="$ 0.00">
+    </div>
+    <div class="field" style="display:flex; align-items:center; margin-top:20px;">
+      <label for="fragil" style="cursor:pointer;">
+        <input type="checkbox" th:field="*{fragil}" id="fragil" style="width:20px; height:20px; margin-right:8px;">
+        ¿Es material frágil?
+      </label>
+    </div>
+  </div>
+</div>
+
+ <div >
+
+
+  <div class="field">
+    <label for="descripcion">Descripción del contenido del paquete</label>
+    <textarea th:field="*{descripcion}" id="descripcion" rows="2" placeholder="Detalles del contenido..."></textarea>
+  </div>
+
+ 
+ </div>
+
+  <!-- SECCIÓN 1: DIRECCIONES Y COORDENADAS -->
+   <div >
+
+  
+  <div class="field-row">
+    <div class="field">
+      <label for="direccionRecogida">Dirección de recogida</label>
+      <input type="text" th:field="*{direccionRecogida}" id="direccionRecogida" readonly placeholder="Ej. calle 642" required>
+      <button class="btn btn-dark" type="button" onclick="abrirMapa('recogida')">Cambiar dirección</button>
+    </div>
+
+    <div class="field">
+      <label for="direccionEntrega">Dirección de entrega</label>
+      <input type="text" th:field="*{direccionEntrega}" id="direccionEntrega" readonly placeholder="Ej. calle 32" required>
+      <button class="btn btn-dark" type="button" onclick="abrirMapa('entrega')">Cambiar dirección</button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: DESTINATARIO -->
+  <div class="field-row">
+    <div class="field">
+      <label for="nombreDestinatario">Nombre del destinatario</label>
+      <input type="text" th:field="*{nombreDestinatario}" placeholder="Ej. Carlos Peña" required>
+    </div>
+    <div class="field">
+      <label for="telefonoDestinatario">Teléfono del destinatario</label>
+      <input type="text" th:field="*{telefonoDestinatario}" placeholder="09XXXXXXXX" required>
+    </div>
+  </div>
+ </div>
+
+<div>
+
+  <!-- CAMPOS OCULTOS PARA COORDENADAS (LO MIRA TU JS DE MAPA) -->
+  <input type="hidden" th:field="*{latitudRecogida}" id="latitudRecogida">
+  <input type="hidden" th:field="*{longitudRecogida}" id="longitudRecogida">
+  <input type="hidden" th:field="*{latitudEntrega}" id="latitudEntrega">
+  <input type="hidden" th:field="*{longitudEntrega}" id="longitudEntrega">
+
+  <!-- CAMPOS OCULTOS DE CÁLCULO -->
+  <input type="hidden" th:field="*{distanciaKm}">
+  <input type="hidden" th:field="*{tiempoEstimadoMin}">
+  <input type="hidden" th:field="*{costoTotal}">
+</div>
+
+  <!-- BOTONES DE ACCIÓN -->
+  <div class="field-row" style="margin-top:20px; display:flex; gap:10px;">
+    <a th:href="@{/cliente/dashboard}" class="btn btn-primary" style="text-decoration:none;">Cancelar</a>
+    <button type="submit" class="btn btn-dark">Guardar Cambios</button>
+  </div>
+
+        </form>
+
+</div>
+
+        <div id="mapRuta" style="height: 50vh; width: 100%; margin-top: 24px;"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="modalMapa" class="modal">
+    <div class="modal-content">
+      <h3 id="tituloMapa">Seleccionar dirección</h3>
+      <div id="mapSeleccion" style="height:400px;"></div>
+      <button class="btn btn-dark" type="button" onclick="guardarDireccion()">Guardar ubicación</button>
+      <button class="btn btn-dark" type="button" onclick="cerrarMapa()">Cancelar</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script th:src="@{/scripts/controlDepaneles.js}"></script>
+  <script th:src="@{/scripts/mapa.js}"></script>
+</body>
+
+</html>

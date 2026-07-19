@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Utc.RutaExpress.DTO.RegistroEnvioDTO;
 import com.Utc.RutaExpress.entity.Envio;
+import com.Utc.RutaExpress.entity.Paquete;
+import com.Utc.RutaExpress.entity.Usuario;
+public interface EnvioService {
 import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Repartidor;
 import com.Utc.RutaExpress.repository.EnvioRepository;
@@ -217,6 +221,17 @@ public class EnvioService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    void eliminarEnvio(Long id);
+
+    Envio registrarEnvio(Usuario remitente, RegistroEnvioDTO dto);
+    RegistroEnvioDTO obtenerDetalleEnvio(Long id);
+    Paquete buscarPaquetePorEnvioId(Long envioId);
+    
+    List<Envio> listarPorCliente(Long clienteId);
+    
+    List<Envio> listarPorDestinatario(Long destinatarioId);
+    
+    Envio actualizarEnvio(Long id, RegistroEnvioDTO dto);
     // Historial de "Ganancias": las ultimas 10 entregas completadas, mas reciente primero.
     public List<Envio> listarEntregasRecientes(Repartidor repartidor) {
         return envioRepository.findTop10ByRepartidorAndEstadoOrderByFechaEntregaDesc(
