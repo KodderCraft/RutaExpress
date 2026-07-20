@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Envío</title>
+  <link rel="stylesheet" th:href="@{/css/stilos.css}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+
+<body>
+  <div th:replace="~{componentes/header :: header}"></div>
+  <div class="app active" id="app-remitente">
+    <!-- <div th:replace="~{componentes/sidebarCliente :: sidebarCliente}"></div> -->
+    <div class="sidebar">
+
+      <div class="sidebar-title">Cliente</div>
+      <div class="nav-item " style="pointer-events: none;" onclick="none"><i data-icon="star"></i>Perfil</div>
+      <div class="sidebar-foot">
+        <div class="avatar" th:text="${#strings.substring(usuario.nombre,0,1)}">
+
+        </div>
+
+        <div class="who"><b th:text="${usuario.nombre}"></b><span th:text="${usuario.rol}"></span></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="panel active" data-panel="editar-envio">
+        <div class="topbar">
+          <div>
+            <h1>Editar Perfil</h1>
+            <div class="sub">Actualiza tus datos</div>
+          </div>
+          <div class="topbar-actions">
+            <div th:switch="${#strings.toString(usuario?.rol)}">
+              <!-- Si es ADMIN -->
+              <a th:case="'ADMIN'" class="btn btn-ghost" style="text-decoration: none;"
+                th:href="@{/admin/dashboard}">Volver al dashboard</a>
+
+              <!-- Si es REPARTIDOR -->
+              <a th:case="'REPARTIDOR'" class="btn btn-ghost" style="text-decoration: none;"
+                th:href="@{/repartidor/dashboard}">Volver al dashboard</a>
+
+              <!-- Si es CLIENTE o cualquier otro por defecto -->
+              <a th:case="*" class="btn btn-ghost" style="text-decoration: none;" th:href="@{/cliente/dashboard}">Volver
+                al dashboard</a>
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+      <div class="card">
+        <form class="grid" th:action="@{/usuario/dashboard/perfil/actulizar/{id}(id=${usuario.id})}"
+          th:object="${nuevoDto}" method="post" id="registroUsuarioForm">
+          <h4 style="margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+            Registro de Usuario
+          </h4>
+
+          <!-- SECCIÓN 1: DATOS PERSONALES -->
+          <div class="field-row">
+            <div class="field">
+              <label for="nombre">Nombre completo</label>
+              <input type="text" th:field="*{nombre}" id="nombre" placeholder="Ej. Juan Pérez" required />
+            </div>
+
+            <div class="field">
+              <label for="email">Correo electrónico</label>
+              <input type="email" th:field="*{email}" id="email" placeholder="ejemplo@correo.com" required />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="password">Contraseña</label>
+              <input type="password" th:field="*{password}" id="password" placeholder="*****" required />
+            </div>
+
+            <div class="field">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" th:field="*{telefono}" id="telefono" placeholder="09XXXXXXXX" required />
+            </div>
+          </div>
+
+          <!-- SECCIÓN 2: ROL Y DATOS DE VEHÍCULO -->
+          <div class="field-row">
+            <div class="field">
+              <label for="rol">Tipo de usuario (Rol)</label>
+              <select th:field="*{rol}" id="rol" onchange="toggleCamposRepartidor()" required>
+                <option value="CLIENTE">Cliente</option>
+                <option value="REPARTIDOR">Repartidor</option>
+                <option value="ADMINISTRADOR">Administrador</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- CAMPOS EXTRA SÓLO SI ES REPARTIDOR -->
+          <div class="field-row" id="seccionRepartidor" style="display: none;">
+            <div class="field">
+              <label for="vehiculoTipo">Tipo de vehículo</label>
+              <select th:field="*{vehiculoTipo}" id="vehiculoTipo">
+                <option value="Moto">Motocicleta</option>
+                <option value="Auto">Automóvil</option>
+                <option value="Camioneta">Camioneta</option>
+                <option value="Bicicleta">Bicicleta</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="placa">Placa del vehículo</label>
+              <input type="text" th:field="*{placa}" id="placa" placeholder="Ej. ABC-1234" />
+            </div>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN -->
+          <div class="field-row" style="margin-top: 20px; display: flex; gap: 10px;">
+            <div th:switch="${#strings.toString(usuario?.rol)}">
+    <!-- Si es ADMIN -->
+    <a th:case="'ADMIN'" class="btn btn-primary" style="text-decoration: none;" th:href="@{/admin/dashboard}">Cancelar</a>
+    
+    <!-- Si es REPARTIDOR -->
+    <a th:case="'REPARTIDOR'" class="btn btn-primary" style="text-decoration: none;" th:href="@{/repartidor/dashboard}">Cancelar</a>
+    
+    <!-- Si es CLIENTE o cualquier otro por defecto -->
+    <a th:case="*" class="btn btn-primary" style="text-decoration: none;" th:href="@{/cliente/dashboard}">Cancelar</a>
+</div>
+            <button type="submit" class="btn btn-dark">Actualizar</button>
+          </div>
+
+        </form>
+
+        <!-- <a th:href="@{/login}" class="btn btn-primary" style="text-decoration: none;">Cancelar</a> -->
+
+
+        <!-- SCRIPT PARA MOSTRAR/OCULTAR VEHÍCULO SEGÚN EL ROL SELECCIONADO -->
+        <script>
+          function toggleCamposRepartidor() {
+            const rolSelect = document.getElementById('rol');
+            const seccionRepartidor = document.getElementById('seccionRepartidor');
+
+            if (rolSelect.value === 'REPARTIDOR') {
+              seccionRepartidor.style.display = 'flex';
+            } else {
+              seccionRepartidor.style.display = 'none';
+            }
+          }
+
+          // Ejecutar al cargar por si la página vuelve con errores de validación
+          document.addEventListener('DOMContentLoaded', toggleCamposRepartidor);
+        </script>
+      </div>
+    </div>
+
+  </div>
+
+  <script th:src="@{/scripts/controlDepaneles.js}"></script>
+  <!-- <script th:src="@{/scripts/mapa.js}"></script> -->
+</body>
+
+</html>

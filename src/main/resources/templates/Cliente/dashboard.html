@@ -51,10 +51,12 @@
           </div>
           <div class="card stat-card">
             <div class="top">
-              <span></span> <div class="icon-wrap ink"><i data-icon="wallet"></i></div> 
+              <span></span> <div class="icon-wrap ink"><i data-icon="eye"></i></div> 
             </div>
-            <div class="value">$186.40</div>
-            <div class="label">Gastado este mes</div>
+            <!-- <div class="value">$186.40</div>
+            <div class="label">Gastado este mes</div> -->
+            <div class="value">Lista de Envios</div>
+            <div class="label">Envios</div>
           </div>
         
         </div>
@@ -126,15 +128,15 @@
                     <!-- Acciones -->
                     <td >
                       <div class="row-flex" style="display: flex; align-items: center; justify-content: center">
-                        <button class="btn btn-ghost btn-sm" onclick="verRuta()">Ver Ruta</button>
                         <!-- El botón "Editar" SOLO se muestra si el repartidor es nulo -->
                         <a th:if="${e.repartidor == null}" style="margin-left: 8px;text-decoration:none;"
-                          th:href="@{/cliente/envio/editar/{id}(id=${e.id})}" 
-                          class="btn btn-ghost btn-sm">
-                          Editar
-                        </a>  
+                        th:href="@{/cliente/envio/editar/{id}(id=${e.id})}" 
+                        class="btn btn-ghost btn-sm">
+                        Editar
+                      </a>  
+                      <button class="btn btn-ghost btn-sm"  th:onclick="modalAbrir([[${e.direccionEntrega.id}]],[[${e.direccionEntrega.direccionTexto}]], [[${e.direccionEntrega.latitud}]],[[${e.direccionEntrega.longitud}]] ,[[${e.direccionRecogida.id}]] , [[${e.direccionRecogida.direccionTexto}]] ,[[${e.direccionRecogida.latitud}]] , [[${e.direccionRecogida.longitud}]])" >Ver Ruta</button>
                         <!-- Enlace Eliminar con etiqueta <a> -->
-                        <a  th:if="${e.repartidor == null}" 
+                        <a  th:if="${e.repartidor == null || e.estado != entregado}" 
                           th:href="@{/cliente/envio/eliminar/{id}(id=${e.id})}" 
                           class="btn btn-coral" style="text-decoration: none;"
                           onclick="return confirm('¿Estás seguro de que deseas eliminar este envío?');">
@@ -145,18 +147,21 @@
 
                     </td>
 
+                  
+
                   </tr>
-                </tbody> <!-- 👈 Se cerró la etiqueta correctamente -->
+                </tbody>
               </table>
             </div>
           </div>
         </div>
 
+   
       </div>
 
 
       <!-- NUEVO ENVÍO -->
-      <div class="panel" data-panel="nuevo" th:classappend="${errorCss} ? 'panel active' : 'panel'">
+      <div class="panel " data-panel="nuevo" th:classappend="${errorCss} ? 'panel active' : 'panel'">
 
         <div class="topbar">
           <div >
@@ -239,7 +244,7 @@
                 </div>
               </div>
 
-              <div class="field-row">
+              <div class="field-row" style="display: none;">
                 <div class="field">
                   <label for="valorDeclarado">Valor declarado del paquete</label>
                   <input type="text" th:field="*{valorDeclarado}" placeholder="$ 0.00" readonly>
@@ -295,7 +300,7 @@
           </div>
 
           <!-- COLUMNA DERECHA: RESUMEN -->
-          <div class="card">
+          <div class="card" style="display: none; width: 20%;">
             <h3>Resumen</h3>
             <p class="hint">Zona: Centro histórico → El Vergel</p>
             <button  class="btn btn-primary" onclick="verRuta()" >
@@ -314,13 +319,17 @@
             </div>
             <div class="divider"></div>
           </div>
+        <div class="card" id="mapRuta" style="width: 100%; height: 100%; background-color: rgb(214, 213, 213);" ></div>
+
 
         </div>
 
-        <!-- Mapa con la ruta calculada (lo llena verRuta() en mapa.js). Antes vivía fuera de
-             todos los paneles (hijo directo de .main), así que se veía SIEMPRE sin importar
-             la pestaña activa; ahora queda dentro de "nuevo", que es donde tiene sentido. -->
-        <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div>
+
+        <!-- <div id="mapRuta" style="height:60vh; width: 100%; margin-top: 16px;"></div> -->
+  <!-- modal-overlay open -->
+
+       
+        
       </div>
 
 
@@ -335,7 +344,6 @@
 
         <div class="grid">
           <div class="card">
-            <h3>Envíos por recibir</h3>
             <p class="hint">Seguimiento de los paquetes que te están enviando</p>
 
             <div class="table-wrap">
@@ -389,72 +397,7 @@
         </div>
       </div>
 
-      <!-- RASTREAR -->
-      <div class="panel" data-panel="rastrear">
-        <div class="topbar">
-          <div>
-            <h1>Rastrear un paquete</h1>
-            <div class="sub">Ingresa el código de guía para ver el estado en vivo</div>
-          </div>
-        </div>
-        <div class="card" style="margin-bottom:16px;">
-          <div style="display:flex;gap:10px;">
-            <input class="mono" value="SE-48213" style="max-width:220px;">
-            <button class="btn btn-primary">Rastrear</button>
-          </div>
-        </div>
-        <div class="grid two-col">
-          <div class="card">
-            <h3>Estado del envío</h3>
-            <div class="route-tracker">
-              <div class="step done">
-                <div class="dot"><i data-icon="check"></i></div>
-                <div class="label">Recogido</div>
-                <div class="time">9:10 a.m.</div>
-              </div>
-              <div class="step done">
-                <div class="dot"><i data-icon="check"></i></div>
-                <div class="label">En bodega</div>
-                <div class="time">10:40 a.m.</div>
-              </div>
-              <div class="step current">
-                <div class="dot"><i data-icon="truck"></i></div>
-                <div class="label">En reparto</div>
-                <div class="time">Ahora</div>
-              </div>
-              <div class="step">
-                <div class="dot"><i data-icon="mapPin"></i></div>
-                <div class="label">Entregado</div>
-                <div class="time">Est. 3:30 p.m.</div>
-              </div>
-            </div>
-            <div class="mapbox">
-              <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 160 C 100 40, 180 190, 260 60 S 380 40, 385 30" stroke="#B9C3DE" stroke-width="3"
-                  fill="none" stroke-dasharray="6 8" />
-                <circle cx="20" cy="160" r="6" fill="#0E8C7F" />
-                <circle cx="385" cy="30" r="6" fill="#E7495A" />
-                <circle cx="230" cy="95" r="9" fill="#FF9F1C" />
-              </svg>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Tu repartidor</h3>
-            <div class="row-flex" style="margin-bottom:14px;">
-              <div class="avatar" style="background:var(--ink-3);color:#fff;">JT</div>
-              <div><b>Jorge Torres</b>
-                <div style="color:var(--mute);font-size:.8rem;">⭐ 4.9 · Moto · 812 entregas</div>
-              </div>
-            </div>
-            <button class="btn btn-ghost btn-block" style="margin-bottom:8px;"><i data-icon="phone"></i>Llamar</button>
-            <button class="btn btn-ghost btn-block"><i data-icon="bell"></i>Enviar mensaje</button>
-            <div class="divider"></div>
-            <p class="hint" style="margin-bottom:8px;">Cuando se entregue, podrás calificar el servicio:</p>
-            <div class="stars"><i data-icon="star"></i><i data-icon="star"></i><i data-icon="star"></i><i
-                data-icon="star"></i><i data-icon="star"></i></div>
-          </div>
-        </div>
-      </div>
+      
 
       <!-- PAGOS -->
       <div class="panel" data-panel="pagos">
@@ -504,8 +447,10 @@
       <h3 id="tituloMapa">Seleccionar dirección</h3>
 
       <div id="mapSeleccion" style="height:400px;"></div>
+      <!-- <div id="mapa2" style="height:400px;"></div> -->
 
       <button class="btn btn-dark" onclick="guardarDireccion()">
+      <!-- <button class="btn btn-dark" onclick="guarCe()"> -->
         Guardar Ubicacion
       </button>
 
@@ -591,21 +536,66 @@
   </dialog>
 
 
+    <div class="modal-overlay" id="mpmodal" style=" flex-direction: row;  width: 100%; padding: 20px; gap: 20px;">
+  <div class="card" style="width: 28%; height: 100%; overflow-y: auto; scroll-behavior: smooth; min-height: 0; padding-right: 10px;">
+    <button class="btn btn-primary" onclick="modalCerrar()" id="mpmodal">cerra</button>  
+
+    <label>Ciudad origen</label>
+    <select id="origenSelect">
+      <option value="">Seleccione...</option>
+    </select>
+    
+    <div class="divider"></div>
+    
+    <h3>Ciudades intermedias</h3>
+    <div id="contenedorParadas"></div>
+    
+    <button class="btn btn-dark btn-block" type="button" onclick="agregarParada()">
+      + Agregar ciudad
+    </button>
+    
+    <div class="divider"></div>
+    
+    <label>Ciudad destino</label>
+    <select id="destinoSelect">
+      <option value="">Seleccione...</option>
+    </select>
+    
+    <br><br>
+    
+    <button class="btn btn-teal btn-block" onclick="calcularRuta()">
+      Calcular Ruta
+    </button>
+
+    <div id="panelDetalles" style="padding: 15px; background-color: var(--paper); border-left: 5px solid var(--coral); border-radius: 6px; display: none; box-shadow: var(--shadow); margin-top: 15px;">
+    </div>
+
+  
+  </div>
+  
+  <!-- Mapa -->
+  <div class="card" id="map" style="height: 85vh; width: 70%; padding: 0;"></div>
+
+
+</div>
 
 
   <!-- <div th:replace="~{componentes/footer :: footer}" ></div> -->
 </body>
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script th:inline="javascript">
+
+<script th:src="@{/scripts/controlDepaneles.js}"></script>
+<script th:src="@{/scripts/grafo/grafo.js}"></script>
+<script th:src="@{/scripts/mapa.js}"></script>
+<!-- <script th:src="@{/scripts/rp.js}"></script> -->
+</script>
+<script th:inline="javascript" >
   // Tarifas reales (precio por km según tipo de servicio), traídas desde la BD, para que
   // el precio que se muestra en pantalla (mapa.js) coincida con el que cobra el backend.
   window.TARIFAS_POR_KM = /*[[${tarifasPorKm}]]*/ { estandar: 0.10, express: 0.25, prioritario: 0.50 };
-</script>
-<script th:src="@{/scripts/controlDepaneles.js}"></script>
-<script th:src="@{/scripts/mapa.js}"></script>
-<script th:inline="javascript" >
-
-// function clearForm(){
+  
+  // function clearForm(){
   
 //   alert("Limpiar");
 
@@ -620,6 +610,7 @@
 // }
 </script>
 
-<!-- <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&libraries=places"></script> -->
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCi9CM2_jUzbNYi_dLavAwAOWVRV38SLtY&callback=cargarCiudades"></script>
+<!-- <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCT1LFbTIGvaD6gzNPuIl_zzMraNpi-RLg&callback=cargarCiudades"> </script> -->
 
 </html>

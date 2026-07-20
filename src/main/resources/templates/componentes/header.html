@@ -92,7 +92,7 @@
                     Mi perfil
                 </a>
 
-                <a th:href="@{#}">Configuración</a>
+                <a th:href="@{/usuario/dashboard/perfil/editar/{id}(id=${session.usuario.id})}">Configuración</a>
                 <a th:href="@{#}">Preguntas frecuentes</a>
 
                 <hr>

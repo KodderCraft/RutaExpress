@@ -64,11 +64,13 @@ async function initMap(){
     });
 }
 
-async function calcularRuta(){
-    if(origen == null || destino == null){
-        alert("Seleccione una ciudad de origen y una de destino.");
-        return;
-    }
+
+async function calcularRuta(orid , orcalle, orlat , orlng ,finid, ficalle,  filat , filng){
+
+        if(origen == null || destino == null){
+            origen = { id: Number(orid), latitud: parseFloat(orlat), longitud: parseFloat(orlng)};
+            destino = { id: Number(finid), latitud: parseFloat(filat), longitud: parseFloat(filng)};
+        }
 
     const idsParadas = paradas
         .filter(p => p != null)
@@ -219,7 +221,7 @@ function renderizarParadas(){
             <select id="parada${indice}">
                 <option value="">Seleccione...</option>
             </select>
-            <button type="button" onclick="eliminarParada(${indice})">
+            <button class="btn btn-coral" type="button" onclick="eliminarParada(${indice})">
                 Eliminar
             </button>
         `;

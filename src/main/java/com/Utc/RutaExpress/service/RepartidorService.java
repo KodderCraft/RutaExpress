@@ -20,6 +20,7 @@ public class RepartidorService {
         return repartidorRepository.save(repartidor);
     }
 
+
     public Optional<Repartidor> buscarPorUsuarioId(Long usuarioId){
         return repartidorRepository.findByUsuario_Id(usuarioId);
     }

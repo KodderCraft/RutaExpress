@@ -12,4 +12,6 @@ public interface RepartidorRepository extends JpaRepository<Repartidor, Long> {
 
     Optional<Repartidor> findByUsuario_Id(Long usuarioId);
     
+    
+
 }

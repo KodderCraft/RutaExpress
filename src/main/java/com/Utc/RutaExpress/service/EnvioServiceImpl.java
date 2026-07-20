@@ -89,6 +89,7 @@ public class EnvioServiceImpl implements EnvioService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
         envioRepository.deleteById(id);
     }
@@ -123,14 +124,14 @@ Envio envio = envioRepository.findById(id)
         System.out.println("Direccion de recogida creada: " + recogida.getDireccionTexto() + " (Lat: " + recogida.getLatitud() + ", Lon: " + recogida.getLongitud() + ")");
         Direccion entrega = crearDireccion(dto.getDireccionEntrega(), dto.getLatitudEntrega(), dto.getLongitudEntrega());
         System.out.println("Direccion de entrega creada: " + entrega.getDireccionTexto() + " (Lat: " + entrega.getLatitud() + ", Lon: " + entrega.getLongitud() + ")");
-
-        Usuario destinatario = obtenerOCrearDestinatario(dto.getNombreDestinatario(), dto.getTelefonoDestinatario());
+        String nombreLimpio = dto.getNombreDestinatario().trim();
+        Usuario remitenteData = usuarioRepository.findBynombre(nombreLimpio).orElseThrow();
         Tarifa tarifa = obtenerTarifaPorTipo(dto.getTipoServicio());
 
         Envio envio = new Envio();
         envio.setCodigoGuia(generarCodigoGuia());
         envio.setRemitente(remitente);
-        envio.setDestinatario(destinatario);
+        envio.setDestinatario(remitenteData);
         envio.setDireccionRecogida(recogida);
         envio.setDireccionEntrega(entrega);
         envio.setTarifa(tarifa);
@@ -296,21 +297,6 @@ Envio envio = envioRepository.findById(id)
         return direccionRepository.save(direccion);
     }
 
-    private Usuario obtenerOCrearDestinatario(String nombre, String telefono) {
-        Usuario existente = usuarioRepository.findByNombreAndTelefono(nombre, telefono).orElse(null);
-        if (existente != null) {
-            return existente;
-        }
-
-        Usuario destinatario = new Usuario();
-        destinatario.setNombre(nombre);
-        destinatario.setEmail(generarEmailTemporal(nombre));
-        destinatario.setPassword("temp123");
-        destinatario.setTelefono(telefono);
-        destinatario.setRol(Rol.CLIENTE);
-        return usuarioRepository.save(destinatario);
-    }
-
     // precioBase se usa como tarifa por kilómetro según el tipo de servicio elegido
     // (ver calcularCostoPorDistancia): estandar/express/prioritario cobran distinto por km.
     private static final Map<String, BigDecimal> PRECIO_POR_KM_POR_TIPO = Map.of(
@@ -376,6 +362,10 @@ Envio envio = envioRepository.findById(id)
         }
         if (esVacio(dto.getDireccionEntrega()) || dto.getLatitudEntrega() == null || dto.getLongitudEntrega() == null) {
             throw new IllegalArgumentException("La dirección de entrega y sus coordenadas son obligatorias");
+        }
+        if (!usuarioRepository.existsByNombre(dto.getNombreDestinatario())){
+            throw new IllegalArgumentException("Usuario destino No encontrado");
+           
         }
         if (esVacio(dto.getDescripcion())) {
             throw new IllegalArgumentException("El paquete y la descripción del paquete son obligatorias");

@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 import com.Utc.RutaExpress.DTO.RegistroEnvioDTO;
 import com.Utc.RutaExpress.entity.Envio;
+import com.Utc.RutaExpress.entity.EstadoEnvio;
 import com.Utc.RutaExpress.entity.Paquete;
 import com.Utc.RutaExpress.entity.Usuario;
 import com.Utc.RutaExpress.service.EnvioServiceImpl;
@@ -55,7 +56,7 @@ public String registrarEnvio(@ModelAttribute("envioDTO") RegistroEnvioDTO regist
         // Si todo está correcto, guardamos en la base de datos:
         envioServiceImpl.registrarEnvio(usuarioSesion, registroEnvioDTO);
 
-        //  ¡ÉXITO! Aquí sí destruimos los datos de la sesión porque ya se guardaron
+        //  Aquí sí destruimos los datos de la sesión porque ya se guardaron
         session.removeAttribute("formularioGuardado");
         
         flash.addFlashAttribute("successMessage", "Envío registrado con éxito.");
@@ -66,6 +67,8 @@ public String registrarEnvio(@ModelAttribute("envioDTO") RegistroEnvioDTO regist
         // Mientras el usuario no corrija el error, este DTO se quedará congelado en la sesión
         // permitiendo hacer 1, 5 o 50 F5 seguidos sin perder absolutamente nada.
         session.setAttribute("formularioGuardado", registroEnvioDTO);
+
+        
         
         flash.addFlashAttribute("errorMessage", "Error: " + ex.getMessage());
         flash.addFlashAttribute("errorCss", true);
@@ -102,9 +105,15 @@ public String registrarEnvio(@ModelAttribute("envioDTO") RegistroEnvioDTO regist
             envioServiceImpl.actualizarEnvio(id, dto);
     return "redirect:/cliente/dashboard";
 }
+    
     @GetMapping("/cliente/envio/eliminar/{id}")
     public String eliminarEnvio(@PathVariable("id") Long id , Model model) {
-        envioServiceImpl.eliminarEnvio(id);
+        Paquete d = envioServiceImpl.buscarPaquetePorEnvioId(id);
+
+        if(d.getEnvio().getEstado().equals(EstadoEnvio.ENTREGADO)){
+        }
+        envioServiceImpl.eliminar(id);
+        
         try{
             model.addAttribute("successMessage", "Por favor completa todos los campos obligatorios del envío y del paquete.");
         } catch (Exception e) {
@@ -115,5 +124,6 @@ public String registrarEnvio(@ModelAttribute("envioDTO") RegistroEnvioDTO regist
         return "redirect:/cliente/dashboard";
    }
 
+    
 }
 

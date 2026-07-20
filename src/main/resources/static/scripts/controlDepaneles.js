@@ -144,6 +144,57 @@
     });
   });
 
+
+ function modalAbrir(orid ,calleInicio, orlat , orlng ,finid, calleFin ,filat , filng) {
+
+
+  var mp = document.getElementById("mpmodal");
+  var mpInicio = document.getElementById("origenSelect");
+  var mpFin = document.getElementById("destinoSelect");
+  // 1. Buscar y seleccionar ORIGEN
+  if (mpInicio && calleInicio) {
+    var txtInicio = String(calleInicio).trim().toLowerCase();
+    for (var i = 0; i < mpInicio.options.length; i++) {
+      var optTxt = mpInicio.options[i].text.trim().toLowerCase();
+      var optVal = mpInicio.options[i].value.trim().toLowerCase();
+
+      if (optTxt === txtInicio || optVal === txtInicio) {
+        mpInicio.selectedIndex = i;
+        break;
+      }
+    }
+  }
+
+  // 2. Buscar y seleccionar DESTINO
+  if (mpFin && calleFin) {
+    var txtFin = String(calleFin).trim().toLowerCase();
+    for (var j = 0; j < mpFin.options.length; j++) {
+      var optTxtFin = mpFin.options[j].text.trim().toLowerCase();
+      var optValFin = mpFin.options[j].value.trim().toLowerCase();
+
+      if (optTxtFin === txtFin || optValFin === txtFin) {
+        mpFin.selectedIndex = j;
+        break;
+      }
+    }
+  }
+    
+
+  calcularRuta(orid, calleInicio, orlat , orlng ,finid, calleFin,  filat , filng)
+  // 3. Abrir modal
+  if (mp) {
+    mp.classList.add('open');
+  }
+
+}
+  
+  function modalCerrar(){
+    var mp = document.getElementById("mpmodal");
+    
+    mp.classList.remove('open')
+  }
+
+
   // Quote reveal
   function showQuote(){
     document.getElementById('quoteCard').style.display = 'block';

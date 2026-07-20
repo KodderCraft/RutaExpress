@@ -3,7 +3,8 @@ package com.Utc.RutaExpress.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 @Entity
 @Table(name = "envios")
 public class Envio {
@@ -38,12 +39,18 @@ public class Envio {
     @JoinColumn(name = "tarifa_id")
     private Tarifa tarifa;
 
+    @OneToMany(mappedBy = "envio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Paquete> paquetes = new ArrayList<>();
+
     private String tipoServicio;
 
     @Enumerated(EnumType.STRING)
     private EstadoEnvio estado;
 
     private BigDecimal costoTotal;
+
+    @OneToOne(mappedBy = "envio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Pago pago;
 
     // Quién paga el envío: "REMITENTE" (prepagado por quien envía) o "DESTINATARIO"
     // (pago contra entrega, lo cobra el repartidor al entregar).

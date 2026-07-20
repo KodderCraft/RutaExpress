@@ -18,6 +18,7 @@ import java.util.Optional;
 public interface EnvioRepository extends JpaRepository<Envio, Long> {
     List<Envio> findByDestinatarioId(Long destinatarioId);
     List<Envio> findByRemitenteId(Long remitenteId);
+    Optional<Envio> findByIdAndRepartidor(Long id, Repartidor repartidor);
 
     
     @Modifying
@@ -27,7 +28,6 @@ public interface EnvioRepository extends JpaRepository<Envio, Long> {
             @Param("fecha") LocalDateTime fecha, @Param("fechaLimite") LocalDateTime fechaLimite);
     List<Envio> findByEstadoAndRepartidorIsNull(EstadoEnvio estado);
 
-    Optional<Envio> findByIdAndRepartidor(Long id, Repartidor repartidor);
 
     long countByRepartidorAndFechaAsignacionBetween(Repartidor repartidor, LocalDateTime inicio, LocalDateTime fin);
 

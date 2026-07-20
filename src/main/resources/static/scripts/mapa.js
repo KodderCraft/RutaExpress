@@ -1,5 +1,3 @@
-
-
 let mapaSeleccion = null;
 
 let mapaRuta = null;
@@ -11,7 +9,8 @@ let tipoDireccion = "";
 let direccionSeleccionada = "";
 let puntoRecogida = null;
 let puntoEntrega = null;  
-let lineaRuta = null;
+let lineaRutaa = null;
+
 
 function abrirMapa(tipo){
 
@@ -42,12 +41,11 @@ function crearMapaSeleccion(){
     }
 
 
-    mapaSeleccion = L.map('mapSeleccion')
+   mapaSeleccion = L.map('mapSeleccion')
     .setView(
-        [-2.90055,-79.00453],
-        14
-    );
-
+        [-0.93333, -78.61667], // Coordenadas del centro de Latacunga, Cotopaxi
+        7                      // Zoom idóneo para abarcar casi todo el Ecuador
+    ) 
 
     L.tileLayer(
         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -245,16 +243,16 @@ function verRuta() {
       let coordenadas = data.routes[0].geometry.coordinates;
       let puntos = coordenadas.map(p => [p[1], p[0]]);
 
-      if (lineaRuta) {
-        mapaRuta.removeLayer(lineaRuta);
+      if (lineaRutaa) {
+        mapaRuta.removeLayer(lineaRutaa);
       }
 
-      lineaRuta = L.polyline(puntos, {
+      lineaRutaa = L.polyline(puntos, {
         color: "blue",
         weight: 5
       }).addTo(mapaRuta);
 
-      mapaRuta.fitBounds(lineaRuta.getBounds());
+      mapaRuta.fitBounds(lineaRutaa.getBounds());
 
 
       let rutaData = data.routes[0];

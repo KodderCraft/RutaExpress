@@ -37,6 +37,9 @@ public class UsuarioService {
         return null;
     }
     
+    public Usuario buscarUsuario(Long id){
+        return usuarioRepository.findById(id).orElseThrow(null);
+    }
     
 
 }

@@ -40,6 +40,11 @@ h1 {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.contenedor-grafo{
+    height: 60vh;
+    width: 90%;
+}
+
 /* Estilo para donde vayas a pintar tu Grafo o Mapa */
 #mapa-grafo {
     width: 100%;
